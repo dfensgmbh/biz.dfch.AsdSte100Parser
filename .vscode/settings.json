@@ -1,0 +1,31 @@
+{
+    "python.defaultInterpreterPath": "C:\\Program Files\\Python311\\python.exe",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8",
+    },
+    "editor.formatOnSave": true,
+    "autopep8.args": [
+        "--max-line-length=80"
+    ],
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.extraPaths": [
+        "src"
+    ],
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "tests",
+        "-t",
+        ".",
+        "-p",
+        "test_*.py"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "cSpell.words": [
+        "NOSONAR"
+    ]
+}
