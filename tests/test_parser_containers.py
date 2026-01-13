@@ -24,8 +24,8 @@ import unittest
 from lark import Transformer, Tree
 from parameterized import parameterized
 
-from src.grammar_type import GrammarType
-from src.parser import Parser
+from grammar.grammar_type import GrammarType
+from biz.dfch.ste100parser.parser import Parser
 
 
 class Phrase(StrEnum):

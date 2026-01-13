@@ -13,4 +13,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""tests module."""
+"""
+tests module.
+
+This folder contains the tests for the biz.dfch.ste100parser package.
+
+root
+    + src
+        + biz
+            + dfch
+                + ste100parser
+                    a_thing.py
+    + tests  # -- > ste100parser
+        test_a_thing.py
+"""

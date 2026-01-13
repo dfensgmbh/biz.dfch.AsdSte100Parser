@@ -19,7 +19,7 @@ from pathlib import Path
 
 from lark import Lark, ParseTree
 
-from .grammar_type import GrammarType
+from .grammar.grammar_type import GrammarType
 
 
 class Parser:

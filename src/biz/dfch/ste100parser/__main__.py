@@ -14,3 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """__main__"""
+
+
+def main():
+    """main function."""
+    print("ste100parser")
+
+
+if __name__ == "__main__":
+    main()
