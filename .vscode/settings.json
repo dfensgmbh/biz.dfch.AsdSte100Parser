@@ -26,6 +26,9 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "cSpell.words": [
-        "NOSONAR"
+        "dquote",
+        "emph",
+        "NOSONAR",
+        "squote"
     ]
 }
