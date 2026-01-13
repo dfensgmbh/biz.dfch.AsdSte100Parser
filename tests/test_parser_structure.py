@@ -16,14 +16,14 @@
 # pylint: disable=C0116
 # type: ignore
 
-"""test_parser_containers"""
+"""test_parser_structure"""
 
 from enum import StrEnum
 import unittest
 
-from lark import Transformer
 from parameterized import parameterized
 
+from biz.dfch.ste100parser.transformer.transformer_base import TransformerBase
 from biz.dfch.ste100parser import Parser, GrammarType
 from biz.dfch.ste100parser.transformer import ContainersTransformer
 from biz.dfch.ste100parser.renderer import ContainersRenderer
@@ -36,17 +36,6 @@ class Phrase(StrEnum):
     SQUOTE = """This is 'quoted text'."""
 
 
-class TransformerBase(Transformer):
-    """TransformerBase"""
-
-    def __default__(self, data, children, meta):
-        # data = the rule name (e.g., "squote", "bold", "emph")
-        # children = the list of children
-        # meta = metadata (line/column info)
-
-        print(f"__default__ caught: {data}")
-
-
 class MyTransformer(TransformerBase):
     """MyTransformer"""
 
@@ -56,18 +45,18 @@ class MyTransformer(TransformerBase):
             print(f"#{i}: '{child}' [{type(child)}]")
 
 
-class TestParserContainers(unittest.TestCase):
-    """TestParserContainers"""
+class TestParserStructure(unittest.TestCase):
+    """TestParserStructure"""
 
     sut: Parser
 
     def setUp(self):
-        self.sut = Parser(GrammarType.CONTAINERS)
+        self.sut = Parser(GrammarType.STRUCTURE)
 
     def test_and_display(self):
 
         value = """'I *can* _quote_ *_opening_* `parentheses` "(" and ")".'"""
-        self.sut = Parser(GrammarType.CONTAINERS)
+        self.sut = Parser(GrammarType.STRUCTURE)
 
         try:
             result = self.sut.invoke(value)
@@ -82,7 +71,7 @@ class TestParserContainers(unittest.TestCase):
     def test_dquote_start(self):
 
         value = '''"This, is a-dquote" at the start of a text.'''
-        self.sut = Parser(GrammarType.CONTAINERS)
+        self.sut = Parser(GrammarType.STRUCTURE)
 
         try:
             tree0 = self.sut.invoke(value)
@@ -106,7 +95,7 @@ class TestParserContainers(unittest.TestCase):
     def test_dquote_start2(self):
 
         value = '''"This is a dquote" at the start of a text.'''
-        self.sut = Parser(GrammarType.CONTAINERS)
+        self.sut = Parser(GrammarType.STRUCTURE)
 
         try:
             result = self.sut.invoke(value)

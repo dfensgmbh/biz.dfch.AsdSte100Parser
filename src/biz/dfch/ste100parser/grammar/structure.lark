@@ -1,17 +1,17 @@
-# Copyright (C) 2026 Ronald Rink, d-fens GmbH, http://d-fens.ch
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// Copyright (C) 2026 Ronald Rink, d-fens GmbH, http://d-fens.ch
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // grammar.lark
 // Inline markup grammar (strict; preserves whitespace; multiline quotes allowed)
@@ -28,6 +28,8 @@
        | dquote
        | squote
        | TEXT
+       | APOSTROPHE
+       | YEAR_SHORT
 
 // ---------- Containers ----------
 dquote: DQUOTE dquote_item* DQUOTE
@@ -39,6 +41,8 @@ dquote: DQUOTE dquote_item* DQUOTE
             | emph
             | squote      // allow '...' inside "..."
             | TEXT
+            | APOSTROPHE
+            | YEAR_SHORT
 
 squote: SQUOTE squote_item* SQUOTE
 ?squote_item: WS
@@ -49,6 +53,8 @@ squote: SQUOTE squote_item* SQUOTE
             | emph
             | dquote      // allow "..." inside '...'
             | TEXT
+            | APOSTROPHE
+            | YEAR_SHORT
 
 bold: STAR bold_item* STAR
 ?bold_item: WS
@@ -59,6 +65,8 @@ bold: STAR bold_item* STAR
           | squote
           | bold_emph
           | TEXT
+          | APOSTROPHE
+          | YEAR_SHORT
 
 emph: UNDER emph_item* UNDER
 ?emph_item: WS
@@ -69,6 +77,8 @@ emph: UNDER emph_item* UNDER
           | squote
           | bold_emph
           | TEXT
+          | APOSTROPHE
+          | YEAR_SHORT
 
 bold_emph: BOLD_EMPH_OPEN bold_emph_item* BOLD_EMPH_CLOSE
 ?bold_emph_item: WS
@@ -79,13 +89,21 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item* BOLD_EMPH_CLOSE
                | dquote
                | squote
                | TEXT
+               | APOSTROPHE
+               | YEAR_SHORT
 
 // ---------- Code (literal until ending backtick) ----------
 code: CODE
 
 // ---------- Terminals ----------
-// Highest priority: code, so delimiters inside code are not parsed
-CODE.20: /`[^`]*`/
+// Highest priority: code and year abbreviations
+CODE.40: /`[^`]*`/
+YEAR_SHORT.40: /'\d{2}s?(?=[\s.,!?;:]|$)/
+
+// Apostrophes (possessives, decades like 1990's)
+// Matches ' or 's if preceded by alphanumeric
+// and followed by space, punctuation, or end of string
+APOSTROPHE.30: /(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)/
 
 // Make "*_" and "_*" single tokens so they don't split into STAR/UNDER
 BOLD_EMPH_OPEN.10: "*_"
