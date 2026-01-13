@@ -13,9 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-start: (uint | int)
+start: QUOTED_TEXT
 
-?digit: "0" .. "9"
-?digit_non_zero: "1" .. "9"
-uint: digit+
-int: ( "-"? | "+"? ) uint
+D_QUOTE_START: '"'
+S_QUOTE: "'"
+
+QUOTED_TEXT: ALPHA+
+    | ALPHA+ HYPHEN ALPHA+
+    | ALPHA+ HYPHEN ALPHA+ HYPHEN ALPHA+

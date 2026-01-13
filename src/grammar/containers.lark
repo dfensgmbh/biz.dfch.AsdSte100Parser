@@ -1,0 +1,105 @@
+// Copyright (c) 2026 d-fens GmbH, http://d-fens.ch
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// grammar.lark
+// Inline markup grammar (strict; preserves whitespace; multiline quotes allowed)
+
+?start: inline*
+
+// ---------- Top-level inline stream ----------
+?inline: WS
+       | NEWLINE
+       | code
+       | bold_emph
+       | bold
+       | emph
+       | dquote
+       | squote
+       | TEXT
+
+// ---------- Containers ----------
+dquote: DQUOTE dquote_item* DQUOTE
+?dquote_item: WS
+            | NEWLINE
+            | code
+            | bold_emph
+            | bold
+            | emph
+            | squote      // allow '...' inside "..."
+            | TEXT
+
+squote: SQUOTE squote_item* SQUOTE
+?squote_item: WS
+            | NEWLINE
+            | code
+            | bold_emph
+            | bold
+            | emph
+            | dquote      // allow "..." inside '...'
+            | TEXT
+
+bold: STAR bold_item* STAR
+?bold_item: WS
+          | NEWLINE
+          | code
+          | emph         // bold can contain emphasis
+          | dquote
+          | squote
+          | bold_emph
+          | TEXT
+
+emph: UNDER emph_item* UNDER
+?emph_item: WS
+          | NEWLINE
+          | code
+          | bold         // emphasis can contain bold
+          | dquote
+          | squote
+          | bold_emph
+          | TEXT
+
+bold_emph: BOLD_EMPH_OPEN bold_emph_item* BOLD_EMPH_CLOSE
+?bold_emph_item: WS
+               | NEWLINE
+               | code
+               | bold
+               | emph
+               | dquote
+               | squote
+               | TEXT
+
+// ---------- Code (literal until ending backtick) ----------
+code: CODE
+
+// ---------- Terminals ----------
+// Highest priority: code, so delimiters inside code are not parsed
+CODE.20: /`[^`]*`/
+
+// Make "*_" and "_*" single tokens so they don't split into STAR/UNDER
+BOLD_EMPH_OPEN.10: "*_"
+BOLD_EMPH_CLOSE.10: "_*"
+
+// Delimiter tokens
+DQUOTE: "\""
+SQUOTE: "'"
+STAR: "*"
+UNDER: "_"
+
+// Whitespace preserved (not ignored)
+WS: /[ \t]+/
+NEWLINE: /\r?\n/
+
+// Any run of characters that is not a delimiter or whitespace/newline
+TEXT: /[^"'*_`\s]+/

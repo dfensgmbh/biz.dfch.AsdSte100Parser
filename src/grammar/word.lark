@@ -13,9 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-start: (uint | int)
+start: WORD
 
-?digit: "0" .. "9"
-?digit_non_zero: "1" .. "9"
-uint: digit+
-int: ( "-"? | "+"? ) uint
+HYPHEN: "-"
+
+CHAR_UPPER: "A".."Z"
+CHAR_LOWER: "a".."z"
+DIGIT: "0".."9"
+ALPHA: CHAR_UPPER
+    | CHAR_LOWER
+    | DIGIT
+
+WORD: ALPHA+
+    | ALPHA+ HYPHEN ALPHA+
+    | ALPHA+ HYPHEN ALPHA+ HYPHEN ALPHA+
