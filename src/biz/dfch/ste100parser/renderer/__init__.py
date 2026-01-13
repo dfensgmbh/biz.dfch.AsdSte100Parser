@@ -13,14 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""biz.dfch.ste100parser package root"""
+"""interpreter module."""
 
-from .parser import Parser
-from .grammar import GrammarType
-from .char import Char
+from .containers_renderer import ContainersRenderer
 
 __all__ = [
-    "Parser",
-    "GrammarType",
-    "Char",
+    "ContainersRenderer",
 ]

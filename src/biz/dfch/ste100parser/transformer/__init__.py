@@ -14,3 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """transformer module."""
+
+from .containers_transformer import ContainersTransformer
+
+__all__ = [
+    "ContainersTransformer",
+]

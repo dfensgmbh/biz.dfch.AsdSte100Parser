@@ -13,14 +13,38 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""biz.dfch.ste100parser package root"""
+# pylint: disable=C0116
+# type: ignore
 
-from .parser import Parser
-from .grammar import GrammarType
-from .char import Char
+"""char enum."""
+
+from enum import StrEnum
 
 __all__ = [
-    "Parser",
-    "GrammarType",
     "Char",
 ]
+
+
+class Char(StrEnum):
+    """Character definitions."""
+
+    EMPTY = ''
+    BLANK = ' '
+
+    DQUOTE = '"'
+    SQUOTE = "'"
+
+    COMMA = '.'
+    DOT = '.'
+    EXCLAMATION = '!'
+    QUESTION = '?'
+    COLON = ':'
+
+    PAREN_OPEN = '('
+    PAREN_CLOSE = ')'
+
+    STAR = '*'
+    UNDERLINE = '_'
+    BACKTICK = '`'
+    BOLD_ITALIC_OPEN = '*_'
+    BOLD_ITALIC_CLOSE = '_*'

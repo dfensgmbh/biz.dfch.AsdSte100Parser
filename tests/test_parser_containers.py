@@ -21,10 +21,12 @@
 from enum import StrEnum
 import unittest
 
-from lark import Transformer, Tree
+from lark import Transformer
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import Parser, GrammarType
+from biz.dfch.ste100parser.transformer import ContainersTransformer
+from biz.dfch.ste100parser.renderer import ContainersRenderer
 
 
 class Phrase(StrEnum):
@@ -78,6 +80,30 @@ class TestParserContainers(unittest.TestCase):
             self.fail(ex)
 
     def test_dquote_start(self):
+
+        value = '''"This, is a-dquote" at the start of a text.'''
+        self.sut = Parser(GrammarType.CONTAINERS)
+
+        try:
+            tree0 = self.sut.invoke(value)
+            print(tree0.pretty())
+
+            tree1 = ContainersTransformer().transform(tree0)
+            print(tree1.pretty())
+
+            tree2 = ContainersRenderer().transform(tree1)
+            print(tree2.pretty())
+
+            result = ''.join(tree2.children)
+            self.assertEqual(value, result)
+
+            tree0 = self.sut.is_valid(value)
+            self.assertTrue(tree0)
+
+        except Exception as ex:  # pylint: disable=W0718
+            self.fail(ex)
+
+    def test_dquote_start2(self):
 
         value = '''"This is a dquote" at the start of a text.'''
         self.sut = Parser(GrammarType.CONTAINERS)
