@@ -22,8 +22,7 @@ import unittest
 
 from parameterized import parameterized
 
-from grammar.grammar_type import GrammarType
-from biz.dfch.ste100parser.parser import Parser
+from biz.dfch.ste100parser import Parser, GrammarType
 
 
 class TestParserNumber(unittest.TestCase):
