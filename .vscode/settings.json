@@ -29,6 +29,8 @@
         "dquote",
         "emph",
         "NOSONAR",
+        "pylint",
+        "PYTHONPATH",
         "squote"
     ]
 }
