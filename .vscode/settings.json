@@ -26,11 +26,13 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "cSpell.words": [
+        "dfch",
         "dquote",
         "emph",
         "NOSONAR",
         "pylint",
         "PYTHONPATH",
-        "squote"
+        "squote",
+        "venv"
     ]
 }
