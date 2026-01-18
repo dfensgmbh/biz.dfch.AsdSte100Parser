@@ -18,98 +18,99 @@
 
 ?start: inline*
 
+// Single line text elements.
+?common_text: TEXT
+    | APOSTROPHE
+    | PLURAL_S
+    | YEAR_SHORT
+    | MULTIPLY
+
+// Single line pair-wise formatting containers.
+?format_containers: bold
+    | emph
+    | bold_emph
+
+// Single line pair-wise quoting containers.
+?quote_containers: dquote
+    | squote
+
 // ---------- Top-level inline stream ----------
 ?inline: WS
-       | NEWLINE
-       | code
-       | bold_emph
-       | bold
-       | emph
-       | dquote
-       | squote
-       | cite
-       | TEXT
-       | MULTIPLY
-       | APOSTROPHE
-       | PLURAL_S
-       | YEAR_SHORT
+    | NEWLINE
+    | format_containers
+    | code
+    | quote_containers
+    | cite
+    | paren
+    | paren_sl
+    | common_text
 
 // ---------- Containers ----------
+
+// Single line container.
 dquote: DQUOTE dquote_item* DQUOTE
 ?dquote_item: WS
-            // | NEWLINE
-            | code
-            | bold_emph
-            | bold
-            | emph
-            | squote      // allow '...' inside "..."
-            | MULTIPLY
-            | TEXT
-            | APOSTROPHE
-            | PLURAL_S
-            | YEAR_SHORT
+    | format_containers
+    | code
+    | squote
+    | paren_sl
+    | common_text
 
+// Single line container.
 squote: SQUOTE squote_item* SQUOTE
 ?squote_item: WS
-            // | NEWLINE
-            | code
-            | bold_emph
-            | bold
-            | emph
-            | dquote      // allow "..." inside '...'
-            | MULTIPLY
-            | TEXT
-            | APOSTROPHE
-            | PLURAL_S
-            | YEAR_SHORT
+    | format_containers
+    | code
+    | dquote
+    | paren_sl
+    | common_text
 
+// Single line container.
 bold: STAR_OPEN bold_item+ STAR_CLOSE
 ?bold_item: WS
-          | code
-          | emph         // bold can contain emphasis
-          | dquote
-          | squote
-          | MULTIPLY
-          | TEXT
-          | APOSTROPHE
-          | PLURAL_S
-          | YEAR_SHORT
+    | emph
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
 
+// Single line container.
 emph: UNDER_OPEN emph_item+ UNDER_CLOSE
 ?emph_item: WS
-          | code
-          | bold         // emphasis can contain bold
-          | dquote
-          | squote
-          | MULTIPLY
-          | TEXT
-          | APOSTROPHE
-          | PLURAL_S
-          | YEAR_SHORT
+    | bold
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
 
-bold_emph: BOLD_EMPH_OPEN bold_emph_item* BOLD_EMPH_CLOSE
+// Single line container.
+bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
 ?bold_emph_item: WS
-               | code
-               | dquote
-               | squote
-               | MULTIPLY
-               | TEXT
-               | APOSTROPHE
-               | PLURAL_S
-               | YEAR_SHORT
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
 
-cite: NEWLINE CITE_BLOCK cite_item* NEWLINE
+// Single line block quote.
+cite: NEWLINE CITE_START cite_item* NEWLINE
 ?cite_item: WS
-               | bold
-               | emph
-               | bold_emph
-               | dquote
-               | squote
-               | MULTIPLY
-               | TEXT
-               | APOSTROPHE
-               | PLURAL_S
-               | YEAR_SHORT
+    | format_containers
+    | quote_containers
+    | paren_sl
+    | common_text
+
+// ---------- Parentheses (that can be nested) ----------
+// Multi line container.
+paren: PAREN_OPEN paren_item_ml* PAREN_CLOSE
+?paren_item_ml: NEWLINE
+    | paren_item_sl
+// Single line container. Use it within single line containers.
+paren_sl: PAREN_OPEN paren_item_sl* PAREN_CLOSE
+?paren_item_sl: WS
+    | format_containers
+    | quote_containers
+    | paren
+    | common_text
 
 // ---------- Code (literal until ending backtick) ----------
 code: BACK_TICK CODE BACK_TICK
@@ -133,9 +134,11 @@ APOSTROPHE.30: /(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)/
 BOLD_EMPH_OPEN.10: "*_"
 BOLD_EMPH_CLOSE.10: "_*"
 
-CITE_BLOCK.10: "> "
+CITE_START.10: "> "
 
 // Delimiter tokens
+PAREN_OPEN: "("
+PAREN_CLOSE: ")"
 DQUOTE: "\""
 SQUOTE: "'"
 MULTIPLY: " * "
@@ -156,7 +159,6 @@ WS: /[ \t]+/
 NEWLINE: /\r?\n/
 
 // Any run of characters that is not a delimiter or whitespace/newline
-TEXT: /[^"'*_`\s]+/
-// TEXT: /[a-zA-Z0-9\(\).,:?!=-]+/
+TEXT: /[^"'*_`()\s]+/
 
 TEXT_NO_UNDER: /[^"'*`\s]+/
