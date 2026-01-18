@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""transformer module."""
+"""serializer module."""
 
-from .structure_transformer import StructureTransformer
+from .structure_serializer import StructureSerializer
 
 __all__ = [
-    "StructureTransformer",
+    "StructureSerializer",
 ]

@@ -18,29 +18,73 @@
 
 """containers_transformer"""
 
+from dataclasses import dataclass
+
 from lark import Transformer, Tree
+
+from ..token import Token
+from ..token_metrics import TokenMetrics
 
 __all__ = [
     "TransformerBase",
 ]
 
 
+@dataclass
+class TransformerConfiguration():
+    """TransformerConfiguration"""
+
+    log: bool = False
+
+
 class TransformerBase(Transformer):
     """TransformerBase"""
+
+    _cfg: TransformerConfiguration
+    _metrics: TokenMetrics | None
+
+    def __init__(
+        self,
+        metrics: TokenMetrics | None = None,
+        cfg: TransformerConfiguration = TransformerConfiguration(),
+        log: bool = False,
+        visit_tokens: bool = True
+    ) -> None:
+
+        super().__init__(visit_tokens)
+
+        assert isinstance(cfg, TransformerConfiguration)
+        self._cfg = cfg
+        if log:
+            self._cfg.log = log
+
+        if isinstance(metrics, TokenMetrics):
+            self._metrics = metrics
+        else:
+            self._metrics = TokenMetrics()
+
+    @property
+    def metrics(self) -> TokenMetrics:
+        return self._metrics
 
     def print(self, children, data: str = '') -> None:
         """Prints the token and its children."""
 
-        print(f"#{len(children)}: '{data}'")
-        for i, child in enumerate(children):
-            print(f"#{i}: '{child}' [{type(child)}]")
+        if not self._cfg.log:
+            return
+
+        print(f"#{len(children)} [{data}]: '{children}'.")
+        # for i, child in enumerate(children):
+        #     print(f"#{i}: '{child}' [{type(child)}]")
 
     def __default__(self, data, children, meta):
         # data = the rule name (e.g., "squote", "bold", "emph")
         # children = the list of children
         # meta = metadata (line/column info)
 
-        print(f"__default__: '{data}' [{meta}].")
+        self.print(f"__default__: '{data}' [{meta}].")
 
         result = Tree(data=data, children=children, meta=meta)
+        self._metrics.append(Token.default)
+
         return result

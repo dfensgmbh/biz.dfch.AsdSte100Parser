@@ -27,78 +27,102 @@
        | emph
        | dquote
        | squote
+       | cite
        | TEXT
+       | MULTIPLY
        | APOSTROPHE
+       | PLURAL_S
        | YEAR_SHORT
 
 // ---------- Containers ----------
 dquote: DQUOTE dquote_item* DQUOTE
 ?dquote_item: WS
-            | NEWLINE
+            // | NEWLINE
             | code
             | bold_emph
             | bold
             | emph
             | squote      // allow '...' inside "..."
+            | MULTIPLY
             | TEXT
             | APOSTROPHE
+            | PLURAL_S
             | YEAR_SHORT
 
 squote: SQUOTE squote_item* SQUOTE
 ?squote_item: WS
-            | NEWLINE
+            // | NEWLINE
             | code
             | bold_emph
             | bold
             | emph
             | dquote      // allow "..." inside '...'
+            | MULTIPLY
             | TEXT
             | APOSTROPHE
+            | PLURAL_S
             | YEAR_SHORT
 
-bold: STAR bold_item* STAR
+bold: STAR_OPEN bold_item+ STAR_CLOSE
 ?bold_item: WS
-          | NEWLINE
           | code
           | emph         // bold can contain emphasis
           | dquote
           | squote
-          | bold_emph
+          | MULTIPLY
           | TEXT
           | APOSTROPHE
+          | PLURAL_S
           | YEAR_SHORT
 
-emph: UNDER emph_item* UNDER
+emph: UNDER_OPEN emph_item+ UNDER_CLOSE
 ?emph_item: WS
-          | NEWLINE
           | code
           | bold         // emphasis can contain bold
           | dquote
           | squote
-          | bold_emph
+          | MULTIPLY
           | TEXT
           | APOSTROPHE
+          | PLURAL_S
           | YEAR_SHORT
 
 bold_emph: BOLD_EMPH_OPEN bold_emph_item* BOLD_EMPH_CLOSE
 ?bold_emph_item: WS
-               | NEWLINE
                | code
-               | bold
-               | emph
                | dquote
                | squote
+               | MULTIPLY
                | TEXT
                | APOSTROPHE
+               | PLURAL_S
+               | YEAR_SHORT
+
+cite: NEWLINE CITE_BLOCK cite_item* NEWLINE
+?cite_item: WS
+               | bold
+               | emph
+               | bold_emph
+               | dquote
+               | squote
+               | MULTIPLY
+               | TEXT
+               | APOSTROPHE
+               | PLURAL_S
                | YEAR_SHORT
 
 // ---------- Code (literal until ending backtick) ----------
-code: CODE
+code: BACK_TICK CODE BACK_TICK
 
 // ---------- Terminals ----------
 // Highest priority: code and year abbreviations
-CODE.40: /`[^`]*`/
+CODE.40: /[^`]+/
 YEAR_SHORT.40: /'\d{2}s?(?=[\s.,!?;:]|$)/
+
+// Plural (s) - Matches (s) if preceded by a letter  
+// and followed by space, punctuation, or end of string.  
+// We use a lookbehind for a letter [A-Za-z]  
+PLURAL_S.35: /(?<=[A-Za-z])\(s\)(?=[\s.,!?;:]|$)/
 
 // Apostrophes (possessives, decades like 1990's)
 // Matches ' or 's if preceded by alphanumeric
@@ -109,15 +133,30 @@ APOSTROPHE.30: /(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)/
 BOLD_EMPH_OPEN.10: "*_"
 BOLD_EMPH_CLOSE.10: "_*"
 
+CITE_BLOCK.10: "> "
+
 // Delimiter tokens
 DQUOTE: "\""
 SQUOTE: "'"
+MULTIPLY: " * "
 STAR: "*"
-UNDER: "_"
+STAR_OPEN.2: /\*(?!\s)/
+STAR_CLOSE.2: /(?<!\s)\*/
 
-// Whitespace preserved (not ignored)
+UNDER: "_"
+UNDER_OPEN.2: /_(?!\s)/
+UNDER_CLOSE.2: /(?<!\s)_/
+
+BACK_TICK: "`"
+
+// Whitespace preserved.
+// When there is more than one WS, then this is only one token.
 WS: /[ \t]+/
+// When there is more than on NEWLINE, then each NEWLINE is a different token.
 NEWLINE: /\r?\n/
 
 // Any run of characters that is not a delimiter or whitespace/newline
 TEXT: /[^"'*_`\s]+/
+// TEXT: /[a-zA-Z0-9\(\).,:?!=-]+/
+
+TEXT_NO_UNDER: /[^"'*`\s]+/

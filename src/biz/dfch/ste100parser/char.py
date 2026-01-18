@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""char enum."""
+
 # pylint: disable=C0116
 # type: ignore
-
-"""char enum."""
 
 from enum import StrEnum
 
@@ -29,22 +29,32 @@ class Char(StrEnum):
     """Character definitions."""
 
     EMPTY = ''
-    BLANK = ' '
 
     DQUOTE = '"'
     SQUOTE = "'"
 
-    COMMA = '.'
     DOT = '.'
-    EXCLAMATION = '!'
     QUESTION = '?'
+    EXCLAMATION = '!'
+    COMMA = '.'
     COLON = ':'
 
     PAREN_OPEN = '('
     PAREN_CLOSE = ')'
 
     STAR = '*'
-    UNDERLINE = '_'
-    BACKTICK = '`'
-    BOLD_ITALIC_OPEN = '*_'
-    BOLD_ITALIC_CLOSE = '_*'
+    UNDER = '_'
+    CODE = '`'
+    BOLD_EMPH_OPEN = '*_'
+    BOLD_EMPH_CLOSE = '_*'
+
+    WS = r"[ \t]+"
+    MULTIPLY = '*'
+    SPACE = ' '
+    TAB = '\t'
+    NEWLINE = r"\r?\n"
+    LF = "\n"
+    TEXT = r"""[^"'*_`\s]+"""
+    APOSTROPHE = r"""(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)"""
+    CHAR_LOWER_S = 's'
+    YEAR_SHORT = r"""'\d{2}s?(?=[\s.,!?;:]|$)"""

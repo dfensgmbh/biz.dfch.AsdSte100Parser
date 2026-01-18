@@ -13,10 +13,39 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""interpreter module."""
+"""Token enum."""
 
-from .containers_renderer import ContainersRenderer
+# pylint: disable=C0103
+
+from enum import StrEnum, auto
 
 __all__ = [
-    "ContainersRenderer",
+    "Token",
 ]
+
+
+class Token(StrEnum):
+    """Token definitions."""
+
+    default = auto()
+
+    start = auto()
+    inline = auto()
+
+    squote = auto()
+    dquote = auto()
+
+    cite = auto()
+
+    CODE = auto()
+    bold = auto()
+    emph = auto()
+    bold_emph = auto()
+
+    MULTIPLY = auto()
+
+    WS = auto()
+    NEWLINE = auto()
+    TEXT = auto()
+    APOSTROPHE = auto()
+    YEAR_SHORT = auto()

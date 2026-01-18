@@ -15,12 +15,16 @@
 
 """biz.dfch.ste100parser package root"""
 
-from .parser import Parser
-from .grammar import GrammarType
 from .char import Char
+from .grammar import GrammarType
+from .parser import Parser
+from .token import Token
+from .token_metrics import TokenMetrics
 
 __all__ = [
-    "Parser",
-    "GrammarType",
     "Char",
+    "GrammarType",
+    "Parser",
+    "Token",
+    "TokenMetrics",
 ]
