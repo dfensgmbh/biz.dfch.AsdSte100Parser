@@ -58,8 +58,47 @@ class TestBold(unittest.TestCase):
 
         self.assertEqual(0, len(metrics), metrics)
 
+    def test_multi_line_fails(self):
+
+        value = "_some_code\nmore code_ "
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
+    def test_single_fails(self):
+        value = "*"
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
     def test_empty_fails(self):
         value = "**"
         result = Parser(GrammarType.STRUCTURE).is_valid(value)
 
         self.assertFalse(result)
+
+    def test_in_dquote(self):
+        value = '"*"'
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.dquote])
+        self.assertEqual(1, metrics[Token.CHAR])
+
+    def test_in_squote(self):
+        value = "'*'"
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.squote])
+        self.assertEqual(1, metrics[Token.CHAR])

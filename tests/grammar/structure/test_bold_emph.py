@@ -16,7 +16,7 @@
 # pylint: disable=C0116
 # type: ignore
 
-"""test_code"""
+"""test_bold_emph"""
 
 import unittest
 
@@ -24,12 +24,12 @@ from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
 from biz.dfch.ste100parser.transformer import StructureTransformer
 
 
-class TestCode(unittest.TestCase):
-    """TestCode"""
+class TestBoldEmph(unittest.TestCase):
+    """TestBoldEmph"""
 
-    def test_single(self):
+    def test(self):
 
-        value = "`some_code` at-the-start."
+        value = "*_bold-emph text_* at the start"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -37,73 +37,54 @@ class TestCode(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
+        self.assertEqual(11, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.CODE])
-        self.assertEqual(1, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
+        self.assertEqual(5, metrics[Token.TEXT])
+        self.assertEqual(4, metrics[Token.WS])
+        self.assertEqual(1, metrics[Token.bold_emph])
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.CODE, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
-
-    def test_double(self):
-
-        value = "`some_code` `more code`"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
-
-        metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.CODE])
-        self.assertEqual(1, metrics[Token.WS])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.CODE, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.CODE, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
-
-    def test_multi_line(self):
-
-        value = "`some_code\nmore code` "
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
-
-        metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.CODE])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.CODE, metrics.pop())
+        self.assertEqual(Token.bold_emph, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.WS, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
 
         self.assertEqual(0, len(metrics), metrics)
 
-    def test_single_fails(self):
-        value = "`"
+    def test_multi_line_fails(self):
+
+        value = "*_some_code\nmore code_* "
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
+    def test_single_open_fails(self):
+        value = "*_"
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
+    def test_single_close_fails(self):
+        value = "_*"
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
+    def test_empty_fails(self):
+        value = "*__*"
         result = Parser(GrammarType.STRUCTURE).is_valid(value)
 
         self.assertFalse(result)
 
     def test_in_dquote(self):
-        value = '"`"'
+        value = '"*__*"'
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -111,12 +92,12 @@ class TestCode(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(5, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(1, metrics[Token.CHAR])
+        self.assertEqual(4, metrics[Token.CHAR])
 
     def test_in_squote(self):
-        value = "'`'"
+        value = "'*__*'"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -124,6 +105,6 @@ class TestCode(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(5, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(1, metrics[Token.CHAR])
+        self.assertEqual(4, metrics[Token.CHAR])

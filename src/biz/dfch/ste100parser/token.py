@@ -48,5 +48,6 @@ class Token(StrEnum):
     WS = auto()
     NEWLINE = auto()
     TEXT = auto()
+    CHAR = auto()
     APOSTROPHE = auto()
     YEAR_SHORT = auto()

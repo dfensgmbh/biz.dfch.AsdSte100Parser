@@ -25,6 +25,17 @@
     | YEAR_SHORT
     | MULTIPLY
 
+char_paren_open: PAREN_OPEN
+char_paren_close: PAREN_CLOSE
+char_star: STAR
+char_under: UNDER
+char_code: BACK_TICK
+?char_single: char_paren_open
+    | char_paren_close
+    | char_star
+    | char_under
+    | char_code
+
 // Single line pair-wise formatting containers.
 ?format_containers: bold
     | emph
@@ -54,6 +65,7 @@ dquote: DQUOTE dquote_item* DQUOTE
     | code
     | squote
     | paren_sl
+    | char_single
     | common_text
 
 // Single line container.
@@ -63,6 +75,7 @@ squote: SQUOTE squote_item* SQUOTE
     | code
     | dquote
     | paren_sl
+    | char_single
     | common_text
 
 // Single line container.

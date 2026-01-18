@@ -186,3 +186,66 @@ class TestParentheses(unittest.TestCase):
 
         result = Parser(GrammarType.STRUCTURE).is_valid(value)
         self.assertEqual(expected, result, rule)
+
+    def test_empty(self):
+        value = "()"
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(1, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paren])
+
+    def test_empty_in_dquote(self):
+        value = '"()"'
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paren])
+        self.assertEqual(1, metrics[Token.dquote])
+
+    def test_paren_open_fails(self):
+        value = ")"
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
+    def test_paren_close_fails(self):
+        value = ")"
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
+
+    def test_open_in_dquote(self):
+        value = '"("'
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.dquote])
+        self.assertEqual(1, metrics[Token.CHAR])
+
+    def test_close_in_dquote(self):
+        value = '")"'
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.dquote])
+        self.assertEqual(1, metrics[Token.CHAR])

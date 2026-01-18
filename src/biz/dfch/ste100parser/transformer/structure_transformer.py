@@ -56,6 +56,32 @@ class StructureTransformer(TransformerBase):
 
         return result
 
+    def _process_empty_token_pair(
+        self,
+        children,
+        token: Token,
+        start: Char,
+        end: Char | None = None,
+    ):
+        assert isinstance(children, list), children
+        assert 2 <= len(children), len(children)
+
+        first, *mid, last = children
+        if 2 == len(children):
+            mid = Char.EMPTY
+
+        self.print(children, token.name)
+
+        if end is None:
+            end = start
+        assert isinstance(first, str) and start == first, first
+        assert isinstance(last, str) and end == last, last
+
+        result = Tree(token.name, mid)
+        self._metrics.append(token)
+
+        return result
+
     def start(self, children):
         """start"""
 
@@ -107,12 +133,12 @@ class StructureTransformer(TransformerBase):
         return self._process_token_pair(children, Token.squote, Char.SQUOTE)
 
     def paren(self, children):
-        return self._process_token_pair(
+        return self._process_empty_token_pair(
             children, Token.paren, Char.PAREN_OPEN, Char.PAREN_CLOSE)
 
     def paren_sl(self, children):
         """Single line parentheses change to standard parentheses."""
-        return self._process_token_pair(
+        return self._process_empty_token_pair(
             children, Token.paren, Char.PAREN_OPEN, Char.PAREN_CLOSE)
 
     def cite(self, children):
@@ -177,6 +203,34 @@ class StructureTransformer(TransformerBase):
         self.print(children, token.name)
 
         result = Tree(token.name, f" {Char.MULTIPLY} ")
+        self._metrics.append(token)
+
+        return result
+
+    def char_paren_open(self, children):  # pylint: disable=C0103
+        return self._process_char(children)
+
+    def char_paren_close(self, children):  # pylint: disable=C0103
+        return self._process_char(children)
+
+    def char_star(self, children):  # pylint: disable=C0103
+        return self._process_char(children)
+
+    def char_under(self, children):  # pylint: disable=C0103
+        return self._process_char(children)
+
+    def char_code(self, children):  # pylint: disable=C0103
+        return self._process_char(children)
+
+    def _process_char(self, children):
+        assert isinstance(children, list)
+        assert 1 == len(children), children
+
+        token = Token.CHAR
+
+        self.print(children, token.name)
+
+        result = Tree(token.name, children)
         self._metrics.append(token)
 
         return result
