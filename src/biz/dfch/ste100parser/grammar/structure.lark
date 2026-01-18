@@ -124,19 +124,12 @@ proc: proc_first_line proc_next_line*
     | paren_sl  
     | common_text
 
-// procedure_start_first: PROCEDURE_NL_FIRST? proc_indent_prefix proc_marker proc_delimiter P_SPACE
-// procedure_start_cont:  PROCEDURE_NL_CONT proc_indent_prefix proc_marker proc_delimiter P_SPACE
-  
-// procedure_first_line: PROCEDURE_NL_FIRST? proc_indent_prefix proc_marker proc_delimiter P_SPACE procedure_item+  
-// procedure_cont_line:  PROCEDURE_NL_CONT proc_indent_prefix proc_marker proc_delimiter P_SPACE  procedure_item+
-?proc_indent_prefix: " "*  // We capture leading spaces as a token, so that we can discard them.
-proc_marker: /[a-zA-Z0-9]+/  
-proc_delimiter: /[.)]/  
+// We capture leading spaces as a token, so that we can discard them.
+?proc_indent_prefix: " "*
+proc_marker: /[a-zA-Z0-9]+/
+proc_delimiter: /[.)]/
+// We capture the trailing space as a token, so that we can discard it.
 ?proc_indent_suffix: " "
-
-// PROCEDURE_NL_FIRST.20: /\A|\r?\n/
-PROCEDURE_NL_FIRST.20: /\r?\n/
-PROCEDURE_NL_CONT.20:  /\r?\n/
 
 // ---------- Parentheses can be nested. ----------
 // Multi line container. Use outside single line containers.
@@ -176,8 +169,8 @@ BOLD_EMPH_CLOSE.10: "_*"
 CITE_START_FIRST.10: /(?:\A|\r?\n)> /
 CITE_START_CONT.10: /\r?\n> /
 
-// PROCEDURE_START_FIRST.10: /(?:\A|\r?\n) *[a-zA-Z0-9]+[.)] /  
-// PROCEDURE_START_CONT.10:  /\r?\n *[a-zA-Z0-9]+[.)] /
+PROCEDURE_NL_FIRST: /\r?\n/
+PROCEDURE_NL_CONT:  /\r?\n/
 
 // Delimiter tokens
 PAREN_OPEN: "("
