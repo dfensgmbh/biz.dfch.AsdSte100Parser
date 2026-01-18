@@ -32,7 +32,7 @@ from .transformer_base import TransformerBase
 class StructureTransformer(TransformerBase):
     """StructureTransformer"""
 
-    def _process_token2(
+    def _process_token_pair(
         self,
         children,
         token: Token,
@@ -70,13 +70,13 @@ class StructureTransformer(TransformerBase):
         return result
 
     def bold(self, children):
-        return self._process_token2(children, Token.bold, Char.STAR)
+        return self._process_token_pair(children, Token.bold, Char.STAR)
 
     def emph(self, children):
-        return self._process_token2(children, Token.emph, Char.UNDER)
+        return self._process_token_pair(children, Token.emph, Char.UNDER)
 
     def bold_emph(self, children):
-        return self._process_token2(
+        return self._process_token_pair(
             children,
             Token.bold_emph,
             Char.BOLD_EMPH_OPEN,
@@ -101,9 +101,11 @@ class StructureTransformer(TransformerBase):
         return result
 
     def dquote(self, children):
-        return self._process_token2(children, Token.dquote, Char.DQUOTE)
+        return self._process_token_pair(children, Token.dquote, Char.DQUOTE)
 
     def squote(self, children):
+        return self._process_token_pair(children, Token.squote, Char.SQUOTE)
+
         return self._process_token2(children, Token.squote, Char.SQUOTE)
 
     def cite(self, children):
