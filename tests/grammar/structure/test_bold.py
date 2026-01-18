@@ -57,3 +57,9 @@ class TestBold(unittest.TestCase):
         self.assertEqual(Token.TEXT, metrics.pop())
 
         self.assertEqual(0, len(metrics), metrics)
+
+    def test_empty_fails(self):
+        value = "**"
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+
+        self.assertFalse(result)
