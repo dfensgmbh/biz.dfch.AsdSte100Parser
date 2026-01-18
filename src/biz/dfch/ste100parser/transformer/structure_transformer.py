@@ -21,7 +21,7 @@
 
 import sys
 
-from lark import lexer, Tree
+from lark import lexer, Tree, Discard
 
 from ..char import Char
 from ..token import Token
@@ -207,19 +207,19 @@ class StructureTransformer(TransformerBase):
 
         return result
 
-    def char_paren_open(self, children):  # pylint: disable=C0103
+    def char_paren_open(self, children):
         return self._process_char(children)
 
-    def char_paren_close(self, children):  # pylint: disable=C0103
+    def char_paren_close(self, children):
         return self._process_char(children)
 
-    def char_star(self, children):  # pylint: disable=C0103
+    def char_star(self, children):
         return self._process_char(children)
 
-    def char_under(self, children):  # pylint: disable=C0103
+    def char_under(self, children):
         return self._process_char(children)
 
-    def char_code(self, children):  # pylint: disable=C0103
+    def char_code(self, children):
         return self._process_char(children)
 
     def _process_char(self, children):
@@ -231,6 +231,74 @@ class StructureTransformer(TransformerBase):
         self.print(children, token.name)
 
         result = Tree(token.name, children)
+        self._metrics.append(token)
+
+        return result
+
+    def proc_indent_prefix(self, children):
+        _ = children
+
+        # Remove the token from the tree.
+        return Discard
+
+    def proc_indent_suffix(self, children):
+        _ = children
+
+        # Remove the token from the tree.
+        return Discard
+
+    def proc(self, children):
+        assert isinstance(children, list), children
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.proc
+
+        self.print(children, token.name)
+
+        items = children
+
+        result = Tree(token.name, items)
+        self._metrics.append(token)
+
+        return result
+
+    def proc_marker(self, children):
+        assert isinstance(children, list), children
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+
+        return str(children[0])
+
+    def proc_delimiter(self, children):
+        assert isinstance(children, list), children
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+
+        return str(children[0])
+
+    def proc_first_line(self, children):
+        return self._process_proc_line(children)
+
+    def proc_next_line(self, children):
+        assert isinstance(children, list), children
+        assert 4 <= len(children), f"#{len(children)}: [{children}]."
+
+        return self._process_proc_line(children[1:])
+
+    def _process_proc_line(self, children):
+        assert isinstance(children, list), children
+        assert 3 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.proc_item
+
+        self.print(children, token.name)
+
+        step, delimiter, *remaining = children
+
+        items = [
+            Tree(Token.PROC_STEP.name, step),
+            Tree(Token.PROC_DELIMITER.name, delimiter),
+            *remaining
+        ]
+        result = Tree(token.name, items)
         self._metrics.append(token)
 
         return result

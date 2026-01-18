@@ -54,6 +54,7 @@ char_code: BACK_TICK
     | cite
     | paren
     | paren_sl
+    | proc
     | common_text
 
 // ---------- Containers ----------
@@ -104,7 +105,7 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
     | paren_sl
     | common_text
 
-// Single line block quote.
+// Single line quote.
 cite: cite_first_line cite_cont_line*
 ?cite_first_line: CITE_START_FIRST cite_item+
 ?cite_cont_line: CITE_START_CONT cite_item+
@@ -114,8 +115,31 @@ cite: cite_first_line cite_cont_line*
     | paren_sl
     | common_text
 
-// ---------- Parentheses (that can be nested) ----------
-// Multi line container.
+proc: proc_first_line proc_next_line*
+?proc_first_line: PROCEDURE_NL_FIRST? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?proc_next_line: PROCEDURE_NL_CONT proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?procedure_item: WS  
+    | format_containers  
+    | quote_containers  
+    | paren_sl  
+    | common_text
+
+// procedure_start_first: PROCEDURE_NL_FIRST? proc_indent_prefix proc_marker proc_delimiter P_SPACE
+// procedure_start_cont:  PROCEDURE_NL_CONT proc_indent_prefix proc_marker proc_delimiter P_SPACE
+  
+// procedure_first_line: PROCEDURE_NL_FIRST? proc_indent_prefix proc_marker proc_delimiter P_SPACE procedure_item+  
+// procedure_cont_line:  PROCEDURE_NL_CONT proc_indent_prefix proc_marker proc_delimiter P_SPACE  procedure_item+
+?proc_indent_prefix: " "*  // We capture leading spaces as a token, so that we can discard them.
+proc_marker: /[a-zA-Z0-9]+/  
+proc_delimiter: /[.)]/  
+?proc_indent_suffix: " "
+
+// PROCEDURE_NL_FIRST.20: /\A|\r?\n/
+PROCEDURE_NL_FIRST.20: /\r?\n/
+PROCEDURE_NL_CONT.20:  /\r?\n/
+
+// ---------- Parentheses can be nested. ----------
+// Multi line container. Use outside single line containers.
 paren: PAREN_OPEN paren_item_ml* PAREN_CLOSE
 ?paren_item_ml: NEWLINE
     | paren_item_sl
@@ -151,6 +175,9 @@ BOLD_EMPH_CLOSE.10: "_*"
 
 CITE_START_FIRST.10: /(?:\A|\r?\n)> /
 CITE_START_CONT.10: /\r?\n> /
+
+// PROCEDURE_START_FIRST.10: /(?:\A|\r?\n) *[a-zA-Z0-9]+[.)] /  
+// PROCEDURE_START_CONT.10:  /\r?\n *[a-zA-Z0-9]+[.)] /
 
 // Delimiter tokens
 PAREN_OPEN: "("

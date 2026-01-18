@@ -51,3 +51,8 @@ class Token(StrEnum):
     CHAR = auto()
     APOSTROPHE = auto()
     YEAR_SHORT = auto()
+
+    proc = auto()
+    proc_item = auto()
+    PROC_STEP = auto()
+    PROC_DELIMITER = auto()
