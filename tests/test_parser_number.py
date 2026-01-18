@@ -16,7 +16,7 @@
 # pylint: disable=C0116
 # type: ignore
 
-"""test_parser_number"""
+"""test_parser_number."""
 
 import unittest
 

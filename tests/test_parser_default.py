@@ -16,7 +16,7 @@
 # pylint: disable=C0116
 # type: ignore
 
-"""TestParser"""
+"""test_parser_default"""
 
 import unittest
 from parameterized import parameterized
@@ -24,28 +24,24 @@ from parameterized import parameterized
 from biz.dfch.ste100parser import Parser, GrammarType
 
 
-class TestParser(unittest.TestCase):
-    """TestParser"""
+class TestParserDefault(unittest.TestCase):
+    """TestParserDefault"""
 
     sut: Parser
 
     def setUp(self):
-        self.sut = Parser()
+        self.sut = Parser(GrammarType.DEFAULT)
 
     def test_and_display(self):
 
-        value = "00.00"
-        self.sut = Parser(GrammarType.NUMBER)
+        value = "i_fail"
+        self.sut = Parser(GrammarType.DEFAULT)
 
-        try:
-            result = self.sut.invoke(value)
-            print(result.pretty())
+        result = self.sut.is_valid(value)
+        self.assertTrue(result)
 
-            result = not self.sut.is_valid(value)
-            self.assertTrue(result)
-
-        except Exception as ex:  # pylint: disable=W0718
-            self.fail(ex)
+        result = self.sut.invoke(value)
+        print(result.pretty())
 
     def test_single_word_ending_with_dot(self):
 
