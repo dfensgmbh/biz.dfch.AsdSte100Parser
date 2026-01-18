@@ -92,7 +92,9 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
     | common_text
 
 // Single line block quote.
-cite: NEWLINE CITE_START cite_item* NEWLINE
+cite: cite_first_line cite_cont_line*
+?cite_first_line: CITE_START_FIRST cite_item+
+?cite_cont_line: CITE_START_CONT cite_item+
 ?cite_item: WS
     | format_containers
     | quote_containers
@@ -134,7 +136,8 @@ APOSTROPHE.30: /(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)/
 BOLD_EMPH_OPEN.10: "*_"
 BOLD_EMPH_CLOSE.10: "_*"
 
-CITE_START.10: "> "
+CITE_START_FIRST.10: /(?:\A|\r?\n)> /
+CITE_START_CONT.10: /\r?\n> /
 
 // Delimiter tokens
 PAREN_OPEN: "("

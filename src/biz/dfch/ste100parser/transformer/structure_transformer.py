@@ -108,11 +108,17 @@ class StructureTransformer(TransformerBase):
 
     def cite(self, children):
         assert isinstance(children, list)
-        assert 2 <= len(children)
+        assert 1 <= len(children), len(children)
+
+        return children
+
+    def cite_first_line(self, children):
+        assert isinstance(children, list)
+        assert 3 <= len(children), len(children)
 
         token = Token.cite
 
-        _, _, *mid, _ = children
+        _, *mid = children
 
         self.print(children, token.name)
 
@@ -123,6 +129,12 @@ class StructureTransformer(TransformerBase):
         self._metrics.append(token)
 
         return result
+
+    def cite_cont_line(self, children):
+        assert isinstance(children, list)
+        assert 4 <= len(children), len(children)
+
+        return self.cite_first_line(children)
 
     def NEWLINE(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token)
