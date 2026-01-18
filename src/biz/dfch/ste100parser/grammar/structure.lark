@@ -116,8 +116,8 @@ cite: cite_first_line cite_cont_line*
     | common_text
 
 proc: proc_first_line proc_next_line*
-?proc_first_line: PROCEDURE_NL_FIRST? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
-?proc_next_line: PROCEDURE_NL_CONT proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?proc_first_line: PROC_FIRST_LINE? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?proc_next_line: PROC_LINE_NEXT proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
 ?procedure_item: WS  
     | format_containers  
     | quote_containers  
@@ -169,8 +169,8 @@ BOLD_EMPH_CLOSE.10: "_*"
 CITE_START_FIRST.10: /(?:\A|\r?\n)> /
 CITE_START_CONT.10: /\r?\n> /
 
-PROCEDURE_NL_FIRST: /\r?\n/
-PROCEDURE_NL_CONT:  /\r?\n/
+PROC_FIRST_LINE: /\r?\n/
+PROC_LINE_NEXT:  /\r?\n/
 
 // Delimiter tokens
 PAREN_OPEN: "("
