@@ -106,7 +106,14 @@ class StructureTransformer(TransformerBase):
     def squote(self, children):
         return self._process_token_pair(children, Token.squote, Char.SQUOTE)
 
-        return self._process_token2(children, Token.squote, Char.SQUOTE)
+    def paren(self, children):
+        return self._process_token_pair(
+            children, Token.paren, Char.PAREN_OPEN, Char.PAREN_CLOSE)
+
+    def paren_sl(self, children):
+        """Single line parentheses change to standard parentheses."""
+        return self._process_token_pair(
+            children, Token.paren, Char.PAREN_OPEN, Char.PAREN_CLOSE)
 
     def cite(self, children):
         assert isinstance(children, list)

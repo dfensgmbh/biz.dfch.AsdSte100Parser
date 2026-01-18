@@ -34,6 +34,7 @@ class Token(StrEnum):
 
     squote = auto()
     dquote = auto()
+    paren = auto()
 
     cite = auto()
 
