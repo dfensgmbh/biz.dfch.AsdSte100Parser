@@ -27,10 +27,10 @@ from biz.dfch.ste100parser.transformer import StructureTransformer
 class TestCite(unittest.TestCase):
     """TestCite"""
 
-    def test_cite_sof(self):
-        """Cite at the start of the input (without a line break at the start) is valid."""
+    def test_cite(self):
+        """Cite after a line break is valid."""
 
-        value = "> cite-text more-text\nend-text"
+        value = "\r\n> cite-text more-text\nend-text"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -57,10 +57,10 @@ class TestCite(unittest.TestCase):
 
         self.assertEqual(0, len(metrics), metrics)
 
-    def test_cite(self):
-        """Cite after a line break is valid."""
+    def test_cite_sof(self):
+        """Cite at the start of the input (without a line break at the start) is valid."""
 
-        value = "\r\n> cite-text more-text\nend-text"
+        value = "> cite-text more-text\nend-text"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -118,7 +118,35 @@ class TestCite(unittest.TestCase):
 
         self.assertEqual(0, len(metrics), metrics)
 
-    def test_double(self):
+    def test_empty(self):
+        """An 'empty' cite line must contain a minimum of one WS."""
+
+        value = ">  \n>  \n"
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(6, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(2, metrics[Token.cite])
+        self.assertEqual(1, metrics[Token.NEWLINE])
+        self.assertEqual(2, metrics[Token.WS])
+
+        # Assert order of tokens (recursively).
+        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+
+        self.assertEqual(Token.cite, metrics.pop())
+        self.assertEqual(Token.WS, metrics.pop())
+        self.assertEqual(Token.cite, metrics.pop())
+        self.assertEqual(Token.WS, metrics.pop())
+
+        self.assertEqual(0, len(metrics), metrics)
+
+    def test_multi(self):
 
         # value = "\r\n> block-quote-text1 *more-text*\n> block-quote-text1 *more-text*\nend-text"
         value = "\r\n> first-text *some-text*\n> next-text 'more-text'\nend-text"
