@@ -29,7 +29,7 @@ class TestEmph(unittest.TestCase):
 
     def test_single(self):
 
-        value = "_some-code_ at-the-start."
+        value = "_some-emph_ at-the-start."
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -54,7 +54,7 @@ class TestEmph(unittest.TestCase):
 
     def test_double(self):
 
-        value = "_some-code_ _more-code_"
+        value = "_some-emph_ _more-emph_"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -80,7 +80,7 @@ class TestEmph(unittest.TestCase):
 
     def test_multi_line_fails(self):
 
-        value = "_some-code\nmore-code_ "
+        value = "_some-emph\nmore-emph_ "
         result = Parser(GrammarType.STRUCTURE).is_valid(value)
 
         self.assertFalse(result)
