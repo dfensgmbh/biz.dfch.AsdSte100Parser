@@ -29,11 +29,17 @@
         "dfch",
         "dquote",
         "emph",
+        "getframe",
         "NOSONAR",
         "pylint",
         "PYTHONPATH",
+        "rtype",
         "setuptools",
         "squote",
         "venv"
-    ]
+    ],
+    "sonarlint.connectedMode.project": {
+        "connectionId": "dfensgmbh",
+        "projectKey": "dfensgmbh_biz.dfch.AsdSte100Parser"
+    }
 }
