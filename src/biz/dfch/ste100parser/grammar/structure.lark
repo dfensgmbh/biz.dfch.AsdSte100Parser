@@ -46,18 +46,11 @@ char_code: BACK_TICK
     | squote
 
 // ---------- Top-level inline stream ----------
-?inline: WS
-    | NEWLINE
+?inline: NEWLINE
     | heading
-    | format_containers
-    | code
-    | quote_containers
-    | cite
-    | paren
-    | paren_sl
-    | proc
-    // | common_text
     | paragraph
+    | proc
+    | cite
 
 // ---------- Containers ----------
 
@@ -108,27 +101,27 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
     | common_text
 
 // Single line quote.
-cite: cite_first_line cite_next_line*
+cite.1: cite_first_line cite_next_line*
 ?cite_first_line: CITE_LINE_START_FIRST cite_item+
 ?cite_next_line: CITE_LINE_START_NEXT cite_item+
-?cite_item: WS
+?cite_item.1: WS
     | format_containers
     | quote_containers
     | paren_sl
     | common_text
 
 // Single line heading.
-heading: heading_first_line heading_next_line*
+heading.1: heading_first_line heading_next_line*
 ?heading_first_line: HEADING_LINE_START? HEADING_MARKER heading_marker_suffix heading_item+
 ?heading_next_line: HEADING_LINE_START HEADING_MARKER heading_marker_suffix heading_item+
-?heading_item: WS
+?heading_item.1: WS
     | format_containers
     | quote_containers
     | paren_sl
     | common_text
 HEADING_MARKER: "#"+
 // We capture the trailing space as a token, so that we can discard it.
-?heading_marker_suffix: " "
+?heading_marker_suffix: SPACE
 HEADING_LINE_START: NEWLINE
 
 // Paragraph multi-line container.
@@ -139,28 +132,30 @@ paragraph: paragraph_first_item paragraph_next_item*
     | quote_containers
     | paren
     | paren_sl
-?paragraph_next_item: WS
-    | SINGLE_NEWLINE
+?paragraph_next_item: SINGLE_NEWLINE
+    | paragraph_item
+?paragraph_item: WS
     | paragraph_first_item
 // SINGLE_NEWLINE matches a NEWLINE only if NOT followed by another NEWLINE  
 // This uses a negative lookahead (?!\r?\n)  
 SINGLE_NEWLINE: /\r?\n(?!\r?\n)/
 
-proc: proc_first_line proc_next_line*
-?proc_first_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
-?proc_next_line: PROC_LINE_START proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
-?procedure_item: WS  
+?proc.1: proc_line+
+?proc_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?procedure_item.1: WS  
     | format_containers  
     | quote_containers  
     | paren_sl  
     | common_text
 
 // We capture leading spaces as a token, so that we can discard them.
-?proc_indent_prefix: " "*
-proc_marker: /[a-zA-Z0-9]+/
-proc_delimiter: /[.)]/
+?proc_indent_prefix: SPACE*
+?proc_marker: PROC_MARKER
+PROC_MARKER: /[a-zA-Z0-9]+/
+?proc_delimiter: PROC_DELIMITER
+PROC_DELIMITER: /[.)]/
 // We capture the trailing space as a token, so that we can discard it.
-?proc_indent_suffix: " "
+?proc_indent_suffix: SPACE
 
 // ---------- Parentheses can be nested. ----------
 // Multi line container. Use outside single line containers.
@@ -218,6 +213,7 @@ UNDER_OPEN.2: /_(?!\s)/
 UNDER_CLOSE.2: /(?<!\s)_/
 
 BACK_TICK: "`"
+SPACE: " "
 
 TERMINATOR: /[.?!:]/
 SEPARATOR:  ","

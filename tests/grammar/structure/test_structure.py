@@ -59,7 +59,7 @@ class TestStructure(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(24, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.squote])
         self.assertEqual(2, metrics[Token.bold])
         self.assertEqual(1, metrics[Token.emph])
@@ -67,7 +67,7 @@ class TestStructure(unittest.TestCase):
         self.assertEqual(9, metrics[Token.WS])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
@@ -107,7 +107,7 @@ class TestStructure(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(24, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.dquote])
         self.assertEqual(2, metrics[Token.bold])
         self.assertEqual(1, metrics[Token.emph])
@@ -115,7 +115,7 @@ class TestStructure(unittest.TestCase):
         self.assertEqual(9, metrics[Token.WS])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())

@@ -46,7 +46,10 @@ class Token(StrEnum):
     MULTIPLY = auto()
 
     WS = auto()
+    SPACE = auto()
+
     NEWLINE = auto()
+    LINEBREAK = auto()
     TEXT = auto()
     CHAR = auto()
     APOSTROPHE = auto()
@@ -59,3 +62,5 @@ class Token(StrEnum):
 
     heading = auto()
     HEADING_LEVEL = auto()
+
+    paragraph = auto()

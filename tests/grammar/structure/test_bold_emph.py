@@ -38,13 +38,13 @@ class TestBoldEmph(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(11, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(5, metrics[Token.TEXT])
         self.assertEqual(4, metrics[Token.WS])
         self.assertEqual(1, metrics[Token.bold_emph])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
@@ -92,7 +92,8 @@ class TestBoldEmph(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
+        self.assertEqual(6, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.dquote])
         self.assertEqual(4, metrics[Token.CHAR])
 
@@ -105,6 +106,7 @@ class TestBoldEmph(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
+        self.assertEqual(6, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.squote])
         self.assertEqual(4, metrics[Token.CHAR])
