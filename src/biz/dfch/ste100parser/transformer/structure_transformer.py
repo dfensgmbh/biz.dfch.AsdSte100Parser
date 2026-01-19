@@ -304,8 +304,8 @@ class StructureTransformer(TransformerBase):
         return result
 
     def TEXT(self, children):  # pylint: disable=C0103
-        assert isinstance(children, lexer.Token)
-        assert 1 <= len(children)
+        assert isinstance(children, lexer.Token), type(children)
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
         token = Token.TEXT
 
