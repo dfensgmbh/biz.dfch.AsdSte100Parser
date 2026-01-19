@@ -335,3 +335,79 @@ class StructureTransformer(TransformerBase):
         self._metrics.append(token)
 
         return result
+
+    def heading_marker_suffix(self, children):
+        _ = children
+
+        # Remove the token from the tree.
+        return Discard
+
+    def HEADING_MARKER(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token)
+        assert 1 <= len(children)
+
+        token = Token.HEADING_LEVEL
+
+        self.print(children, token.name)
+
+        result = Tree(token.name, Char.HASH * len(children))
+        self._metrics.append(token)
+
+        return result
+
+    def _process_heading_line(self, children):
+        assert isinstance(children, list), children
+        assert 2 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.heading
+
+        self.print(children, token.name)
+
+        level, *remaining = children
+
+        items = [
+            level,
+            *remaining
+        ]
+        result = Tree(token.name, items)
+        self._metrics.append(token)
+
+        return result
+
+    def heading_first_line(self, children):
+        assert isinstance(children, list), children
+        assert 2 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.heading
+
+        self.print(children, token.name)
+
+        return self._process_heading_line(children)
+
+    def heading_next_line(self, children):
+        assert isinstance(children, list), children
+        assert 2 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.heading
+
+        self.print(children, token.name)
+
+        return self._process_heading_line(children)
+
+    def heading(self, children):
+        assert isinstance(children, list), children
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.heading
+
+        self.print(children, token.name)
+
+        items = []
+        for item in children:
+            items.extend(item.children)
+
+        result = Tree(token.name, items)
+        # Do not add a token to the metrics collection.
+        # This was done in heading_*_line().
+
+        return result

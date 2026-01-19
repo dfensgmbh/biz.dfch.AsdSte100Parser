@@ -56,3 +56,6 @@ class Token(StrEnum):
     proc_item = auto()
     PROC_STEP = auto()
     PROC_DELIMITER = auto()
+
+    heading = auto()
+    HEADING_LEVEL = auto()

@@ -48,6 +48,7 @@ char_code: BACK_TICK
 // ---------- Top-level inline stream ----------
 ?inline: WS
     | NEWLINE
+    | heading
     | format_containers
     | code
     | quote_containers
@@ -107,17 +108,31 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
 
 // Single line quote.
 cite: cite_first_line cite_next_line*
-?cite_first_line: CITE_START_FIRST cite_item+
-?cite_next_line: CITE_START_NEXT cite_item+
+?cite_first_line: CITE_LINE_START_FIRST cite_item+
+?cite_next_line: CITE_LINE_START_NEXT cite_item+
 ?cite_item: WS
     | format_containers
     | quote_containers
     | paren_sl
     | common_text
 
+// Single line heading.
+heading: heading_first_line heading_next_line*
+?heading_first_line: HEADING_LINE_START? HEADING_MARKER heading_marker_suffix heading_item+
+?heading_next_line: HEADING_LINE_START HEADING_MARKER heading_marker_suffix heading_item+
+?heading_item: WS
+    | format_containers
+    | quote_containers
+    | paren_sl
+    | common_text
+HEADING_MARKER: "#"+
+// We capture the trailing space as a token, so that we can discard it.
+?heading_marker_suffix: " "
+HEADING_LINE_START: NEWLINE
+
 proc: proc_first_line proc_next_line*
-?proc_first_line: PROC_FIRST_LINE? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
-?proc_next_line: PROC_LINE_NEXT proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?proc_first_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
+?proc_next_line: PROC_LINE_START proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
 ?procedure_item: WS  
     | format_containers  
     | quote_containers  
@@ -167,11 +182,10 @@ APOSTROPHE.30: /(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)/
 BOLD_EMPH_OPEN.10: "*_"
 BOLD_EMPH_CLOSE.10: "_*"
 
-CITE_START_FIRST.10: /(?:\A|\r?\n)> /
-CITE_START_NEXT.10: /\r?\n> /
+CITE_LINE_START_FIRST.10: /(?:\A|\r?\n)> /
+CITE_LINE_START_NEXT.10: /\r?\n> /
 
-PROC_FIRST_LINE: /\r?\n/
-PROC_LINE_NEXT:  /\r?\n/
+PROC_LINE_START: NEWLINE
 
 // Delimiter tokens
 PAREN_OPEN: "("
@@ -188,6 +202,9 @@ UNDER_OPEN.2: /_(?!\s)/
 UNDER_CLOSE.2: /(?<!\s)_/
 
 BACK_TICK: "`"
+
+TERMINATOR: /[.?!:]/
+SEPARATOR:  ","
 
 // Whitespace preserved.
 // When there is more than one WS, then this is only one token.

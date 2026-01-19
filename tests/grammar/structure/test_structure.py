@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # pylint: disable=C0116
+# pylint: disable=C0301
 # type: ignore
 
 """test_structure"""

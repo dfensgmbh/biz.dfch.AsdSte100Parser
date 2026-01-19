@@ -58,3 +58,5 @@ class Char(StrEnum):
     APOSTROPHE = r"""(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)"""
     CHAR_LOWER_S = 's'
     YEAR_SHORT = r"""'\d{2}s?(?=[\s.,!?;:]|$)"""
+
+    HASH = '#'
