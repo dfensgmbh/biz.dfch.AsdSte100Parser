@@ -56,7 +56,8 @@ char_code: BACK_TICK
     | paren
     | paren_sl
     | proc
-    | common_text
+    // | common_text
+    | paragraph
 
 // ---------- Containers ----------
 
@@ -129,6 +130,21 @@ HEADING_MARKER: "#"+
 // We capture the trailing space as a token, so that we can discard it.
 ?heading_marker_suffix: " "
 HEADING_LINE_START: NEWLINE
+
+// Paragraph multi-line container.
+paragraph: paragraph_first_item paragraph_next_item*
+?paragraph_first_item: common_text
+    | code
+    | format_containers
+    | quote_containers
+    | paren
+    | paren_sl
+?paragraph_next_item: WS
+    | SINGLE_NEWLINE
+    | paragraph_first_item
+// SINGLE_NEWLINE matches a NEWLINE only if NOT followed by another NEWLINE  
+// This uses a negative lookahead (?!\r?\n)  
+SINGLE_NEWLINE: /\r?\n(?!\r?\n)/
 
 proc: proc_first_line proc_next_line*
 ?proc_first_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
