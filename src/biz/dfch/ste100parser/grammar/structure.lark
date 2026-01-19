@@ -167,6 +167,7 @@ LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
     | quote_containers  
     | paren_sl  
     | common_text
+    | list
 
 // We capture leading spaces as a token, so that we can discard them.
 ?proc_indent_prefix: SPACE*

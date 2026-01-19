@@ -83,3 +83,46 @@ class TestList(unittest.TestCase):
         self.assertEqual(Token.TEXT, metrics.pop())
 
         self.assertEqual(0, len(metrics), metrics)
+
+    def test_list_in_proc(self):
+
+        value = " 01. first-text more-text:\n* First\n* Second\n* Last.\n02.  next-text more-text\nend-text"
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(20, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
+        self.assertEqual(2, metrics[Token.NEWLINE])
+        self.assertEqual(8, metrics[Token.TEXT])
+        self.assertEqual(3, metrics[Token.WS])
+        self.assertEqual(3, metrics[Token.list_item])
+        self.assertEqual(2, metrics[Token.proc_item])
+
+        # Assert order of tokens (recursively).
+        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.proc_item, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.WS, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.WS, metrics.pop())
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.proc_item, metrics.pop())
+        self.assertEqual(Token.list_item, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.list_item, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.list_item, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.WS, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+
+        self.assertEqual(0, len(metrics), metrics)
