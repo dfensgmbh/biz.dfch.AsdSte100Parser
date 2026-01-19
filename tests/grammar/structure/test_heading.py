@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # pylint: disable=C0116
+# pylint: disable=C0301
 # type: ignore
 
 """test_quote"""
@@ -44,6 +45,42 @@ class TestQuote(unittest.TestCase):
         self.assertEqual(1, metrics[Token.TEXT])
 
         # Assert order of tokens (recursively).
+        self.assertEqual(Token.heading, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.HEADING_LEVEL, metrics.pop())
+
+        self.assertEqual(0, len(metrics), metrics)
+
+    def test_multi(self):
+        value = "# This-is-a-heading-level-1\n\n## This-is-a-heading-level-2\n\nThis-is-normal-text."
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
+        # Assert type and quantity of tokens.
+        self.assertEqual(12, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(2, metrics[Token.heading])
+        self.assertEqual(2, metrics[Token.HEADING_LEVEL])
+        self.assertEqual(3, metrics[Token.TEXT])
+        self.assertEqual(4, metrics[Token.NEWLINE])
+
+        # Assert order of tokens (recursively).
+        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+
+        self.assertEqual(Token.heading, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.HEADING_LEVEL, metrics.pop())
+
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.NEWLINE, metrics.pop())
+
         self.assertEqual(Token.heading, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.HEADING_LEVEL, metrics.pop())
