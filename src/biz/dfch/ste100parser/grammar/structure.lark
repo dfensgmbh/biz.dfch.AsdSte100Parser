@@ -106,9 +106,9 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
     | common_text
 
 // Single line quote.
-cite: cite_first_line cite_cont_line*
+cite: cite_first_line cite_next_line*
 ?cite_first_line: CITE_START_FIRST cite_item+
-?cite_cont_line: CITE_START_CONT cite_item+
+?cite_next_line: CITE_START_NEXT cite_item+
 ?cite_item: WS
     | format_containers
     | quote_containers
@@ -148,6 +148,7 @@ paren_sl: PAREN_OPEN paren_item_sl* PAREN_CLOSE
 code: BACK_TICK CODE BACK_TICK
 
 // ---------- Terminals ----------
+
 // Highest priority: code and year abbreviations
 CODE.40: /[^`]+/
 YEAR_SHORT.40: /'\d{2}s?(?=[\s.,!?;:]|$)/
@@ -167,7 +168,7 @@ BOLD_EMPH_OPEN.10: "*_"
 BOLD_EMPH_CLOSE.10: "_*"
 
 CITE_START_FIRST.10: /(?:\A|\r?\n)> /
-CITE_START_CONT.10: /\r?\n> /
+CITE_START_NEXT.10: /\r?\n> /
 
 PROC_FIRST_LINE: /\r?\n/
 PROC_LINE_NEXT:  /\r?\n/
@@ -196,5 +197,3 @@ NEWLINE: /\r?\n/
 
 // Any run of characters that is not a delimiter or whitespace/newline
 TEXT: /[^"'*_`()\s]+/
-
-TEXT_NO_UNDER: /[^"'*`\s]+/

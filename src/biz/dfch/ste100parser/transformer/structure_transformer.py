@@ -165,7 +165,7 @@ class StructureTransformer(TransformerBase):
 
         return result
 
-    def cite_cont_line(self, children):
+    def cite_next_line(self, children):
         return self.cite_first_line(children)
 
     def NEWLINE(self, children):  # pylint: disable=C0103
