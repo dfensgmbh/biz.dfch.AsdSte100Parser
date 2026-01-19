@@ -437,3 +437,29 @@ class StructureTransformer(TransformerBase):
         self._metrics.append(token)
 
         return result
+
+    def list_line(self, children):
+        assert isinstance(children, list), children
+        assert 3 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.list_item
+
+        self.print(children, token.name)
+
+        item = children[0]
+        if "LIST_LINE_START" == item.type:
+            children = children[1:]
+
+        marker = Tree(Token.LIST_MARKER.name, children.pop(0))
+
+        _, *remaining = children
+
+        items = [
+            marker,
+            *remaining
+        ]
+
+        result = Tree(token.name, items)
+        self._metrics.append(token)
+
+        return result

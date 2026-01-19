@@ -106,6 +106,7 @@ cite.1: cite_first_line cite_next_line*
 ?cite_next_line: CITE_LINE_START_NEXT cite_item+
 ?cite_item.1: WS
     | format_containers
+    | code
     | quote_containers
     | paren_sl
     | common_text
@@ -116,6 +117,7 @@ heading.1: heading_first_line heading_next_line*
 ?heading_next_line: HEADING_LINE_START HEADING_MARKER heading_marker_suffix heading_item+
 ?heading_item.1: WS
     | format_containers
+    | code
     | quote_containers
     | paren_sl
     | common_text
@@ -127,11 +129,12 @@ HEADING_LINE_START: NEWLINE
 // Paragraph multi-line container.
 paragraph: paragraph_first_item paragraph_next_item*
 ?paragraph_first_item: common_text
-    | code
     | format_containers
+    | code
     | quote_containers
     | paren
     | paren_sl
+    | list
 ?paragraph_next_item: SINGLE_NEWLINE
     | paragraph_item
 ?paragraph_item: WS
@@ -140,9 +143,26 @@ paragraph: paragraph_first_item paragraph_next_item*
 // This uses a negative lookahead (?!\r?\n)  
 SINGLE_NEWLINE: /\r?\n(?!\r?\n)/
 
+?list.1: list_line+
+list_line.1: LIST_LINE_START list_marker SPACE list_item+
+?list_item.1: WS
+    | format_containers
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
+
+LIST_LINE_START: /(?:\r?\n)/
+?list_marker: LIST_MARKER_ALPHA_NUM
+    | list_marker_star
+    | list_marker_dash
+LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
+?list_marker_star: STAR
+?list_marker_dash: DASH
+
 ?proc.1: proc_line+
-?proc_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix procedure_item+
-?procedure_item.1: WS  
+?proc_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix proc_item+
+?proc_item.1: WS  
     | format_containers  
     | quote_containers  
     | paren_sl  
@@ -214,6 +234,7 @@ UNDER_CLOSE.2: /(?<!\s)_/
 
 BACK_TICK: "`"
 SPACE: " "
+DASH: "-"
 
 TERMINATOR: /[.?!:]/
 SEPARATOR:  ","

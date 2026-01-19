@@ -55,7 +55,6 @@ class Token(StrEnum):
     APOSTROPHE = auto()
     YEAR_SHORT = auto()
 
-    proc = auto()
     proc_item = auto()
     PROC_STEP = auto()
     PROC_DELIMITER = auto()
@@ -64,3 +63,6 @@ class Token(StrEnum):
     HEADING_LEVEL = auto()
 
     paragraph = auto()
+
+    LIST_MARKER = auto()
+    list_item = auto()
