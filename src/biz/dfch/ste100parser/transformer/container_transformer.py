@@ -353,7 +353,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, [Char.HASH * len(children)])
+        result = Tree(token.name, [len(children)])
         self._metrics.append(token)
 
         return result
