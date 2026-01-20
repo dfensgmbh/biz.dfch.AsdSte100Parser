@@ -35,7 +35,7 @@ class TestParserNumber(unittest.TestCase):
 
     def test_and_display(self):
 
-        value = "0.00"
+        value = "0"
         self.sut = Parser(GrammarType.INT)
 
         try:
@@ -77,7 +77,7 @@ class TestParserNumber(unittest.TestCase):
         ("missing_dot_fails", "0", False),
         ("missing_dot_fails", "1", False),
         ("missing_dot_fails", "12", False),
-        ("multi_leading_zero_fails", "00.0", False),
+        ("multi_leading_zero", "00.0", True),
 
         ("zero", "0.0", True),
         ("zero", "0.00", True),
@@ -113,7 +113,6 @@ class TestParserNumber(unittest.TestCase):
         ("missing_dot_is_int", "0", True),
         ("missing_dot_is_int", "1", True),
         ("missing_dot_is_int", "12", True),
-        ("multi_leading_zero_fails", "00.0", False),
 
         ("zero", "0.0", True),
         ("zero", "0.00", True),

@@ -26,5 +26,4 @@ class GrammarType(StrEnum):
     INT = "integer.lark"
     FP = "fp.lark"
     WORD = "word.lark"
-    CONTAINER = "container.lark"
     STRUCTURE = "structure.lark"
