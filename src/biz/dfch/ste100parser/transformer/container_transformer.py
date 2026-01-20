@@ -236,7 +236,8 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, children)
+        value = children[0]
+        result = Tree(token.name, [value])
         self._metrics.append(token)
 
         return result
@@ -453,16 +454,20 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         self.print(children, token.name)
 
         item = children[0]
-        if "LIST_LINE_START" == item.type:
+        if isinstance(item, lexer.Token) and "LIST_LINE_START" == item.type:
             children = children[1:]
 
-        marker = Tree(Token.LIST_MARKER.name, children.pop(0))
+        marker_token = children.pop(0)
+        assert isinstance(marker_token, lexer.Token)
+        marker = Tree(Token.LIST_MARKER.name, [marker_token.value])
 
-        _, *remaining = children
+        space_token = children.pop(0)
+        assert isinstance(space_token, lexer.Token)
+        assert Token.SPACE.name == space_token.type
 
         items = [
             marker,
-            *remaining
+            *children
         ]
 
         result = Tree(token.name, items)
