@@ -149,7 +149,15 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, list)
         assert 1 <= len(children), len(children)
 
-        return children
+        token = Token.cite
+
+        items = []
+        for line in children:
+            items.extend(line)
+
+        result = Tree(token.name, items)
+
+        return result
 
     def cite_first_line(self, children):
         assert isinstance(children, list)
@@ -161,16 +169,10 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        tokens: list = []
-        tokens.extend(mid)
-
-        result = Tree(token.name, mid)
+        result = mid
         self._metrics.append(token)
 
         return result
-
-    def cite_next_line(self, children):
-        return self.cite_first_line(children)
 
     def NEWLINE(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token)

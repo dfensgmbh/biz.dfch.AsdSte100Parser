@@ -101,9 +101,8 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
     | common_text
 
 // Single line quote.
-cite.1: cite_first_line cite_next_line*
+cite.1: cite_first_line+
 ?cite_first_line: CITE_LINE_START_FIRST cite_item+
-?cite_next_line: CITE_LINE_START_NEXT cite_item+
 ?cite_item.1: WS
     | format_containers
     | code
