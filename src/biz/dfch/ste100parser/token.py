@@ -46,16 +46,23 @@ class Token(StrEnum):
     MULTIPLY = auto()
 
     WS = auto()
+    SPACE = auto()
+
     NEWLINE = auto()
+    LINEBREAK = auto()
     TEXT = auto()
     CHAR = auto()
     APOSTROPHE = auto()
     YEAR_SHORT = auto()
 
-    proc = auto()
     proc_item = auto()
     PROC_STEP = auto()
     PROC_DELIMITER = auto()
 
     heading = auto()
     HEADING_LEVEL = auto()
+
+    paragraph = auto()
+
+    LIST_MARKER = auto()
+    list_item = auto()

@@ -30,13 +30,13 @@ class TestWs(unittest.TestCase):
     """TestWs"""
 
     @parameterized.expand([
-        ("single", ' text', True),
-        ("double", '  text', True),
-        ("triple", '   text', True),
-        ("tab_single", '\ttext', True),
-        ("tab_double", '\t\ttext', True),
-        ("tab_triple", '\t\t\ttext', True),
-        ("mixed", '\t \t text', True),
+        ("single", 'text ', True),
+        ("double", 'text  ', True),
+        ("triple", 'text   ', True),
+        ("single_tab", 'text\t', True),
+        ("double_tab", 'text\t\t', True),
+        ("triple_tab", 'text\t\t\t', True),
+        ("mixed", 'text\t \t', True),
     ])
     def test_ws_single_token(self, rule, value, expected):
 
@@ -52,45 +52,35 @@ class TestWs(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.WS])
         self.assertEqual(1, metrics[Token.TEXT])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
+        self.assertEqual(Token.TEXT, metrics.pop())
 
         self.assertEqual(0, len(metrics), metrics)
 
     @parameterized.expand([
-        ("tab", '\t.', True),
-        ("single", ' .', True),
+        ("tab", '\t.', False),
+        ("single", ' .', False),
+        ("single", ' text', False),
+        ("double", '  text', False),
+        ("triple", '   text', False),
+        ("tab_single", '\ttext', False),
+        ("tab_double", '\t\ttext', False),
+        ("tab_triple", '\t\t\ttext', False),
+        ("mixed", '\t \t text', False),
     ])
-    def test_ws_start(self, rule, value, expected):
+    def test_ws_start_fails(self, rule, value, expected):
 
         _ = rule
         _ = expected
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        self.assertFalse(result)
 
     @parameterized.expand([
         ("single", '. ', True),
@@ -110,12 +100,12 @@ class TestWs(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.WS])
         self.assertEqual(1, metrics[Token.TEXT])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
 

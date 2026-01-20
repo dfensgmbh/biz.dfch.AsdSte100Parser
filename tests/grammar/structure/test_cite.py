@@ -38,8 +38,9 @@ class TestCite(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
+        self.assertEqual(8, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(3, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.NEWLINE])
         self.assertEqual(1, metrics[Token.cite])
@@ -47,6 +48,7 @@ class TestCite(unittest.TestCase):
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
 
@@ -68,8 +70,9 @@ class TestCite(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
+        self.assertEqual(8, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(3, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.NEWLINE])
         self.assertEqual(1, metrics[Token.cite])
@@ -77,6 +80,7 @@ class TestCite(unittest.TestCase):
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
 
@@ -97,8 +101,9 @@ class TestCite(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(8, len(metrics), metrics)
+        self.assertEqual(9, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.cite])
         self.assertEqual(1, metrics[Token.bold])
         self.assertEqual(1, metrics[Token.NEWLINE])
@@ -107,6 +112,7 @@ class TestCite(unittest.TestCase):
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
 
@@ -157,9 +163,9 @@ class TestCite(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(13, len(metrics), metrics)
+        self.assertEqual(14, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
-        # self.assertEqual(2, metrics[Token.cite])
+        self.assertEqual(2, metrics[Token.cite])
         self.assertEqual(1, metrics[Token.bold])
         self.assertEqual(1, metrics[Token.squote])
         self.assertEqual(1, metrics[Token.NEWLINE])
@@ -168,6 +174,7 @@ class TestCite(unittest.TestCase):
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
 

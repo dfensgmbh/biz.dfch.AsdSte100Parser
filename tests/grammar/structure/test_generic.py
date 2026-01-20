@@ -29,7 +29,7 @@ from biz.dfch.ste100parser.transformer import StructureTransformer
 class TestGeneric(unittest.TestCase):
     """TestGeneric"""
 
-    def test_inspect(self):
+    def test(self):
 
         value = "`_first`: 4 * 3\nNext-line-ddf\r\n\nFourth-line"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
@@ -39,20 +39,24 @@ class TestGeneric(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(12, len(metrics), metrics)
+        self.assertEqual(14, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(2, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.MULTIPLY])
         self.assertEqual(1, metrics[Token.CODE])
         self.assertEqual(5, metrics[Token.TEXT])
-        self.assertEqual(3, metrics[Token.NEWLINE])
+        self.assertEqual(2, metrics[Token.NEWLINE])
+        self.assertEqual(1, metrics[Token.LINEBREAK])
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.LINEBREAK, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.MULTIPLY, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
@@ -72,16 +76,19 @@ class TestGeneric(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
+        self.assertEqual(7, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(2, metrics[Token.paragraph])
         self.assertEqual(2, metrics[Token.TEXT])
         self.assertEqual(2, metrics[Token.NEWLINE])
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
 
         self.assertEqual(0, len(metrics), metrics)
@@ -127,17 +134,24 @@ class TestGeneric(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(1, len(metrics), metrics)
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.TEXT])
 
     @parameterized.expand([
         ("text_space", "text ", True),
-        ("space_text", " text", True),
+        ("space_text", " text", False),
     ])
     def test_text1(self, rule, value, expected):
 
         _ = rule
         _ = expected
+
+        if not expected:
+            result = Parser(GrammarType.STRUCTURE).is_valid(value)
+            self.assertFalse(result)
+
+            return
 
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
@@ -147,18 +161,23 @@ class TestGeneric(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.WS])
 
     @parameterized.expand([
         ("text_space", "text1 text2 ", True),
-        ("space_text", " text1 text2", True),
+        ("space_text", " text1 text2", False),
     ])
     def test_text2(self, rule, value, expected):
 
         _ = rule
-        _ = expected
+
+        if not expected:
+            result = Parser(GrammarType.STRUCTURE).is_valid(value)
+            self.assertFalse(result)
+
+            return
 
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
@@ -168,6 +187,6 @@ class TestGeneric(unittest.TestCase):
 
         # Assert type and quantity of tokens.
         self.assertEqual(5, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(2, metrics[Token.TEXT])
         self.assertEqual(2, metrics[Token.WS])

@@ -128,11 +128,19 @@ class TestProc(unittest.TestCase):
         result = Parser(GrammarType.STRUCTURE).is_valid(value)
         self.assertEqual(expected, result, rule)
 
+    def test_proc2(self):
+        value = "91. first-text more-text\n02. next-text more-text\nend-text"
+        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+
+        metrics = TokenMetrics()
+        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        print(transformed.pretty())
+
     @parameterized.expand([
-        ("sof_multi", "01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("sof_multi", "01.  first-text more-text\r\n  02.  next-text more-text\r\nend-text", True),
         ("sof_multi", "01. first-text more-text\n  02.  next-text more-text\nend-text", True),
         ("leading_space_multi", " 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
-        ("leading_space_multi", "  01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("leading_space_multi", "  01. first-text more-text\r\n  02.  next-text more-text\nend-text", True),
         ("leading_crlf_multi", "\r\n01. first-text more-text\n  02.  next-text more-text\nend-text", True),
         ("leading_crlf_multi", "\n01. first-text more-text\n  02.  next-text more-text\nend-text", True),
         ("leading_crlf_and_space_multi", "\r\n 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
@@ -151,25 +159,27 @@ class TestProc(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(13, len(metrics), metrics)
+        self.assertEqual(14, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(5, metrics[Token.TEXT])
         self.assertEqual(3, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(1, metrics[Token.proc])
+        self.assertEqual(2, metrics[Token.NEWLINE])
         self.assertEqual(2, metrics[Token.proc_item])
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
 
-        self.assertEqual(Token.proc, metrics.pop())
+        self.assertEqual(Token.NEWLINE, metrics.pop())
         self.assertEqual(Token.proc_item, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
+
+        self.assertEqual(Token.NEWLINE, metrics.pop())
         self.assertEqual(Token.proc_item, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.WS, metrics.pop())
