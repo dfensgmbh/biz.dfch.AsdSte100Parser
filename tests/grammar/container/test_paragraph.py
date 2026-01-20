@@ -21,7 +21,7 @@
 import unittest
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestParagraph(unittest.TestCase):
@@ -30,17 +30,17 @@ class TestParagraph(unittest.TestCase):
     def test_leading_ws_fails(self):
         value = " leading-space-is-not-valid"
 
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertFalse(result)
 
     def test_leading_newline_is_not_part_of_para(self):
         value = "\narbitrary-text-that-is-part-of-the-paragraph."
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -61,11 +61,11 @@ class TestParagraph(unittest.TestCase):
     def test_newline_is_part_of_para(self):
         value = "arbitrary-text-that-is-part-of-the-paragraph\nmore-paragraph-text."
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -86,11 +86,11 @@ class TestParagraph(unittest.TestCase):
         # value = "text-in-1st-para\n\ntext-in-2nd-para."
         value = "text-in-1st-para\n\ntext-in-2nd-para"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -114,11 +114,11 @@ class TestParagraph(unittest.TestCase):
     def test_bold_in_para(self):
         value = "text-in*bold*"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -138,11 +138,11 @@ class TestParagraph(unittest.TestCase):
     def test_emph_in_para(self):
         value = "text-in_emph_"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -162,11 +162,11 @@ class TestParagraph(unittest.TestCase):
     def test_bold_emph_in_para(self):
         value = "text-in*_bold-emph_*"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -186,11 +186,11 @@ class TestParagraph(unittest.TestCase):
     def test_dquote_in_para(self):
         value = 'text-in"dquote"'
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -210,11 +210,11 @@ class TestParagraph(unittest.TestCase):
     def test_squote_in_para(self):
         value = "text-in'squote'"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -234,11 +234,11 @@ class TestParagraph(unittest.TestCase):
     def test_paren_in_para(self):
         value = "text-in(parentheses)"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -258,11 +258,11 @@ class TestParagraph(unittest.TestCase):
     def test_mul_in_para(self):
         value = " * "
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -279,11 +279,11 @@ class TestParagraph(unittest.TestCase):
     def test_apostrophe_in_para1(self):
         value = "Peter's."
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -303,11 +303,11 @@ class TestParagraph(unittest.TestCase):
     def test_apostrophe_in_para2(self):
         value = "Manufacturers'."
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -327,11 +327,11 @@ class TestParagraph(unittest.TestCase):
     def test_proc_after_para(self):
         value = "Some-text.\n\n1. proc-item"
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

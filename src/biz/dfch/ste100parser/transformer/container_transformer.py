@@ -17,7 +17,7 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""structure_transformer"""
+"""container_transformer"""
 
 import sys
 
@@ -28,9 +28,13 @@ from ..token import Token
 
 from .transformer_base import TransformerBase
 
+__all__ = [
+    "ContainerTransformer",
+]
 
-class StructureTransformer(TransformerBase):
-    """StructureTransformer"""
+
+class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
+    """Transformer for pass 1."""
 
     def _process_token_pair(
         self,

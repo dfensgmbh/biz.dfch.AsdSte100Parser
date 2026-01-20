@@ -23,7 +23,7 @@ import unittest
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestWs(unittest.TestCase):
@@ -43,11 +43,11 @@ class TestWs(unittest.TestCase):
         _ = rule
         _ = expected
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -79,7 +79,7 @@ class TestWs(unittest.TestCase):
         _ = rule
         _ = expected
 
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertFalse(result)
 
     @parameterized.expand([
@@ -91,11 +91,11 @@ class TestWs(unittest.TestCase):
         _ = rule
         _ = expected
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

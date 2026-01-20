@@ -21,7 +21,7 @@
 import unittest
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestCite(unittest.TestCase):
@@ -31,10 +31,10 @@ class TestCite(unittest.TestCase):
         """Cite after a line break is valid."""
 
         value = "\r\n> cite-text more-text\nend-text"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -63,10 +63,10 @@ class TestCite(unittest.TestCase):
         """Cite at the start of the input (without a line break at the start) is valid."""
 
         value = "> cite-text more-text\nend-text"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -94,10 +94,10 @@ class TestCite(unittest.TestCase):
     def test_single(self):
 
         value = "\r\n> cite-text *bold-text*\nend-text"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -128,10 +128,10 @@ class TestCite(unittest.TestCase):
         """An 'empty' cite line must contain a minimum of one WS."""
 
         value = ">  \n>  \n"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -156,10 +156,10 @@ class TestCite(unittest.TestCase):
 
         # value = "\r\n> block-quote-text1 *more-text*\n> block-quote-text1 *more-text*\nend-text"
         value = "\r\n> first-text *some-text*\n> next-text 'more-text'\nend-text"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

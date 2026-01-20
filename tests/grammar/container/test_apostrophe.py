@@ -21,7 +21,7 @@
 import unittest
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestApostrophe(unittest.TestCase):
@@ -31,11 +31,11 @@ class TestApostrophe(unittest.TestCase):
 
         value = """Peter's cat."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -58,11 +58,11 @@ class TestApostrophe(unittest.TestCase):
 
         value = """'Peter's cat.' in squote."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -91,11 +91,11 @@ class TestApostrophe(unittest.TestCase):
 
         value = """"Peter's cat." in squote."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -124,11 +124,11 @@ class TestApostrophe(unittest.TestCase):
 
         value = """Manufacturers' regulations."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -151,11 +151,11 @@ class TestApostrophe(unittest.TestCase):
 
         value = """'Manufacturers' regulations' in squote."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -184,11 +184,11 @@ class TestApostrophe(unittest.TestCase):
 
         value = """"Manufacturers' regulations" in squote."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

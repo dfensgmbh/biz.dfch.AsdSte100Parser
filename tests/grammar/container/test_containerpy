@@ -17,14 +17,14 @@
 # pylint: disable=C0301
 # type: ignore
 
-"""test_structure"""
+"""test_container"""
 
 import unittest
 
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 from tests.phrase import Phrase
 
 
@@ -33,8 +33,8 @@ class TestStructure(unittest.TestCase):
 
     def test_and_display(self):
 
-        value = """'I *can* _quote_ Peter's *_opening_* `parentheses` "(" and ")".'"""
-        sut = Parser(GrammarType.STRUCTURE)
+        value = """'I *can* _quote_ Peter's *_opening_* `parentheses` "(" and ")".'"""  # noqa: E501
+        sut = Parser(GrammarType.CONTAINER)
 
         try:
             result = sut.invoke(value)
@@ -50,11 +50,11 @@ class TestStructure(unittest.TestCase):
 
         value = """'This is _an_ *squote*' at the *start* of a text."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -98,11 +98,11 @@ class TestStructure(unittest.TestCase):
 
         value = """"This is _a_ *dquote*" at the *start* of a text."""
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -154,7 +154,7 @@ class TestStructure(unittest.TestCase):
         ("paren_start", '(Unusual) But this can also occur.', True),
         ("paren_mid", 'Not unusual, (when writing) this can happen.', True),
 
-        ("pq_end", 'I can use quoted text in parentheses ("This is quoted text.").', True),
+        ("pq_end", 'I can use quoted text in parentheses ("This is quoted text.").', True),  # noqa: E501
         ("pq_start", '("Quoted text") Sometimes at the start.', True),
         ("pq_mid", 'Quoted text ("in this example") in the middle.', True),
 
@@ -163,17 +163,17 @@ class TestStructure(unittest.TestCase):
 
         ("bold", "This is text in *bold*", True),
 
-        ("squote_with_apostrophe", "This is Edgar's 'single quoted' text.", True),
-        ("squote_with_apostrophe", "This is 'single quoted' text from the 1900's.", True),
+        ("squote_with_apostrophe", "This is Edgar's 'single quoted' text.", True),  # noqa: E501
+        ("squote_with_apostrophe", "This is 'single quoted' text from the 1900's.", True),  # noqa: E501
         ("squote_with_apostrophe",
          "'Single quoted' text from the manufacturers' specification.", True),
-        ("dquote_with_apostrophe", '''This is Edgar's "double quoted" text.''', True),
+        ("dquote_with_apostrophe", '''This is Edgar's "double quoted" text.''', True),  # noqa: E501
 
-        ("paren_nested", 'Nested parentheses (that is parentheses within (another pair of) parentheses).', True),
-        ("paren_nested", 'Nested parentheses (that is parentheses within (another "pair" of) parentheses).', True),
+        ("paren_nested", 'Nested parentheses (that is parentheses within (another pair of) parentheses).', True),  # noqa: E501
+        ("paren_nested", 'Nested parentheses (that is parentheses within (another "pair" of) parentheses).', True),  # noqa: E501
     ])
     def test_container(self, rule, value, expected) -> None:
 
-        sut = Parser(GrammarType.STRUCTURE)
+        sut = Parser(GrammarType.CONTAINER)
         result = sut.is_valid(value)
         self.assertEqual(result, expected, f"{rule}: {value}")

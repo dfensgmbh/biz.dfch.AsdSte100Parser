@@ -24,7 +24,7 @@ import unittest
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestProc(unittest.TestCase):
@@ -112,7 +112,8 @@ class TestProc(unittest.TestCase):
         ("multi_lower_mid_with_ws", '''\n  abc. some-text more-text''', True),
         ("multi_lower_mid_with_ws", '''\n   abc. some-text more-text''', True),
 
-        ("multi_space_will_push_space_into_line", '''1 .  some-text more-text''', True),
+        ("multi_space_will_push_space_into_line",
+         '''1 .  some-text more-text''', True),
 
         ("alpha_num_mid", '''\n1a. some-text more-text''', True),
         ("alpha_num_mid_with_ws", '''\n 1a. some-text''', True),
@@ -125,26 +126,32 @@ class TestProc(unittest.TestCase):
     ])
     def test_is_valid(self, rule, value, expected):  # NOSONAR(54144)
 
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertEqual(expected, result, rule)
 
     def test_proc2(self):
         value = "91. first-text more-text\n02. next-text more-text\nend-text"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
     @parameterized.expand([
         ("sof_multi", "01.  first-text more-text\r\n  02.  next-text more-text\r\nend-text", True),
         ("sof_multi", "01. first-text more-text\n  02.  next-text more-text\nend-text", True),
-        ("leading_space_multi", " 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
-        ("leading_space_multi", "  01. first-text more-text\r\n  02.  next-text more-text\nend-text", True),
-        ("leading_crlf_multi", "\r\n01. first-text more-text\n  02.  next-text more-text\nend-text", True),
-        ("leading_crlf_multi", "\n01. first-text more-text\n  02.  next-text more-text\nend-text", True),
-        ("leading_crlf_and_space_multi", "\r\n 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
-        ("leading_crlf_and_space_multi", "\n 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("leading_space_multi",
+         " 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("leading_space_multi",
+         "  01. first-text more-text\r\n  02.  next-text more-text\nend-text", True),
+        ("leading_crlf_multi",
+         "\r\n01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("leading_crlf_multi",
+         "\n01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("leading_crlf_and_space_multi",
+         "\r\n 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
+        ("leading_crlf_and_space_multi",
+         "\n 01. first-text more-text\n  02.  next-text more-text\nend-text", True),
     ])
     def test_proc(self, rule, value, expected):  # NOSONAR(54144)
 
@@ -152,10 +159,10 @@ class TestProc(unittest.TestCase):
         _ = expected
 
         value = " 01. first-text more-text\n  02.  next-text more-text\nend-text"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

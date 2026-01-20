@@ -23,7 +23,7 @@ import unittest
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import Char, GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestGeneric(unittest.TestCase):
@@ -32,10 +32,10 @@ class TestGeneric(unittest.TestCase):
     def test(self):
 
         value = "`_first`: 4 * 3\nNext-line-ddf\r\n\nFourth-line"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -69,10 +69,10 @@ class TestGeneric(unittest.TestCase):
     def test_newline(self):
 
         value = "first-line\r\n\nthird-line"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -121,7 +121,7 @@ class TestGeneric(unittest.TestCase):
     ])
     def test_text0(self, rule, value, expected):
 
-        sut = Parser(GrammarType.STRUCTURE)
+        sut = Parser(GrammarType.CONTAINER)
 
         if expected is False:
             self.assertFalse(sut.is_valid(value), rule)
@@ -130,7 +130,7 @@ class TestGeneric(unittest.TestCase):
         initial = sut.invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -148,15 +148,15 @@ class TestGeneric(unittest.TestCase):
         _ = expected
 
         if not expected:
-            result = Parser(GrammarType.STRUCTURE).is_valid(value)
+            result = Parser(GrammarType.CONTAINER).is_valid(value)
             self.assertFalse(result)
 
             return
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -174,15 +174,15 @@ class TestGeneric(unittest.TestCase):
         _ = rule
 
         if not expected:
-            result = Parser(GrammarType.STRUCTURE).is_valid(value)
+            result = Parser(GrammarType.CONTAINER).is_valid(value)
             self.assertFalse(result)
 
             return
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

@@ -23,7 +23,7 @@ import unittest
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestQuote(unittest.TestCase):
@@ -44,13 +44,13 @@ class TestQuote(unittest.TestCase):
     ])
     def test_single_char(self, rule, value, expected):
 
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         _ = rule
         _ = expected
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

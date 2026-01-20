@@ -23,7 +23,7 @@ import unittest
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestParentheses(unittest.TestCase):
@@ -32,10 +32,10 @@ class TestParentheses(unittest.TestCase):
     def test_standalone(self):
 
         value = "(some-text-in-parentheses)"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -54,10 +54,10 @@ class TestParentheses(unittest.TestCase):
     def test_multiline(self):
 
         value = "(some-multiline-text\nin-parentheses)"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -79,10 +79,10 @@ class TestParentheses(unittest.TestCase):
     def test_pair_start(self):
 
         value = "(some-text-in-parentheses)"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -101,10 +101,10 @@ class TestParentheses(unittest.TestCase):
     def test_nested(self):
 
         value = "(some-text-in-parentheses (round-brackets))"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -127,10 +127,10 @@ class TestParentheses(unittest.TestCase):
     def test_dquote_in_paren1(self):
 
         value = """(some-text-in-parentheses "round-brackets")"""
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -154,10 +154,10 @@ class TestParentheses(unittest.TestCase):
     def test_dquote_in_paren2(self):
 
         value = """(some-text-in-parentheses "(round-brackets)")"""
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -185,17 +185,18 @@ class TestParentheses(unittest.TestCase):
         ("squote", """'(round\nbrackets)'""", False),
         ("squote", """'(round\r\nbrackets)'""", False),
     ])
-    def test_newline_in_paren_in_quote(self, rule, value, expected):  # NOSONAR(54144)
+    # NOSONAR(54144)
+    def test_newline_in_paren_in_quote(self, rule, value, expected):
 
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertEqual(expected, result, rule)
 
     def test_empty(self):
         value = "()"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -205,10 +206,10 @@ class TestParentheses(unittest.TestCase):
 
     def test_empty_in_dquote(self):
         value = '"()"'
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -219,22 +220,22 @@ class TestParentheses(unittest.TestCase):
 
     def test_paren_open_fails(self):
         value = ")"
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
         self.assertFalse(result)
 
     def test_paren_close_fails(self):
         value = ")"
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
         self.assertFalse(result)
 
     def test_open_in_dquote(self):
         value = '"("'
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -245,10 +246,10 @@ class TestParentheses(unittest.TestCase):
 
     def test_close_in_dquote(self):
         value = '")"'
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

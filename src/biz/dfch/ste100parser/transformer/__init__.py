@@ -15,8 +15,8 @@
 
 """transformer module."""
 
-from .structure_transformer import StructureTransformer
+from .container_transformer import ContainerTransformer  # type: ignore
 
 __all__ = [
-    "StructureTransformer",
+    "ContainerTransformer",
 ]

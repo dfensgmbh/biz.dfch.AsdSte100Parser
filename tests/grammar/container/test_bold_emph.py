@@ -21,7 +21,7 @@
 import unittest
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import StructureTransformer
+from biz.dfch.ste100parser.transformer import ContainerTransformer
 
 
 class TestBoldEmph(unittest.TestCase):
@@ -30,10 +30,10 @@ class TestBoldEmph(unittest.TestCase):
     def test(self):
 
         value = "*_bold-emph text_* at the start"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -61,34 +61,34 @@ class TestBoldEmph(unittest.TestCase):
     def test_multi_line_fails(self):
 
         value = "*_some_code\nmore code_* "
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
         self.assertFalse(result)
 
     def test_single_open_fails(self):
         value = "*_"
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
         self.assertFalse(result)
 
     def test_single_close_fails(self):
         value = "_*"
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
         self.assertFalse(result)
 
     def test_empty_fails(self):
         value = "*__*"
-        result = Parser(GrammarType.STRUCTURE).is_valid(value)
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
         self.assertFalse(result)
 
     def test_in_dquote(self):
         value = '"*__*"'
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -99,10 +99,10 @@ class TestBoldEmph(unittest.TestCase):
 
     def test_in_squote(self):
         value = "'*__*'"
-        initial = Parser(GrammarType.STRUCTURE).invoke(value)
+        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
         metrics = TokenMetrics()
-        transformed = StructureTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
