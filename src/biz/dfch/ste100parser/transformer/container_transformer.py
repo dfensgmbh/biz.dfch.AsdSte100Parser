@@ -125,7 +125,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(first, str) and Char.CODE == first
         assert isinstance(last, str) and Char.CODE == last
 
-        result = Tree(token.name, mid.value)
+        result = Tree(token.name, [mid.value])
         self._metrics.append(token)
 
         return result
@@ -313,7 +313,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, str(children))
+        result = Tree(token.name, [str(children)])
         self._metrics.append(token)
 
         return result
@@ -333,7 +333,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         if Char.SQUOTE == last:
             last = Char.EMPTY
 
-        result = Tree(token.name, last)
+        result = Tree(token.name, [last])
         self._metrics.append(token)
 
         return result
@@ -352,7 +352,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, Char.HASH * len(children))
+        result = Tree(token.name, [Char.HASH * len(children)])
         self._metrics.append(token)
 
         return result
@@ -424,7 +424,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         items = children[0]
 
-        result = Tree(token.name, items)
+        result = Tree(token.name, [items])
         self._metrics.append(token)
 
         return result
