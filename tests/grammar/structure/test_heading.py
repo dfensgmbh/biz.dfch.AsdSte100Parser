@@ -27,8 +27,8 @@ from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
 from biz.dfch.ste100parser.transformer import StructureTransformer
 
 
-class TestQuote(unittest.TestCase):
-    """TestQuote"""
+class TestHeading(unittest.TestCase):
+    """TestHeading"""
 
     def test(self):
         value = "# This-is-a-heading-level-1"
@@ -60,8 +60,9 @@ class TestQuote(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(12, len(metrics), metrics)
+        self.assertEqual(13, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.start])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(2, metrics[Token.heading])
         self.assertEqual(2, metrics[Token.HEADING_LEVEL])
         self.assertEqual(3, metrics[Token.TEXT])
@@ -69,6 +70,7 @@ class TestQuote(unittest.TestCase):
 
         # Assert order of tokens (recursively).
         self.assertEqual(Token.start, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
 
         self.assertEqual(Token.NEWLINE, metrics.pop())

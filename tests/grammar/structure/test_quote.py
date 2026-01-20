@@ -54,11 +54,13 @@ class TestQuote(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(3, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[expected])
         self.assertEqual(1, metrics[Token.CHAR])
 
         # Assert order of tokens (recursively).
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(expected, metrics.pop())
         self.assertEqual(Token.CHAR, metrics.pop())
 

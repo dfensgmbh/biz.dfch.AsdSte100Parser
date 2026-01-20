@@ -39,11 +39,13 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(3, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.paren])
         self.assertEqual(1, metrics[Token.TEXT])
 
         # Assert order of tokens (recursively).
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
 
@@ -59,12 +61,14 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
+        self.assertEqual(5, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.paren])
         self.assertEqual(2, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.NEWLINE])
 
         # Assert order of tokens (recursively).
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
         self.assertEqual(Token.NEWLINE, metrics.pop())
@@ -74,7 +78,7 @@ class TestParentheses(unittest.TestCase):
 
     def test_pair_start(self):
 
-        value = "(some-text-in-parentheses)."
+        value = "(some-text-in-parentheses)"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -82,14 +86,13 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.TEXT])
+        self.assertEqual(3, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.paren])
+        self.assertEqual(1, metrics[Token.paragraph])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
 
@@ -97,7 +100,7 @@ class TestParentheses(unittest.TestCase):
 
     def test_nested(self):
 
-        value = "(some-text-in-parentheses (round-brackets))."
+        value = "(some-text-in-parentheses (round-brackets))"
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -105,15 +108,14 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(3, metrics[Token.TEXT])
+        self.assertEqual(6, len(metrics), metrics)
+        self.assertEqual(2, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.WS])
         self.assertEqual(2, metrics[Token.paren])
+        self.assertEqual(1, metrics[Token.paragraph])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
@@ -124,7 +126,7 @@ class TestParentheses(unittest.TestCase):
 
     def test_dquote_in_paren1(self):
 
-        value = """(some-text-in-parentheses "round-brackets")."""
+        value = """(some-text-in-parentheses "round-brackets")"""
         initial = Parser(GrammarType.STRUCTURE).invoke(value)
 
         metrics = TokenMetrics()
@@ -132,16 +134,15 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(3, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
+        self.assertEqual(6, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.paren])
         self.assertEqual(1, metrics[Token.dquote])
+        self.assertEqual(2, metrics[Token.TEXT])
+        self.assertEqual(1, metrics[Token.WS])
 
         # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.dquote, metrics.pop())
         self.assertEqual(Token.TEXT, metrics.pop())
@@ -160,13 +161,15 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(6, len(metrics), metrics)
+        self.assertEqual(7, len(metrics), metrics)
         self.assertEqual(2, metrics[Token.TEXT])
         self.assertEqual(1, metrics[Token.WS])
         self.assertEqual(2, metrics[Token.paren])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.dquote])
 
         # Assert order of tokens (recursively).
+        self.assertEqual(Token.paragraph, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
         self.assertEqual(Token.dquote, metrics.pop())
         self.assertEqual(Token.paren, metrics.pop())
@@ -196,7 +199,8 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(1, len(metrics), metrics)
+        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.paren])
 
     def test_empty_in_dquote(self):
@@ -208,7 +212,8 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(3, len(metrics), metrics)
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.paren])
         self.assertEqual(1, metrics[Token.dquote])
 
@@ -233,8 +238,9 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(3, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.dquote])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.CHAR])
 
     def test_close_in_dquote(self):
@@ -246,6 +252,7 @@ class TestParentheses(unittest.TestCase):
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
+        self.assertEqual(3, len(metrics), metrics)
         self.assertEqual(1, metrics[Token.dquote])
+        self.assertEqual(1, metrics[Token.paragraph])
         self.assertEqual(1, metrics[Token.CHAR])

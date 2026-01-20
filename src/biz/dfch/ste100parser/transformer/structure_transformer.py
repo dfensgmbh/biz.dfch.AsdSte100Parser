@@ -247,51 +247,47 @@ class StructureTransformer(TransformerBase):
         # Remove the token from the tree.
         return Discard
 
-    def proc(self, children):
-        assert isinstance(children, list), children
+    def PROC_MARKER(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), type(children)
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.proc
+        token = Token.PROC_STEP
 
         self.print(children, token.name)
 
-        items = children
-
-        result = Tree(token.name, items)
-        self._metrics.append(token)
-
+        result = lexer.Token(token.name, str(children))
         return result
 
-    def proc_marker(self, children):
-        assert isinstance(children, list), children
-        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+    def PROC_DELIMITER(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), type(children)
+        assert 1 == len(children), f"#{len(children)}: [{children}]."
 
-        return str(children[0])
+        token = Token.PROC_DELIMITER
 
-    def proc_delimiter(self, children):
-        assert isinstance(children, list), children
-        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+        self.print(children, token.name)
 
-        return str(children[0])
+        result = lexer.Token(token.name, str(children))
+        return result
 
-    def proc_first_line(self, children):
-        return self._process_proc_line(children)
-
-    def proc_next_line(self, children):
+    def proc_line(self, children):
         assert isinstance(children, list), children
         assert 4 <= len(children), f"#{len(children)}: [{children}]."
 
-        return self._process_proc_line(children[1:])
-
-    def _process_proc_line(self, children):
-        assert isinstance(children, list), children
-        assert 3 <= len(children), f"#{len(children)}: [{children}]."
-
         token = Token.proc_item
+
+        item = children[0]
+        assert isinstance(item, lexer.Token)
+
+        if Token.SPACE.name == item.type:
+            children = children[1:]
+
+        item = children[0]
+        assert isinstance(item, lexer.Token)
+        assert Token.PROC_STEP.name == item.type
 
         self.print(children, token.name)
 
-        step, delimiter, *remaining = children
+        step, delimiter, _, *remaining = children
 
         items = [
             Tree(Token.PROC_STEP.name, step),
@@ -409,5 +405,61 @@ class StructureTransformer(TransformerBase):
         result = Tree(token.name, items)
         # Do not add a token to the metrics collection.
         # This was done in heading_*_line().
+
+        return result
+
+    def SINGLE_NEWLINE(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), children
+        assert 1 == len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.LINEBREAK
+
+        self.print(children, token.name)
+
+        items = children[0]
+
+        result = Tree(token.name, items)
+        self._metrics.append(token)
+
+        return result
+
+    def paragraph(self, children):
+        assert isinstance(children, list), children
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.paragraph
+
+        self.print(children, token.name)
+
+        items = children
+
+        result = Tree(token.name, items)
+        self._metrics.append(token)
+
+        return result
+
+    def list_line(self, children):
+        assert isinstance(children, list), children
+        assert 3 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.list_item
+
+        self.print(children, token.name)
+
+        item = children[0]
+        if "LIST_LINE_START" == item.type:
+            children = children[1:]
+
+        marker = Tree(Token.LIST_MARKER.name, children.pop(0))
+
+        _, *remaining = children
+
+        items = [
+            marker,
+            *remaining
+        ]
+
+        result = Tree(token.name, items)
+        self._metrics.append(token)
 
         return result
