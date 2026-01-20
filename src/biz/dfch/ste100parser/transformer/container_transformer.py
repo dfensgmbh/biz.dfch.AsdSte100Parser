@@ -182,7 +182,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, Char.LF)
+        result = Tree(token.name, [Char.LF])
         self._metrics.append(token)
 
         return result
@@ -195,7 +195,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, Char.SPACE * len(children))
+        result = Tree(token.name, [Char.SPACE * len(children)])
         self._metrics.append(token)
 
         return result
@@ -208,7 +208,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = Tree(token.name, f" {Char.MULTIPLY} ")
+        result = Tree(token.name, [f" {Char.MULTIPLY} "])
         self._metrics.append(token)
 
         return result
