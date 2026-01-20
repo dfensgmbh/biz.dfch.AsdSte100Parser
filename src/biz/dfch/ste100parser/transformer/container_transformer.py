@@ -259,7 +259,8 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = lexer.Token(token.name, str(children))
+        items = [str(children)]
+        result = Tree(token.name, items)
         return result
 
     def PROC_DELIMITER(self, children):  # pylint: disable=C0103
@@ -270,7 +271,8 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        result = lexer.Token(token.name, str(children))
+        items = [str(children)]
+        result = Tree(token.name, items)
         return result
 
     def proc_line(self, children):
@@ -280,22 +282,20 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         token = Token.proc_item
 
         item = children[0]
-        assert isinstance(item, lexer.Token)
-
-        if Token.SPACE.name == item.type:
+        if isinstance(item, lexer.Token) and Token.SPACE.name == item.type:
             children = children[1:]
 
         item = children[0]
-        assert isinstance(item, lexer.Token)
-        assert Token.PROC_STEP.name == item.type
+        assert isinstance(item, Tree)
+        assert Token.PROC_STEP.name == item.data
 
         self.print(children, token.name)
 
         step, delimiter, _, *remaining = children
 
         items = [
-            Tree(Token.PROC_STEP.name, step),
-            Tree(Token.PROC_DELIMITER.name, delimiter),
+            step,
+            delimiter,
             *remaining
         ]
         result = Tree(token.name, items)
