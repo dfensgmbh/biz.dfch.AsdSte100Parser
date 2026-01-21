@@ -13,183 +13,124 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_cite"""
 
-import unittest
+from biz.dfch.ste100parser import Token
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestCite(unittest.TestCase):
+class TestCite(TestCaseContainerBase):
     """TestCite"""
 
-    def test_cite(self):
-        """Cite after a line break is valid."""
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
 
-        value = "\r\n> cite-text more-text\nend-text"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
         print(transformed.pretty())
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(8, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(3, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(1, metrics[Token.cite])
-        self.assertEqual(1, metrics[Token.WS])
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
 
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
+    def test_cite(self):
 
-        self.assertEqual(0, len(metrics), metrics)
+        value = "\r\n> cite-text more-text\nend-text"
+
+        expected = [
+            Token.cite,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.cite, level=1)
 
     def test_cite_sof(self):
         """Cite at the start of the input (without a line break at the start) is valid."""
 
         value = "> cite-text more-text\nend-text"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.cite,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(8, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(3, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(1, metrics[Token.cite])
-        self.assertEqual(1, metrics[Token.WS])
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.cite, level=1)
 
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
-
-    def test_single(self):
+    def test_cite_with_bold(self):
 
         value = "\r\n> cite-text *bold-text*\nend-text"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.cite,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(9, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.cite])
-        self.assertEqual(1, metrics[Token.bold])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(3, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.bold,
+        ]
+        self.assert_tree(value, expected, Token.cite, level=1)
 
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.bold, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
-
-    def test_empty(self):
+    def test_empty_fails(self):
         """An 'empty' cite line must contain a minimum of one WS."""
 
-        value = ">  \n>  \n"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        value = "\n> \n"
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        result = self._parser.is_valid(value)
+        self.assertFalse(result)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(6, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.cite])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(2, metrics[Token.WS])
+    def test_ws_fails(self):
+        """An 'empty' cite line must contain a minimum of one WS."""
 
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
+        value = "\n>  \n"
 
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        result = self._parser.is_valid(value)
+        self.assertFalse(result)
 
     def test_multi(self):
 
-        # value = "\r\n> block-quote-text1 *more-text*\n> block-quote-text1 *more-text*\nend-text"
         value = "\r\n> first-text *some-text*\n> next-text 'more-text'\nend-text"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.cite,
+            Token.cite,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(14, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.cite])
-        self.assertEqual(1, metrics[Token.bold])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(5, metrics[Token.TEXT])
-        self.assertEqual(2, metrics[Token.WS])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-
-        # # First block.
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.squote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        # # Second block.
-        self.assertEqual(Token.cite, metrics.pop())
-        self.assertEqual(Token.bold, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.bold,
+        ]
+        self.assert_tree(value, expected, Token.cite, level=1)

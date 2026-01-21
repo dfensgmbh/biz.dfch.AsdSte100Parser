@@ -13,16 +13,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""biz.dfch.ste100parser package root"""
+"""test_data"""
 
-from .char import Char
-from .grammar import GrammarType
-from .parser import Parser
-from .token import Token
+from enum import StrEnum
 
-__all__ = [
-    "Char",
-    "GrammarType",
-    "Parser",
-    "Token",
-]
+
+class TestData(StrEnum):
+    """Test data file names."""
+
+    SINGLE_PARAGRAPH = "single_paragraph.md"
+    SINGLE_PARAGRAPH_WITH_LINEBREAK = "single_paragraph_with_linebreak.md"
+
+    COMPLEX_HEADINGS_PARA_PROC_LIST = "complex_headings_para_proc_list.md"
+    COMPLEX_HEADINGS_PROC_CITE_PARA_LIST = "complex_heading_proc_cite_para_list.md"
+
+    LIST_IN_PARAGRAPH = "list_in_paragraph.md"
+    LIST_IN_PROC = "list_in_proc.md"

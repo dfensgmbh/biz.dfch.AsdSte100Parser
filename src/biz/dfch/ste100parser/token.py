@@ -65,4 +65,10 @@ class Token(StrEnum):
     paragraph = auto()
 
     LIST_MARKER = auto()
+    LIST_INDENT = auto()
     list_item = auto()
+
+    NOTE = auto()
+    WARNING = auto()
+    CAUTION = auto()
+    NOTE_OR_SAFETY_MARKER = auto()

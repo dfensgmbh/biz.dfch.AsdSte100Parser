@@ -13,342 +13,146 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_paragraph"""
 
-import unittest
+from biz.dfch.ste100parser import GrammarType, Parser, Token
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestParagraph(unittest.TestCase):
-    """TestParagraph"""
+class TestParagraph(TestCaseContainerBase):
 
-    def test_leading_ws_fails(self):
+    def _invoke(self, value: str, expected, start_token: Token = Token.start):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
+
+    def test_leading_ws_at_sof_fails(self):
         value = " leading-space-is-not-valid"
 
         result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertFalse(result)
 
-    def test_leading_newline_is_not_part_of_para(self):
-        value = "\narbitrary-text-that-is-part-of-the-paragraph."
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.NEWLINE])
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
-
     def test_newline_is_part_of_para(self):
-        value = "arbitrary-text-that-is-part-of-the-paragraph\nmore-paragraph-text."
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
+        expected = [
+            Token.paragraph,
+        ]
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.LINEBREAK])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.LINEBREAK, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        value = "arbitrary-text-that-is-part-of-the-paragraph\nmore-paragraph-text.\n"
+        self._invoke(value, expected)
 
     def test_double_newline_ends_para(self):
-        # value = "text-in-1st-para\n\ntext-in-2nd-para."
+
+        expected = [
+            Token.paragraph,
+            Token.paragraph,
+        ]
+
         value = "text-in-1st-para\n\ntext-in-2nd-para"
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.paragraph])
-        self.assertEqual(2, metrics[Token.NEWLINE])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_bold_in_para(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "text-in*bold*"
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.bold])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.bold, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_emph_in_para(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "text-in_emph_"
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.emph])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.emph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_bold_emph_in_para(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "text-in*_bold-emph_*"
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.bold_emph])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.bold_emph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_dquote_in_para(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = 'text-in"dquote"'
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.dquote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_squote_in_para(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "text-in'squote'"
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.squote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_paren_in_para(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "text-in(parentheses)"
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.paren])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.paren, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_mul_in_para(self):
+
+        expected = [
+            Token.MULTIPLY,
+        ]
+
         value = " * "
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.MULTIPLY])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.MULTIPLY, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected, Token.paragraph)
 
     def test_apostrophe_in_para1(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "Peter's."
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_apostrophe_in_para2(self):
+
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "Manufacturers'."
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_proc_after_para(self):
+
+        expected = [
+            Token.paragraph,
+            Token.proc_item,
+        ]
+
         value = "Some-text.\n\n1. proc-item"
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(1, metrics[Token.proc_item])
-        self.assertEqual(2, metrics[Token.TEXT])
-        self.assertEqual(2, metrics[Token.NEWLINE])
-        self.assertEqual(1, metrics[Token.paragraph])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.proc_item, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)

@@ -13,202 +13,121 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_apostrophe"""
 
-import unittest
+from biz.dfch.ste100parser import Token
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestApostrophe(unittest.TestCase):
+class TestApostrophe(TestCaseContainerBase):
     """TestApostrophe"""
+
+    def _invoke(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     def test_apostrophe_singular(self):
 
+        expected = [
+            Token.TEXT,
+            Token.APOSTROPHE,
+            Token.WS,
+            Token.TEXT,
+        ]
+
         value = """Peter's cat."""
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected, Token.paragraph, level=1)
 
     def test_apostrophe_inside_squote(self):
 
+        expected = [
+            Token.squote,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+
         value = """'Peter's cat.' in squote."""
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(10, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(4, metrics[Token.TEXT])
-        self.assertEqual(3, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.squote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected, Token.paragraph, level=1)
 
     def test_apostrophe_inside_dquote(self):
 
+        expected = [
+            Token.paragraph,
+        ]
+
         value = """"Peter's cat." in squote."""
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(10, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(4, metrics[Token.TEXT])
-        self.assertEqual(3, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.dquote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_apostrophe_plural(self):
 
+        expected = [
+            Token.TEXT,
+            Token.APOSTROPHE,
+            Token.WS,
+            Token.TEXT,
+        ]
+
         value = """Manufacturers' regulations."""
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(2, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected, Token.paragraph, level=1)
 
     def test_apostrophe_plural_in_squote_is_ambiguous(self):
 
         value = """'Manufacturers' regulations' in squote."""
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
+        expected = [
+            Token.paragraph,
+        ]
+        self._invoke(value, expected)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.squote,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(10, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(4, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(3, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
+        self._invoke(value, expected, Token.paragraph, level=1)
 
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.squote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
+        expected = [
+            Token.TEXT,
+            Token.APOSTROPHE,
+            Token.WS,
+            Token.TEXT,
+        ]
 
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected, Token.squote, level=2)
 
     def test_apostrophe_plural_in_dquote(self):
 
+        expected = [
+            Token.paragraph,
+        ]
+
         value = """"Manufacturers' regulations" in squote."""
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(10, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(4, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(3, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.APOSTROPHE])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.dquote, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.APOSTROPHE, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)

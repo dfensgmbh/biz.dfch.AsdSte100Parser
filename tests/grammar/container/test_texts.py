@@ -15,19 +15,17 @@
 
 # pylint: disable=C0115
 # pylint: disable=C0116
-# pylint: disable=C0301
 # type: ignore
 
-"""test_quote"""
-
-from parameterized import parameterized
+"""test_texts"""
 
 from biz.dfch.ste100parser import Token
 
 from ...test_case_container_base import TestCaseContainerBase
+from ...test_data.test_data import TestData
 
 
-class TestHeading(TestCaseContainerBase):
+class TestTexts(TestCaseContainerBase):
 
     def _invoke(self, value: str, expected):
 
@@ -43,39 +41,69 @@ class TestHeading(TestCaseContainerBase):
         result = self.get_tokens(children)
         self.assertEqual(expected, result)
 
-    def test_single_heading(self):
+    def test_single_paragraph(self):
 
         expected = [
-            Token.heading,
-        ]
-
-        value = "# This-is-a-heading-level-1\n"
-        self._invoke(value, expected)
-
-    def test_multi_headings(self):
-
-        expected = [
-            Token.heading,
-            Token.heading,
             Token.paragraph,
         ]
-        value = "# This-is-a-heading-level-1\n\n## This-is-a-heading-level-2\n\nThis-is-normal-text.\n"
+
+        value = self.load_test_file(TestData.SINGLE_PARAGRAPH)
+
         self._invoke(value, expected)
 
-    @parameterized.expand([
-        ("level_1", "# This-is-a-heading-level-1\n", 1),
-        ("level_2", "## This-is-a-heading-level-2\n", 2),
-        ("level_3", "### This-is-a-heading-level-3\n", 3),
-        ("level_4", "#### This-is-a-heading-level-4\n", 4),
-        ("level_5", "##### This-is-a-heading-level-5\n", 5),
-    ])
-    def test_heading(self, rule, value, expected):
+    def test_single_paragraph_with_linebreak(self):
 
-        _ = rule
-        _ = expected
+        expected = [
+            Token.paragraph,
+        ]
+
+        value = self.load_test_file(TestData.SINGLE_PARAGRAPH_WITH_LINEBREAK)
+        self._invoke(value, expected)
+
+    def test_complex_headings_para_proc_list(self):
 
         expected = [
             Token.heading,
+            Token.cite,
+            Token.cite,
+            Token.cite,
+            Token.NOTE,
+            Token.paragraph,
+            Token.paragraph,
+            Token.heading,
+            Token.proc_item,
+            Token.proc_item,
+            Token.proc_item,
+            Token.proc_item,
+            Token.NOTE,
+            Token.paragraph,
         ]
 
+        value = self.load_test_file(TestData.COMPLEX_HEADINGS_PARA_PROC_LIST)
+        self._invoke(value, expected)
+
+    def test_complex_headings_proc_cite_para_list(self):
+
+        expected = [
+            Token.heading,
+            Token.paragraph,
+            Token.paragraph,
+            Token.heading,
+            Token.proc_item,
+            Token.proc_item,
+            Token.proc_item,
+            Token.paragraph,
+            Token.paragraph,
+            Token.paragraph,
+            Token.proc_item,
+            Token.proc_item,
+            Token.cite,
+            Token.cite,
+            Token.paragraph,
+            Token.cite,
+            Token.cite,
+        ]
+
+        value = self.load_test_file(
+            TestData.COMPLEX_HEADINGS_PROC_CITE_PARA_LIST)
         self._invoke(value, expected)

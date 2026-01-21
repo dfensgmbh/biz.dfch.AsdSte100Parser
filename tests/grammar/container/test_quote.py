@@ -13,21 +13,42 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_quote"""
 
-import unittest
-
 from parameterized import parameterized
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser import Token
+
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestQuote(unittest.TestCase):
-    """TestQuote"""
+class TestQuote(TestCaseContainerBase):
+
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     @parameterized.expand([
         ("paren_open_in_squote", "'('", Token.squote),
@@ -42,26 +63,16 @@ class TestQuote(unittest.TestCase):
         ("under_in_dquote", '"_"', Token.dquote),
         ("back_tick_in_dquote", '"`"', Token.dquote),
     ])
-    def test_single_char(self, rule, value, expected):
-
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+    def test_single_char(self, rule, value, _expected):
 
         _ = rule
-        _ = expected
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            _expected,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[expected])
-        self.assertEqual(1, metrics[Token.CHAR])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(expected, metrics.pop())
-        self.assertEqual(Token.CHAR, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.CHAR,
+        ]
+        self.assert_tree(value, expected, _expected, level=1)

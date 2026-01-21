@@ -13,16 +13,31 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""biz.dfch.ste100parser package root"""
+"""token_converter module."""
 
-from .char import Char
-from .grammar import GrammarType
-from .parser import Parser
-from .token import Token
+from lark import Tree
+
+from ..token import Token
 
 __all__ = [
-    "Char",
-    "GrammarType",
-    "Parser",
-    "Token",
+    "TokenConverter",
 ]
+
+
+class TokenConverter:
+    """TokenConverter"""
+
+    def invoke(self, node: Tree | str) -> tuple[Token, list] | str:
+        """
+            Converts a Lark Tree into a nested structure using Token StrEnum
+            values.
+        """
+
+        if not isinstance(node, Tree):
+            return str(node)
+
+        token = Token[node.data]
+
+        children = [self.invoke(c) for c in node.children]
+
+        return (token, children)

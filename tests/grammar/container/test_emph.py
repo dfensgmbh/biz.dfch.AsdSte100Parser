@@ -13,76 +13,55 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_emph"""
 
-import unittest
+from biz.dfch.ste100parser import GrammarType, Parser, Token
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestEmph(unittest.TestCase):
-    """TestEmph"""
+class TestEmph(TestCaseContainerBase):
+
+    def _invoke(self, value: str, expected, start_token: Token = Token.start):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     def test_single(self):
 
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "_some-emph_ at-the-start."
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.emph])
-        self.assertEqual(2, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.emph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_double(self):
 
+        expected = [
+            Token.paragraph,
+        ]
+
         value = "_some-emph_ _more-emph_"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(6, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(2, metrics[Token.emph])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(2, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.emph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.emph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        self._invoke(value, expected)
 
     def test_multi_line_fails(self):
 
         value = "_some-emph\nmore-emph_ "
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
-
+        result = self._parser.is_valid(value)
         self.assertFalse(result)
 
     def test_single_fails(self):
@@ -91,30 +70,20 @@ class TestEmph(unittest.TestCase):
 
         self.assertFalse(result)
 
-    def test_in_dquote(self):
+    def test_under_in_dquote(self):
+
+        expected = [
+            Token.dquote,
+        ]
+
         value = '"_"'
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        self._invoke(value, expected, Token.paragraph)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+    def test_under_in_squote(self):
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(1, metrics[Token.CHAR])
+        expected = [
+            Token.squote,
+        ]
 
-    def test_in_squote(self):
         value = "'_'"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(1, metrics[Token.CHAR])
+        self._invoke(value, expected, Token.paragraph)

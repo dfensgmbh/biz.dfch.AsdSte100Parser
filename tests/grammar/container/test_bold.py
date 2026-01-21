@@ -13,94 +13,110 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_bold"""
 
-import unittest
+from biz.dfch.ste100parser import GrammarType, Parser, Token
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestBold(unittest.TestCase):
+class TestBold(TestCaseContainerBase):
     """TestBold"""
+
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     def test(self):
 
         value = "*bold text* at the start"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(11, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(5, metrics[Token.TEXT])
-        self.assertEqual(4, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.bold])
+        expected = [
+            Token.bold,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
 
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.bold, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.bold, level=2)
 
     def test_multi_line_fails(self):
 
         value = "_some_code\nmore code_ "
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
+        result = self._parser.is_valid(value)
         self.assertFalse(result)
 
     def test_single_fails(self):
         value = "*"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertFalse(result)
 
     def test_empty_fails(self):
         value = "**"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
         self.assertFalse(result)
 
     def test_in_dquote(self):
         value = '"*"'
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.dquote,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(1, metrics[Token.CHAR])
+        expected = [
+            Token.CHAR,
+        ]
+        self.assert_tree(value, expected, Token.dquote, level=1)
 
     def test_in_squote(self):
         value = "'*'"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.squote,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(1, metrics[Token.CHAR])
+        expected = [
+            Token.CHAR,
+        ]
+        self.assert_tree(value, expected, Token.squote, level=1)

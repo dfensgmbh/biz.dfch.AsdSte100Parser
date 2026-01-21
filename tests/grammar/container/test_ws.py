@@ -13,21 +13,42 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_ws"""
 
-import unittest
-
 from parameterized import parameterized
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser import Token
+
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestWs(unittest.TestCase):
-    """TestWs"""
+class TestWs(TestCaseContainerBase):
+
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     @parameterized.expand([
         ("single", 'text ', True),
@@ -43,25 +64,11 @@ class TestWs(unittest.TestCase):
         _ = rule
         _ = expected
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty)
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+            Token.WS,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
     @parameterized.expand([
         ("tab", '\t.', False),
@@ -79,7 +86,7 @@ class TestWs(unittest.TestCase):
         _ = rule
         _ = expected
 
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = self._parser.is_valid(value)
         self.assertFalse(result)
 
     @parameterized.expand([
@@ -91,22 +98,8 @@ class TestWs(unittest.TestCase):
         _ = rule
         _ = expected
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-        print(initial.pretty())
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+            Token.WS,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)

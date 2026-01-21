@@ -23,7 +23,7 @@ import unittest
 
 from parameterized import parameterized
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
+from biz.dfch.ste100parser import GrammarType, Parser, Token
 from biz.dfch.ste100parser.transformer import ContainerTransformer
 from tests.phrase import Phrase
 
@@ -53,8 +53,7 @@ class TestStructure(unittest.TestCase):
         initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -101,8 +100,7 @@ class TestStructure(unittest.TestCase):
         initial = Parser(GrammarType.CONTAINER).invoke(value)
         print(initial.pretty())
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

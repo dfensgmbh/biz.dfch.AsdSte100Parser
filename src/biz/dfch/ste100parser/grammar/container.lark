@@ -16,7 +16,17 @@
 // grammar.lark
 // Inline markup grammar (strict; preserves whitespace; multiline quotes allowed)
 
-?start: inline*
+?start: inline_first inline_next*
+
+?inline_first: heading
+    | paragraph
+    | proc
+    | note
+    | cite
+
+// ---------- Top-level inline stream ----------
+?inline_next: NEWLINE
+    | inline_first
 
 // Single line text elements.
 ?common_text: TEXT
@@ -44,13 +54,6 @@ char_code: BACK_TICK
 // Single line pair-wise quoting containers.
 ?quote_containers: dquote
     | squote
-
-// ---------- Top-level inline stream ----------
-?inline: NEWLINE
-    | heading
-    | paragraph
-    | proc
-    | cite
 
 // ---------- Containers ----------
 
@@ -101,14 +104,15 @@ bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
     | common_text
 
 // Single line quote.
-cite.1: cite_first_line+
-?cite_first_line: CITE_LINE_START_FIRST cite_item+
-?cite_item.1: WS
+cite.1: cite_line+
+?cite_line: CITE_LINE_START_FIRST cite_first_item cite_next_item*
+?cite_first_item.1: common_text
     | format_containers
     | code
     | quote_containers
     | paren_sl
-    | common_text
+?cite_next_item: WS
+    | cite_first_item
 
 // Single line heading.
 heading.1: heading_first_line heading_next_line*
@@ -124,6 +128,32 @@ HEADING_MARKER: "#"+
 // We capture the trailing space as a token, so that we can discard it.
 ?heading_marker_suffix: SPACE
 HEADING_LINE_START: NEWLINE
+
+// Note multi-line container.
+?safety_instruction: warning
+    | caution
+?note_or_safety_instruction: note
+    | safety_instruction
+
+warning.1: NOTE_OR_SAFETY_LINE_START warning_marker note_or_safety_first note_or_safety_next*
+warning_marker: WARNING_MARKER COLON SPACE
+WARNING_MARKER: "WARNING"
+
+caution.1: NOTE_OR_SAFETY_LINE_START caution_marker note_or_safety_first note_or_safety_next*
+caution_marker: CAUTION_MARKER COLON SPACE
+CAUTION_MARKER: "CAUTION"
+
+note.1: NOTE_OR_SAFETY_LINE_START note_marker note_or_safety_first note_or_safety_next*
+note_marker: NOTE_MARKER COLON SPACE
+NOTE_MARKER: "NOTE"
+
+NOTE_OR_SAFETY_LINE_START: NEWLINE
+?note_or_safety_first.1: common_text
+    | format_containers
+    | code
+    | quote_containers
+?note_or_safety_next.1: WS
+    | note_or_safety_first
 
 // Paragraph multi-line container.
 paragraph: paragraph_first_item paragraph_next_item*
@@ -143,7 +173,7 @@ paragraph: paragraph_first_item paragraph_next_item*
 SINGLE_NEWLINE: /\r?\n(?!\r?\n)/
 
 ?list.1: list_line+
-list_line.1: LIST_LINE_START list_marker SPACE list_item+
+list_line.1: LIST_LINE_START WS list_marker SPACE list_item+
 ?list_item.1: WS
     | format_containers
     | code
@@ -160,13 +190,14 @@ LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
 ?list_marker_dash: DASH
 
 ?proc.1: proc_line+
-?proc_line: PROC_LINE_START? proc_indent_prefix proc_marker proc_delimiter proc_indent_suffix proc_item+
+?proc_line: PROC_LINE_START proc_marker proc_delimiter proc_indent_suffix proc_item+
 ?proc_item.1: WS  
     | format_containers  
     | quote_containers  
     | paren_sl  
     | common_text
     | list
+    | note_or_safety_instruction
 
 // We capture leading spaces as a token, so that we can discard them.
 ?proc_indent_prefix: SPACE*
@@ -216,7 +247,7 @@ BOLD_EMPH_CLOSE.10: "_*"
 CITE_LINE_START_FIRST.10: /(?:\A|\r?\n)> /
 CITE_LINE_START_NEXT.10: /\r?\n> /
 
-PROC_LINE_START: NEWLINE
+PROC_LINE_START: /(?:\r?\n)/
 
 // Delimiter tokens
 PAREN_OPEN: "("
@@ -235,6 +266,7 @@ UNDER_CLOSE.2: /(?<!\s)_/
 BACK_TICK: "`"
 SPACE: " "
 DASH: "-"
+COLON: ":"
 
 TERMINATOR: /[.?!:]/
 SEPARATOR:  ","

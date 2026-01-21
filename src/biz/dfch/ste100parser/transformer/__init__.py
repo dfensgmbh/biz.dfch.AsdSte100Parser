@@ -16,7 +16,9 @@
 """transformer module."""
 
 from .container_transformer import ContainerTransformer  # type: ignore
+from .token_converter import TokenConverter
 
 __all__ = [
     "ContainerTransformer",
+    "TokenConverter",
 ]

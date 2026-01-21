@@ -34,8 +34,7 @@ class TestGeneric(unittest.TestCase):
         value = "`_first`: 4 * 3\nNext-line-ddf\r\n\nFourth-line"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -71,8 +70,7 @@ class TestGeneric(unittest.TestCase):
         value = "first-line\r\n\nthird-line"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -129,8 +127,7 @@ class TestGeneric(unittest.TestCase):
 
         initial = sut.invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -155,8 +152,7 @@ class TestGeneric(unittest.TestCase):
 
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.
@@ -181,8 +177,7 @@ class TestGeneric(unittest.TestCase):
 
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
         # Assert type and quantity of tokens.

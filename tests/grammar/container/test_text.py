@@ -18,16 +18,37 @@
 
 """test_text"""
 
-import unittest
-
 from parameterized import parameterized
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser import Token
+
+from ...test_case_container_base import TestCaseContainerBase
 
 
-class TestText(unittest.TestCase):
+class TestText(TestCaseContainerBase):
     """TestText"""
+
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     @parameterized.expand([
         ("lower", "abcdefghijklmopqrstuvwxzy", True),
@@ -56,75 +77,45 @@ class TestText(unittest.TestCase):
         ("paren_open", "(", False),
         ("paren_close", ")", False),
     ])
-    def test_word(self, rule, value, expected):
+    def test_word(self, rule, value, _expected):
         """Allowed characters."""
 
         _ = rule
-        _ = expected
+        _ = _expected
 
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
-        if not expected:
+        result = self._parser.is_valid(value)
+        if False is _expected:
             self.assertFalse(result)
             return
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
-
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
     def test_single_word_is_paragraph(self):
         """Cite after a line break is valid."""
 
         value = "this-is-text"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.TEXT])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
     def test_multi_word_is_paragraph(self):
         """Cite after a line break is valid."""
 
         value = "this-is-text this-is-also-text"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(4, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(2, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)

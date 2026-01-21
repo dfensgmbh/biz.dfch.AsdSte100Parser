@@ -18,45 +18,36 @@
 
 """test_bold_emph"""
 
-import unittest
-
-from biz.dfch.ste100parser import GrammarType, Parser, Token, TokenMetrics
+from biz.dfch.ste100parser import GrammarType, Parser, Token
 from biz.dfch.ste100parser.transformer import ContainerTransformer
 
+from ...test_case_container_base import TestCaseContainerBase
 
-class TestBoldEmph(unittest.TestCase):
+
+class TestBoldEmph(TestCaseContainerBase):
     """TestBoldEmph"""
+
+    def _invoke(self, value: str, expected, start_token: Token = Token.start):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     def test(self):
 
         value = "*_bold-emph text_* at the start"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(11, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(5, metrics[Token.TEXT])
-        self.assertEqual(4, metrics[Token.WS])
-        self.assertEqual(1, metrics[Token.bold_emph])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.bold_emph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
 
     def test_multi_line_fails(self):
 
@@ -87,26 +78,12 @@ class TestBoldEmph(unittest.TestCase):
         value = '"*__*"'
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(6, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.dquote])
-        self.assertEqual(4, metrics[Token.CHAR])
 
     def test_in_squote(self):
         value = "'*__*'"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        metrics = TokenMetrics()
-        transformed = ContainerTransformer(metrics, log=True).transform(initial)
+        transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(6, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.squote])
-        self.assertEqual(4, metrics[Token.CHAR])
