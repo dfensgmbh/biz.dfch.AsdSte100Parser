@@ -13,83 +13,82 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=C0115
 # pylint: disable=C0116
 # type: ignore
 
 """test_generic"""
 
-import unittest
-
 from parameterized import parameterized
 
-from biz.dfch.ste100parser import Char, GrammarType, Parser, Token, TokenMetrics
+from biz.dfch.ste100parser import Char, GrammarType, Parser, Token
 from biz.dfch.ste100parser.transformer import ContainerTransformer
 
+from ...test_case_container_base import TestCaseContainerBase
 
-class TestGeneric(unittest.TestCase):
-    """TestGeneric"""
+
+class TestGeneric(TestCaseContainerBase):
+
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
+
+        initial = self.invoke(value)
+        transformed = self.transform(initial)
+
+        print(transformed.pretty())
+
+        token_tree = self.get_token_tree(transformed)
+        token, children = token_tree
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
+
+        result = self.get_tokens(children)
+        self.assertEqual(expected, result)
 
     def test(self):
 
         value = "`_first`: 4 * 3\nNext-line-ddf\r\n\nFourth-line"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.paragraph,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(14, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.MULTIPLY])
-        self.assertEqual(1, metrics[Token.CODE])
-        self.assertEqual(5, metrics[Token.TEXT])
-        self.assertEqual(2, metrics[Token.NEWLINE])
-        self.assertEqual(1, metrics[Token.LINEBREAK])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.LINEBREAK, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.MULTIPLY, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.WS, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.CODE, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.CODE,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+            Token.MULTIPLY,
+            Token.TEXT,
+            Token.LINEBREAK,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
 
     def test_newline(self):
 
-        value = "first-line\r\n\nthird-line"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        value = "first line\r\n\nsecond and last line"
 
-        transformed = ContainerTransformer(log=True).transform(initial)
-        print(transformed.pretty())
+        expected = [
+            Token.paragraph,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected, Token.start)
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(7, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.start])
-        self.assertEqual(2, metrics[Token.paragraph])
-        self.assertEqual(2, metrics[Token.TEXT])
-        self.assertEqual(2, metrics[Token.NEWLINE])
-
-        # Assert order of tokens (recursively).
-        self.assertEqual(Token.start, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.NEWLINE, metrics.pop())
-        self.assertEqual(Token.paragraph, metrics.pop())
-        self.assertEqual(Token.TEXT, metrics.pop())
-
-        self.assertEqual(0, len(metrics), metrics)
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
 
     @parameterized.expand([
         ("empty", Char.EMPTY, False),
@@ -125,15 +124,10 @@ class TestGeneric(unittest.TestCase):
             self.assertFalse(sut.is_valid(value), rule)
             return
 
-        initial = sut.invoke(value)
-
-        transformed = ContainerTransformer(log=True).transform(initial)
-        print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(2, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.TEXT])
+        expected = [
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph)
 
     @parameterized.expand([
         ("text_space", "text ", True),
@@ -155,12 +149,6 @@ class TestGeneric(unittest.TestCase):
         transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
 
-        # Assert type and quantity of tokens.
-        self.assertEqual(3, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(1, metrics[Token.TEXT])
-        self.assertEqual(1, metrics[Token.WS])
-
     @parameterized.expand([
         ("text_space", "text1 text2 ", True),
         ("space_text", " text1 text2", False),
@@ -179,9 +167,3 @@ class TestGeneric(unittest.TestCase):
 
         transformed = ContainerTransformer(log=True).transform(initial)
         print(transformed.pretty())
-
-        # Assert type and quantity of tokens.
-        self.assertEqual(5, len(metrics), metrics)
-        self.assertEqual(1, metrics[Token.paragraph])
-        self.assertEqual(2, metrics[Token.TEXT])
-        self.assertEqual(2, metrics[Token.WS])

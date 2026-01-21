@@ -22,8 +22,7 @@
 
 from parameterized import parameterized
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser import Token
 
 from ...test_case_container_base import TestCaseContainerBase
 
@@ -208,7 +207,7 @@ class TestProc(TestCaseContainerBase):
         _ = rule
 
         if not _expected:
-            result = Parser(GrammarType.CONTAINER).is_valid(value)
+            result = self._parser.is_valid(value)
             self.assertFalse(result)
             return
 

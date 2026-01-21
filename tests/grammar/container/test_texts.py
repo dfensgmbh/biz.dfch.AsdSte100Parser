@@ -27,7 +27,7 @@ from ...test_data.test_data import TestData
 
 class TestTexts(TestCaseContainerBase):
 
-    def _invoke(self, value: str, expected):
+    def assert_tree(self, value: str, expected):
 
         initial = self.invoke(value)
         transformed = self.transform(initial)
@@ -49,7 +49,7 @@ class TestTexts(TestCaseContainerBase):
 
         value = self.load_test_file(TestData.SINGLE_PARAGRAPH)
 
-        self._invoke(value, expected)
+        self.assert_tree(value, expected)
 
     def test_single_paragraph_with_linebreak(self):
 
@@ -58,7 +58,7 @@ class TestTexts(TestCaseContainerBase):
         ]
 
         value = self.load_test_file(TestData.SINGLE_PARAGRAPH_WITH_LINEBREAK)
-        self._invoke(value, expected)
+        self.assert_tree(value, expected)
 
     def test_complex_headings_para_proc_list(self):
 
@@ -80,7 +80,7 @@ class TestTexts(TestCaseContainerBase):
         ]
 
         value = self.load_test_file(TestData.COMPLEX_HEADINGS_PARA_PROC_LIST)
-        self._invoke(value, expected)
+        self.assert_tree(value, expected)
 
     def test_complex_headings_proc_cite_para_list(self):
 
@@ -106,4 +106,4 @@ class TestTexts(TestCaseContainerBase):
 
         value = self.load_test_file(
             TestData.COMPLEX_HEADINGS_PROC_CITE_PARA_LIST)
-        self._invoke(value, expected)
+        self.assert_tree(value, expected)
