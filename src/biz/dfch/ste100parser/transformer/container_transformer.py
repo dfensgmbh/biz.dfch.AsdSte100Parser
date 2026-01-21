@@ -31,6 +31,72 @@ __all__ = [
 ]
 
 
+class ContainerTransformerRules:
+    """Rules for ContainerTransformer start."""
+    rules = [
+        (
+            [Token.NEWLINE, Token.NEWLINE, Token.heading],
+            lambda n1, n2, h: h,
+            True,
+        ),
+        (
+            [Token.NEWLINE, Token.cite],
+            lambda n, c: c,
+            True,
+        ),
+        (
+            [Token.NEWLINE, Token.heading],
+            lambda n, h: h,
+            True,
+        ),
+        (
+            [Token.NEWLINE, Token.NEWLINE, Token.paragraph],
+            lambda n1, n2, p: p,
+            True,
+        ),
+        (
+            [Token.heading, Token.NEWLINE],
+            lambda h, n1: h,
+            True,
+        ),
+        (
+            [Token.cite, Token.NEWLINE],
+            lambda c, n1: c,
+            True,
+        ),
+        (
+            [Token.proc_item, Token.NEWLINE, Token.NEWLINE, Token.paragraph],  # noqa: E501
+            lambda proc, n1, n2, para: [proc, para],
+            False,
+        ),
+        (
+            [Token.proc_item, Token.NEWLINE, Token.NOTE],
+            lambda proc, n, note: [proc, note],
+            False,
+        ),
+        (
+            [Token.proc_item, Token.NEWLINE, Token.paragraph],
+            lambda proc, n, para: [proc, para],
+            False,
+        ),
+        (
+            [Token.paragraph, Token.NEWLINE, Token.proc_item],
+            lambda para, n, proc: [para, proc],  # noqa: E501
+            True,
+        ),
+        (
+            [Token.paragraph, Token.NEWLINE, Token.paragraph],
+            lambda a, n, b: Tree(Token.paragraph.name, a.children + b.children),  # noqa: E501
+            True,
+        ),
+        (
+            [Token.paragraph, Token.paragraph],
+            lambda a, b: Tree(Token.paragraph.name, a.children + b.children),  # noqa: E501
+            False,
+        ),
+    ]
+
+
 class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
     """Transformer for pass 1."""
 
@@ -501,68 +567,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token.name)
 
-        rules = [
-            (
-                [Token.NEWLINE, Token.NEWLINE, Token.heading],
-                lambda n1, n2, h: h,
-                True,
-            ),
-            (
-                [Token.NEWLINE, Token.cite],
-                lambda n, c: c,
-                True,
-            ),
-            (
-                [Token.NEWLINE, Token.heading],
-                lambda n, h: h,
-                True,
-            ),
-            (
-                [Token.NEWLINE, Token.NEWLINE, Token.paragraph],
-                lambda n1, n2, p: p,
-                True,
-            ),
-            (
-                [Token.heading, Token.NEWLINE],
-                lambda h, n1: h,
-                True,
-            ),
-            (
-                [Token.cite, Token.NEWLINE],
-                lambda c, n1: c,
-                True,
-            ),
-            (
-                [Token.proc_item, Token.NEWLINE, Token.NEWLINE, Token.paragraph],  # noqa: E501
-                lambda proc, n1, n2, para: [proc, para],
-                False,
-            ),
-            (
-                [Token.proc_item, Token.NEWLINE, Token.NOTE],
-                lambda proc, n, note: [proc, note],
-                False,
-            ),
-            (
-                [Token.proc_item, Token.NEWLINE, Token.paragraph],
-                lambda proc, n, para: [proc, para],
-                False,
-            ),
-            (
-                [Token.paragraph, Token.NEWLINE, Token.proc_item],
-                lambda para, n, proc: [para, proc],  # noqa: E501
-                True,
-            ),
-            (
-                [Token.paragraph, Token.NEWLINE, Token.paragraph],
-                lambda a, n, b: Tree(Token.paragraph.name, a.children + b.children),  # noqa: E501
-                True,
-            ),
-            (
-                [Token.paragraph, Token.paragraph],
-                lambda a, b: Tree(Token.paragraph.name, a.children + b.children),  # noqa: E501
-                False,
-            ),
-        ]
+        rules = ContainerTransformerRules().rules
         children = self._rewrite_children(children, rules)
         self.print(children, token.name)
 
