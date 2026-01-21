@@ -15,7 +15,7 @@
 
 # pylint: disable=W0212
 
-"""StructureSerializer class."""
+"""ContainerSerializer class."""
 
 import sys
 
@@ -23,12 +23,8 @@ from biz.dfch.ste100parser.char import Char
 from biz.dfch.ste100parser.transformer.transformer_base import TransformerBase
 
 
-class StructureSerializer(TransformerBase):
-    """StructureRenderer"""
-
-    # def start(self, children):
-    #     """Return ''."""
-    #     return ""
+class ContainerSerializer(TransformerBase):
+    """ContainerSerializer"""
 
     def bold(self, children):
         """Insert STAR."""
@@ -73,7 +69,7 @@ class StructureSerializer(TransformerBase):
 
         return result
 
-    def WS(self, children):
+    def WS(self, children):  # pylint: disable=C0103
         """Insert DQUOTE."""
 
         # assert isinstance(children, list)

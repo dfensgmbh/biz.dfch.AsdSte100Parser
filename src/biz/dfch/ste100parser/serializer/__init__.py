@@ -15,8 +15,8 @@
 
 """serializer module."""
 
-from .structure_serializer import StructureSerializer
+from .container_serializer import ContainerSerializer
 
 __all__ = [
-    "StructureSerializer",
+    "ContainerSerializer",
 ]
