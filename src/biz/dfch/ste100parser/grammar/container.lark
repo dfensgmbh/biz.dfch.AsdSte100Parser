@@ -1,0 +1,281 @@
+// Copyright (C) 2026 Ronald Rink, d-fens GmbH, http://d-fens.ch
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// grammar.lark
+// Inline markup grammar (strict; preserves whitespace; multiline quotes allowed)
+
+?start: inline_first inline_next*
+
+?inline_first: heading
+    | paragraph
+    | proc
+    | note
+    | cite
+
+// ---------- Top-level inline stream ----------
+?inline_next: NEWLINE
+    | inline_first
+
+// Single line text elements.
+?common_text: TEXT
+    | APOSTROPHE
+    | PLURAL_S
+    | YEAR_SHORT
+    | MULTIPLY
+
+char_paren_open: PAREN_OPEN
+char_paren_close: PAREN_CLOSE
+char_star: STAR
+char_under: UNDER
+char_code: BACK_TICK
+?char_single: char_paren_open
+    | char_paren_close
+    | char_star
+    | char_under
+    | char_code
+
+// Single line pair-wise formatting containers.
+?format_containers: bold
+    | emph
+    | bold_emph
+
+// Single line pair-wise quoting containers.
+?quote_containers: dquote
+    | squote
+
+// ---------- Containers ----------
+
+// Single line container.
+dquote: DQUOTE dquote_item* DQUOTE
+?dquote_item: WS
+    | format_containers
+    | code
+    | squote
+    | paren_sl
+    | char_single
+    | common_text
+
+// Single line container.
+squote: SQUOTE squote_item* SQUOTE
+?squote_item: WS
+    | format_containers
+    | code
+    | dquote
+    | paren_sl
+    | char_single
+    | common_text
+
+// Single line container.
+bold: STAR_OPEN bold_item+ STAR_CLOSE
+?bold_item: WS
+    | emph
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
+
+// Single line container.
+emph: UNDER_OPEN emph_item+ UNDER_CLOSE
+?emph_item: WS
+    | bold
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
+
+// Single line container.
+bold_emph: BOLD_EMPH_OPEN bold_emph_item+ BOLD_EMPH_CLOSE
+?bold_emph_item: WS
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
+
+// Single line quote.
+cite.1: cite_line+
+?cite_line: CITE_LINE_START_FIRST cite_first_item cite_next_item*
+?cite_first_item.1: common_text
+    | format_containers
+    | code
+    | quote_containers
+    | paren_sl
+?cite_next_item: WS
+    | cite_first_item
+
+// Single line heading.
+heading.1: heading_first_line heading_next_line*
+?heading_first_line: HEADING_LINE_START? HEADING_MARKER heading_marker_suffix heading_item+
+?heading_next_line: HEADING_LINE_START HEADING_MARKER heading_marker_suffix heading_item+
+?heading_item.1: WS
+    | format_containers
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
+HEADING_MARKER: "#"+
+// We capture the trailing space as a token, so that we can discard it.
+?heading_marker_suffix: SPACE
+HEADING_LINE_START: NEWLINE
+
+// Note multi-line container.
+?safety_instruction: warning
+    | caution
+?note_or_safety_instruction: note
+    | safety_instruction
+
+warning.1: NOTE_OR_SAFETY_LINE_START warning_marker note_or_safety_first note_or_safety_next*
+warning_marker: WARNING_MARKER COLON SPACE
+WARNING_MARKER: "WARNING"
+
+caution.1: NOTE_OR_SAFETY_LINE_START caution_marker note_or_safety_first note_or_safety_next*
+caution_marker: CAUTION_MARKER COLON SPACE
+CAUTION_MARKER: "CAUTION"
+
+note.1: NOTE_OR_SAFETY_LINE_START note_marker note_or_safety_first note_or_safety_next*
+note_marker: NOTE_MARKER COLON SPACE
+NOTE_MARKER: "NOTE"
+
+NOTE_OR_SAFETY_LINE_START: NEWLINE
+?note_or_safety_first.1: common_text
+    | format_containers
+    | code
+    | quote_containers
+?note_or_safety_next.1: WS
+    | note_or_safety_first
+
+// Paragraph multi-line container.
+paragraph: paragraph_first_item paragraph_next_item*
+?paragraph_first_item: common_text
+    | format_containers
+    | code
+    | quote_containers
+    | paren
+    | paren_sl
+    | list
+?paragraph_next_item: SINGLE_NEWLINE
+    | paragraph_item
+?paragraph_item: WS
+    | paragraph_first_item
+// SINGLE_NEWLINE matches a NEWLINE only if NOT followed by another NEWLINE  
+// This uses a negative lookahead (?!\r?\n)  
+SINGLE_NEWLINE: /\r?\n(?!\r?\n)/
+
+?list.1: list_line+
+list_line.1: LIST_LINE_START WS list_marker SPACE list_item+
+?list_item.1: WS
+    | format_containers
+    | code
+    | quote_containers
+    | paren_sl
+    | common_text
+
+LIST_LINE_START: /(?:\r?\n)/
+?list_marker: LIST_MARKER_ALPHA_NUM
+    | list_marker_star
+    | list_marker_dash
+LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
+?list_marker_star: STAR
+?list_marker_dash: DASH
+
+?proc.1: proc_line+
+?proc_line: PROC_LINE_START proc_marker proc_delimiter proc_indent_suffix proc_item+
+?proc_item.1: WS  
+    | format_containers  
+    | quote_containers  
+    | paren_sl  
+    | common_text
+    | list
+    | note_or_safety_instruction
+
+// We capture leading spaces as a token, so that we can discard them.
+?proc_indent_prefix: SPACE*
+?proc_marker: PROC_MARKER
+PROC_MARKER: /[a-zA-Z0-9]+/
+?proc_delimiter: PROC_DELIMITER
+PROC_DELIMITER: /[.)]/
+// We capture the trailing space as a token, so that we can discard it.
+?proc_indent_suffix: SPACE
+
+// ---------- Parentheses can be nested. ----------
+// Multi line container. Use outside single line containers.
+paren: PAREN_OPEN paren_item_ml* PAREN_CLOSE
+?paren_item_ml: NEWLINE
+    | paren_item_sl
+// Single line container. Use it within single line containers.
+paren_sl: PAREN_OPEN paren_item_sl* PAREN_CLOSE
+?paren_item_sl: WS
+    | format_containers
+    | quote_containers
+    | paren
+    | common_text
+
+// ---------- Code (literal until ending backtick) ----------
+code: BACK_TICK CODE BACK_TICK
+
+// ---------- Terminals ----------
+
+// Highest priority: code and year abbreviations
+CODE.40: /[^`]+/
+YEAR_SHORT.40: /'\d{2}s?(?=[\s.,!?;:]|$)/
+
+// Plural (s) - Matches (s) if preceded by a letter  
+// and followed by space, punctuation, or end of string.  
+// We use a lookbehind for a letter [A-Za-z]  
+PLURAL_S.35: /(?<=[A-Za-z])\(s\)(?=[\s.,!?;:]|$)/
+
+// Apostrophes (possessives, decades like 1990's)
+// Matches ' or 's if preceded by alphanumeric
+// and followed by space, punctuation, or end of string
+APOSTROPHE.30: /(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)/
+
+// Make "*_" and "_*" single tokens so they don't split into STAR/UNDER
+BOLD_EMPH_OPEN.10: "*_"
+BOLD_EMPH_CLOSE.10: "_*"
+
+CITE_LINE_START_FIRST.10: /(?:\A|\r?\n)> /
+CITE_LINE_START_NEXT.10: /\r?\n> /
+
+PROC_LINE_START: /(?:\r?\n)/
+
+// Delimiter tokens
+PAREN_OPEN: "("
+PAREN_CLOSE: ")"
+DQUOTE: "\""
+SQUOTE: "'"
+MULTIPLY: " * "
+STAR: "*"
+STAR_OPEN.2: /\*(?!\s)/
+STAR_CLOSE.2: /(?<!\s)\*/
+
+UNDER: "_"
+UNDER_OPEN.2: /_(?!\s)/
+UNDER_CLOSE.2: /(?<!\s)_/
+
+BACK_TICK: "`"
+SPACE: " "
+DASH: "-"
+COLON: ":"
+
+TERMINATOR: /[.?!:]/
+SEPARATOR:  ","
+
+// Whitespace preserved.
+// When there is more than one WS, then this is only one token.
+WS: /[ \t]+/
+// When there is more than on NEWLINE, then each NEWLINE is a different token.
+NEWLINE: /\r?\n/
+
+// Any run of characters that is not a delimiter or whitespace/newline
+TEXT: /[^"'*_`()\s]+/
