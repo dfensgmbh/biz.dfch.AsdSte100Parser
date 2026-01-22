@@ -32,7 +32,11 @@ __all__ = [
 
 
 class ContainerTransformerRules:
-    """Rules for ContainerTransformer start."""
+    """
+    Rules for ContainerTransformer start.
+
+    These rules removed NEWLINE between different rules.
+    """
     rules = [
         (
             [Token.NEWLINE, Token.NEWLINE, Token.heading],
