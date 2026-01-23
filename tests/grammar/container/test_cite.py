@@ -134,3 +134,47 @@ class TestCite(TestCaseContainerBase):
             Token.bold,
         ]
         self.assert_tree(value, expected, Token.cite, level=1)
+
+    def test_cite_with_paren(self):
+
+        value = "\r\n> cite-text (more-text)\nend-text"
+
+        expected = [
+            Token.cite,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.paren,
+        ]
+        self.assert_tree(value, expected, Token.cite, level=1)
+
+    def test_cite_with_nested_paren(self):
+
+        value = "\r\n> ((cite-text)) (more-text)\nend-text"
+
+        expected = [
+            Token.cite,
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.paren,
+            Token.WS,
+            Token.paren,
+        ]
+        self.assert_tree(value, expected, Token.cite, level=1)
+
+        expected = [
+            Token.paren,
+        ]
+        self.assert_tree(value, expected, Token.paren, level=2)
+
+        expected = [
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paren, level=3)
