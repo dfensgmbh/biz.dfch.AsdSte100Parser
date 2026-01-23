@@ -53,7 +53,8 @@ And\tthis\tis\talso\ttext\twith\twhitespace.
 
 ## NEWLINE
 
-This is a `\r\n` or `\n`.
+  * A `NEWLINE` is a top-level token.
+  * This is a `\r\n` or `\n`.
 
 ## TEXT
 
@@ -143,6 +144,7 @@ CAUTION: This is a safety instruction for this work step of the type 'CAUTION'.
 
 ### Citation (`cite`)
 
+  * A `cite` is a top-level token.
   * This formatter shows text as a "citation" (`cite`).
   * A `NEWLINE` starts a `cite`, when a `> ` comes directly after the `NEWLINE` token.
   * A `cite` must not be empty. It must contain `TEXT` or `WS`.
