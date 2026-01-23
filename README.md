@@ -25,7 +25,15 @@ This library implements a:
 
 You must use a special structure of **Markdown** as the input text.
 
-## Example
+## Installation
+
+Create a virtual environment and install the library with `pip`:
+
+```
+pip install biz-dfch-ste100parser
+```
+
+## Usage
 
 ```py
 from biz.dfch.ste100parser import ContainerTransformer
@@ -33,15 +41,19 @@ from biz.dfch.ste100parser import GrammarType
 from biz.dfch.ste100parser import Parser
 from biz.dfch.ste100parser import Token
 
-value = ""  # Load from text file (content see below).
+value = ""  # Specify text (example content and output see below).
 
 parser = Parser(GrammarType.CONTAINER)
 assert parser.is_valid(value)
 
+# This parses the tree according to the CONTAINER grammar.
 initial_tree = parser.invoke(value)
+
+# This transforms the tree to the tokens described in the "Format" section.
 transformer = ContainerTransformer()
 transformed_tree = transformer.invoke(initial_tree)
 
+# This prints the resulting AST.
 print(transformed.pretty())
 ```
 
