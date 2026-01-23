@@ -45,7 +45,7 @@ And\tthis\tis\talso\ttext\twith\twhitespace.
 ## Single space (SPACE)
 
   * A `SPACE` is a delimiter token that only is inside other `tokens.
-  * For example, in `1) Text` the `SPACE` is the delimter after `1)`. 
+  * For example, in `1) Text` the `SPACE` is the delimiter after `1)`. 
 
 ```
 1) A work step.
@@ -179,7 +179,7 @@ This is a paragraph, that starts a list:
 
 ### Single quote (`squote`)
 
-  * This formatter shows text in "souble quote" (`squote`).
+  * This formatter shows text in 'single quote' (`squote`).
   * This token cannot contain `NEWLINE`.
   * You must not nest `squote`.
   * `squote` can contain `dquote`.
