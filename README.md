@@ -60,6 +60,11 @@ And\tthis\tis\talso\ttext\twith\twhitespace.
 
 Any character sequence, that does not contain these characters: `^"'*_`()\s` (regex).
 
+## APOSTROPHE
+
+  * An `APOSTROPHE` is either `'s` or `'` when it comes directly after `TEXT`.
+  * You must not put an `APOSTROPHE` in a `squote`.
+
 ## Heading
 
   * A `heading` is a top-level token.
@@ -85,14 +90,24 @@ Any character sequence, that does not contain these characters: `^"'*_`()\s` (re
   * Two `NEWLINE` tokens stop a `paragraph`. 
   * A `paragraph` can have a `NEWLINE` token between `TEXT` tokens.
 
-text lines, that do not ss
+```
+This is a paragraph. This is still the paragraph.
+
+This is another paragraph. This is still the second paragraph.
+This is still the second paragraph (after a LINEBREAK).
+
+This is a new and the last paragraph.
+
+```
 
 ## Procedure (list of work steps)
 
   * A `procedure` is a top-level token.
-  * A `procedure` is at least one *work step* (`proc_item`).
-  * A `procedure` starts after a `NEWLINE` token, when `[a-zA-Z0-9]+` and `[.)] ` directly come after the `NEWLINE` token.
+  * A `procedure` is one or more *work step* (`proc_item`).
+  * A `procedure` starts after a `NEWLINE` token, when `[a-zA-Z0-9]+` (`proc_marker`) and `[.)] ` (`PROC_DELIMITER`) directly come after the `NEWLINE` token.
   * A `proc_item` can contain a vertical list.
+  * A `proc_item` can contain a `NOTE` or a safety instruction (`WARNING`, `CAUTION`).
+  * In contrast to other markdown, there is no two `NEWLINE` to stop the vertical list, `NOTE` or safety instruction. There is only a single `NEWLINE` to stop one of these.
 
 ```
 1. This is the first work step.
@@ -114,6 +129,38 @@ WARNING: This is a safety instruction for this work step of the type 'WARNING'.
 CAUTION: This is a safety instruction for this work step of the type 'CAUTION'.
 6. This is the last work step.
 
+```
+
+## Vertical list (`list_item`)
+
+  * A vertical list can occur in a `paragraph` or a procedure (`proc_item`).
+  * A vertical list is one or more `lite_item`.
+  * A `NEWLINE` starts a `list_item` when `WS+`, a `list_marker` and a `SPACE` come directly after the `NEWLINE` token.
+  * Before the `list_item`, there is `TEXT` that has a `:` as the last token.
+  * A numeric `list_marker` cannot contain a `.` or `)`. This is only correct for `proc_item`.
+  * A `list_marker` has `WS` (indentation).
+  * You must not put a vertical list inside another vertical list.
+
+```
+This is a paragraph, that starts a list:
+  * Indented list item with "*" as the list marker
+  * Another list item.
+
+This is another paragraph, that starts a list:
+    * More indented list item with "*" as the list marker
+    * Another list item.
+
+This is a paragraph, that starts a list:
+  1 Indented list item with a numeric as the list marker
+  2 Another list item.
+
+This is a paragraph, that starts a list:
+  a Indented list item with a lower alpha as the list marker
+  a Another list item.
+
+This is a paragraph, that starts a list:
+  A Indented list item with an upper alpha as the list marker
+  B Another list item.
 ```
 
 ## Quote and cite
