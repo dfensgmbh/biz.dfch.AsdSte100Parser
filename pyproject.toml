@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "biz-dfch-ste100parser"
-version = "0.1.0"
+version = "0.1.1"
 description = "An ASD STE-100 parser."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -35,3 +35,6 @@ ste100-parser = "biz.dfch.ste100parser.__main__:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 namespaces = true
+
+[tool.setuptools.package-data]
+"biz.dfch.ste100parser" = ["grammar/*.lark"]
