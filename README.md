@@ -20,8 +20,417 @@
 This library implements a:
   * An EBNF grammar for Lark (earley) 
   * A multi-pass transformer
+  * A tokenizer
+  * A serializer.
 
 You must use a special structure of **Markdown** as the input text.
+
+## Example
+
+```py
+from biz.dfch.ste100parser import ContainerTransformer
+from biz.dfch.ste100parser import GrammarType
+from biz.dfch.ste100parser import Parser
+from biz.dfch.ste100parser import Token
+
+value = ""  # Load from text file (content see below).
+
+parser = Parser(GrammarType.CONTAINER)
+assert parser.is_valid(value)
+
+initial_tree = parser.invoke(value)
+transformer = ContainerTransformer()
+transformed_tree = transformer.invoke(initial_tree)
+
+print(transformed.pretty())
+```
+
+### Input text
+
+```
+# This is a heading *level 1*
+
+This is the start of the _first_ paragraph. This is the second sentence.
+Third sentence, after a LINEBREAK. The fourth sentence starts a list:
+  1 This is the first list item.
+  2 Another item
+  3 Last item.
+The paragraph continues.
+
+This is para2. And, this is a new paragraph with only a single sentence.
+
+## This is our procedure
+
+1. Do this
+2. Do that:
+   a This is a list with item 1
+   b The next item
+   c The last item.
+3. And then, do this one last time.
+
+This is para3. Here, we have another paragraph.
+
+This is para4. Here, we have another paragraph.
+This continues para4 after a LINEBREAK.
+
+This is para5. Here, we have another paragraph.
+    a This is a list with item 1
+    b The next item
+    c The last item.
+
+1. Another proc (without heading)
+2. Last step.
+
+> Line1. This-is-some-cite-text-1.1. This-is-some-cite-text-2.1.
+> Line2. This-is-some-cite-text-2.1. This-is-some-cite-text-2.2.
+
+And yet another, paragraph.
+
+> LineA. This-is-some-cite-text-A.1. This-is-some-cite-text-A.1.
+> LineB. This-is-some-cite-text-B.1. This-is-some-cite-text-B.2.
+
+```
+
+### Transformed tree
+
+```
+start
+  heading
+    HEADING_LEVEL       1
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        a
+    WS  1
+    TEXT        heading
+    WS  1
+    bold
+      TEXT      level
+      WS        1
+      TEXT      1
+  paragraph
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        the
+    WS  1
+    TEXT        start
+    WS  1
+    TEXT        of
+    WS  1
+    TEXT        the
+    WS  1
+    emph
+      TEXT      first
+    WS  1
+    TEXT        paragraph.
+    WS  1
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        the
+    WS  1
+    TEXT        second
+    WS  1
+    TEXT        sentence.
+    LINEBREAK
+
+    TEXT        Third
+    WS  1
+    TEXT        sentence,
+    WS  1
+    TEXT        after
+    WS  1
+    TEXT        a
+    WS  1
+    TEXT        LINEBREAK.
+    WS  1
+    TEXT        The
+    WS  1
+    TEXT        fourth
+    WS  1
+    TEXT        sentence
+    WS  1
+    TEXT        starts
+    WS  1
+    TEXT        a
+    WS  1
+    TEXT        list:
+    list_item
+      LIST_MARKER       1
+      LIST_INDENT       2
+      TEXT      This
+      WS        1
+      TEXT      is
+      WS        1
+      TEXT      the
+      WS        1
+      TEXT      first
+      WS        1
+      TEXT      list
+      WS        1
+      TEXT      item.
+    list_item
+      LIST_MARKER       2
+      LIST_INDENT       2
+      TEXT      Another
+      WS        1
+      TEXT      item
+    list_item
+      LIST_MARKER       3
+      LIST_INDENT       2
+      TEXT      Last
+      WS        1
+      TEXT      item.
+    TEXT        The
+    WS  1
+    TEXT        paragraph
+    WS  1
+    TEXT        continues.
+  paragraph
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        para2.
+    WS  1
+    TEXT        And,
+    WS  1
+    TEXT        this
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        a
+    WS  1
+    TEXT        new
+    WS  1
+    TEXT        paragraph
+    WS  1
+    TEXT        with
+    WS  1
+    TEXT        only
+    WS  1
+    TEXT        a
+    WS  1
+    TEXT        single
+    WS  1
+    TEXT        sentence.
+  heading
+    HEADING_LEVEL       2
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        our
+    WS  1
+    TEXT        procedure
+  proc_item
+    PROC_STEP   1
+    PROC_DELIMITER      .
+    TEXT        Do
+    WS  1
+    TEXT        this
+  proc_item
+    PROC_STEP   2
+    PROC_DELIMITER      .
+    TEXT        Do
+    WS  1
+    TEXT        that:
+    list_item
+      LIST_MARKER       a
+      LIST_INDENT       3
+      TEXT      This
+      WS        1
+      TEXT      is
+      WS        1
+      TEXT      a
+      WS        1
+      TEXT      list
+      WS        1
+      TEXT      with
+      WS        1
+      TEXT      item
+      WS        1
+      TEXT      1
+    list_item
+      LIST_MARKER       b
+      LIST_INDENT       3
+      TEXT      The
+      WS        1
+      TEXT      next
+      WS        1
+      TEXT      item
+    list_item
+      LIST_MARKER       c
+      LIST_INDENT       3
+      TEXT      The
+      WS        1
+      TEXT      last
+      WS        1
+      TEXT      item.
+  proc_item
+    PROC_STEP   3
+    PROC_DELIMITER      .
+    TEXT        And
+    WS  1
+    TEXT        then,
+    WS  1
+    TEXT        do
+    WS  1
+    TEXT        this
+    WS  1
+    TEXT        one
+    WS  1
+    TEXT        last
+    WS  1
+    TEXT        time.
+  paragraph
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        para3.
+    WS  1
+    TEXT        Here,
+    WS  1
+    TEXT        we
+    WS  1
+    TEXT        have
+    WS  1
+    TEXT        another
+    WS  1
+    TEXT        paragraph.
+  paragraph
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        para4.
+    WS  1
+    TEXT        Here,
+    WS  1
+    TEXT        we
+    WS  1
+    TEXT        have
+    WS  1
+    TEXT        another
+    WS  1
+    TEXT        paragraph.
+    LINEBREAK
+
+    TEXT        This
+    WS  1
+    TEXT        continues
+    WS  1
+    TEXT        para4
+    WS  1
+    TEXT        after
+    WS  1
+    TEXT        a
+    WS  1
+    TEXT        LINEBREAK.
+  paragraph
+    TEXT        This
+    WS  1
+    TEXT        is
+    WS  1
+    TEXT        para5.
+    WS  1
+    TEXT        Here,
+    WS  1
+    TEXT        we
+    WS  1
+    TEXT        have
+    WS  1
+    TEXT        another
+    WS  1
+    TEXT        paragraph.
+    list_item
+      LIST_MARKER       a
+      LIST_INDENT       4
+      TEXT      This
+      WS        1
+      TEXT      is
+      WS        1
+      TEXT      a
+      WS        1
+      TEXT      list
+      WS        1
+      TEXT      with
+      WS        1
+      TEXT      item
+      WS        1
+      TEXT      1
+    list_item
+      LIST_MARKER       b
+      LIST_INDENT       4
+      TEXT      The
+      WS        1
+      TEXT      next
+      WS        1
+      TEXT      item
+    list_item
+      LIST_MARKER       c
+      LIST_INDENT       4
+      TEXT      The
+      WS        1
+      TEXT      last
+      WS        1
+      TEXT      item.
+  proc_item
+    PROC_STEP   1
+    PROC_DELIMITER      .
+    TEXT        Another
+    WS  1
+    TEXT        proc
+    WS  1
+    paren
+      TEXT      without
+      WS        1
+      TEXT      heading
+  proc_item
+    PROC_STEP   2
+    PROC_DELIMITER      .
+    TEXT        Last
+    WS  1
+    TEXT        step.
+  cite
+    TEXT        Line1.
+    WS  1
+    TEXT        This-is-some-cite-text-1.1.
+    WS  1
+    TEXT        This-is-some-cite-text-2.1.
+  cite
+    TEXT        Line2.
+    WS  1
+    TEXT        This-is-some-cite-text-2.1.
+    WS  1
+    TEXT        This-is-some-cite-text-2.2.
+  paragraph
+    TEXT        And
+    WS  1
+    TEXT        yet
+    WS  1
+    TEXT        another,
+    WS  1
+    TEXT        paragraph.
+  cite
+    TEXT        LineA.
+    WS  1
+    TEXT        This-is-some-cite-text-A.1.
+    WS  1
+    TEXT        This-is-some-cite-text-A.1.
+  cite
+    TEXT        LineB.
+    WS  1
+    TEXT        This-is-some-cite-text-B.1.
+    WS  1
+    TEXT        This-is-some-cite-text-B.2.
+
+```
 
 # Format
 
@@ -162,6 +571,16 @@ This is a paragraph, that starts a list:
   A Indented list item with an upper alpha as the list marker
   B Another list item.
 ```
+
+## Parentheses (`paren`)
+
+  * This container can 
+  * A `paragraph` can contain `paren`.
+  * A `list_item` can contain `paren`.
+  * A `proc_item` can contain `paren`.
+  * A `cite` can contain `paren`.
+  * `paren` must not contain `NEWLINE` tokens.
+  * Parentheses can be nested.
 
 ## Quote and cite
 
