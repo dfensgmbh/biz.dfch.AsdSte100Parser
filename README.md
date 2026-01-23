@@ -16,3 +16,233 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=dfensgmbh_biz.dfch.AsdSte100Parser&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=dfensgmbh_biz.dfch.AsdSte100Parser)
 
 # biz.dfch.AsdSte100Parser
+
+This library implements a:
+  * An EBNF grammar for Lark (earley) 
+  * A multi-pass transformer
+
+You must use a special structure of **Markdown** as the input text.
+
+# Format
+
+  * There a top-level tokens. These are tokens, that must be at the top-most hierarchical level of the text.
+  * There are tokens, that can only appear inside other tokens.
+  * A text must end with two `NEWLINE` tokens.
+
+## Whitespace (WS)
+
+  * Whitespace is a sequence of either `\t` or ` ` tokens.
+  * `\t` is the same as eight ` ` tokens.
+
+```
+This is TEXT with whitespace.
+
+This is  TEXT   with    multiple     whitespace.
+
+And\tthis\tis\talso\ttext\twith\twhitespace.
+```
+
+## Single space (SPACE)
+
+  * A `SPACE` is a delimiter token that only is inside other `tokens.
+  * For example, in `1) Text` the `SPACE` is the delimter after `1)`. 
+
+```
+1) A work step.
+```
+
+## NEWLINE
+
+This is a `\r\n` or `\n`.
+
+## TEXT
+
+Any character sequence, that does not contain these characters: `^"'*_`()\s` (regex).
+
+## Heading
+
+  * A `heading` is a top-level token.
+  * A `NEWLINE` that starts with a `# ` (or a multiple of `#`) with one or more `TEXT` tokens.
+  * Two `NEWLINE` tokens stop a `heading`.
+
+```
+# Heading level 1
+
+## Heading level 2
+
+### Heading level 3
+
+#### Heading level 4
+
+##### Heading level 5
+
+```
+## Paragraph
+
+  * A `paragraph` is a top-level token.
+  * A `paragraph` starts after a `NEWLINE`, when `TEXT` directly comes after the `NEWLINE` token.
+  * Two `NEWLINE` tokens stop a `paragraph`. 
+  * A `paragraph` can have a `NEWLINE` token between `TEXT` tokens.
+
+text lines, that do not ss
+
+## Procedure (list of work steps)
+
+  * A `procedure` is a top-level token.
+  * A `procedure` is at least one *work step* (`proc_item`).
+  * A `procedure` starts after a `NEWLINE` token, when `[a-zA-Z0-9]+` and `[.)] ` directly come after the `NEWLINE` token.
+  * A `proc_item` can contain a vertical list.
+
+```
+1. This is the first work step.
+2. This is the second work step.
+  * This is a list item in a work step.
+  * Another list item in a work step.
+3. This is the third work step.
+NOTE: This is a note for the work step.
+4. This is the fourth work step.
+WARNING: This is a safety instruction for this work step of the type 'WARNING'.
+4. This is the fifth work step.
+CAUTION: This is a safety instruction for this work step of the type 'CAUTION'.
+5. A work step can contain multiple:
+  * 'NOTE'
+  * 'WARNING'
+  * 'CAUTION'.
+NOTE: This is a note for the work step.
+WARNING: This is a safety instruction for this work step of the type 'WARNING'.
+CAUTION: This is a safety instruction for this work step of the type 'CAUTION'.
+6. This is the last work step.
+
+```
+
+## Quote and cite
+
+### Double quote (`dquote`)
+
+  * This formatter shows text in "double quote" (`dquote`).
+  * This token cannot contain `NEWLINE`.
+  * You must not nest `dquote`.
+  * `dquote` can contain `squote`.
+  * `squote` can contain "formatters".
+
+```
+"this is text in double quote"
+```
+
+### Single quote (`squote`)
+
+  * This formatter shows text in "souble quote" (`squote`).
+  * This token cannot contain `NEWLINE`.
+  * You must not nest `squote`.
+  * `squote` can contain `dquote`.
+  * `squote` can contain "formatters".
+
+```
+*this is text in single quote*
+```
+
+### Citation (`cite`)
+
+  * This formatter shows text as a "citation" (`cite`).
+  * A `NEWLINE` starts a `cite`, when a `> ` comes directly after the `NEWLINE` token.
+  * A `cite` must not be empty. It must contain `TEXT` or `WS`.
+  * This token cannot contain `NEWLINE`.
+  * You must not nest `cite`.
+
+```
+> This is a citation line.
+> This is another citation line.
+
+```
+
+## Formatters
+
+### Bold
+
+  * This formatter shows text is **bold** (`bold`).
+  * This token cannot contain `NEWLINE`.
+
+```
+*this is text in bold*
+```
+
+### Emphasis
+
+  * This formatter shows text is _emphasis_  (`emph`).
+  * This token cannot contain `NEWLINE`.
+
+```
+_this is text in emphasis_
+```
+
+### Bold emphasis
+
+  * This formatter shows text is **_bold emphasis_** (`boldemph`).
+  * This token cannot contain `NEWLINE`.
+
+```
+*_this is text in bold emphasis_*
+```
+
+### Code
+
+  * This formatter shows text is `monospace` (`code`).
+  * This token can contain `NEWLINE`.
+
+```
+`this is text in monospace`
+```
+
+# Examples:
+
+You find examples in [./test/test_data/](./test/test_data/).
+
+## Heading with paragraph
+
+```
+# This is a heading level 1
+
+This is the start of a paragraph. And this is the end of the paragraph.
+
+This is a new paragraph. A paragraph continues after a single NEWLINE.
+This is still the same paragraph.
+```
+
+## Paragraph with vertical lists
+
+```
+# This is a heading level 1
+
+This is the start of a paragraph. This will start a new vertical list:
+  * Note, that the list delimiter '*' is indented by a minimum of one `WS`.
+  * The next list item.
+This continues the paragraph. This is not standard 'Github'-flavored Markdown.
+
+This is a new paragraph. This will start a new vertical list:
+  - This is another list delimiter.
+  - Another list item.
+
+This is a new paragraph. This will start a new vertical list:
+ 1 This is another list delimiter.
+ 2 Another list item.
+
+This is another paragraph.
+
+```
+
+## Paragraph with formatters, quotes and cite
+
+```
+# This is a heading level 1
+
+## Text in quotes
+
+This is a paragraph. In *this* paragraph we have "text in double quotes".
+
+> Here is a citation. This is similar to a full line in "double quotes".
+
+This is another paragraph. In _that_ paragraph we have 'text in single quotes'.
+
+At last, this is another paragraph. In *_that_* paragraph we have "text in 'double' quotes" that contains "'single' quotes".   
+
+```
