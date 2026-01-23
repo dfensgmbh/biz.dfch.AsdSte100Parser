@@ -200,7 +200,6 @@ LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
     | note_or_safety_instruction
 
 // We capture leading spaces as a token, so that we can discard them.
-?proc_indent_prefix: SPACE*
 ?proc_marker: PROC_MARKER
 PROC_MARKER: /[a-zA-Z0-9]+/
 ?proc_delimiter: PROC_DELIMITER

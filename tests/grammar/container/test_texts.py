@@ -27,7 +27,13 @@ from ...test_data.test_data import TestData
 
 class TestTexts(TestCaseContainerBase):
 
-    def assert_tree(self, value: str, expected):
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
 
         initial = self.invoke(value)
         transformed = self.transform(initial)
@@ -36,7 +42,9 @@ class TestTexts(TestCaseContainerBase):
 
         token_tree = self.get_token_tree(transformed)
         token, children = token_tree
-        self.assertEqual(Token.start, token)
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
 
         result = self.get_tokens(children)
         self.assertEqual(expected, result)
