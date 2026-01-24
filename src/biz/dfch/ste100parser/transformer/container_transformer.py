@@ -19,7 +19,8 @@
 
 """container_transformer"""
 
-from lark import lexer, Tree, Discard
+from lark import Discard, lexer, Tree, v_args
+from lark.tree import Meta
 
 from ..char import Char
 from ..token import Token
@@ -32,7 +33,11 @@ __all__ = [
 
 
 class ContainerTransformerRules:
-    """Rules for ContainerTransformer start."""
+    """
+    Rules for ContainerTransformer start.
+
+    These rules removed NEWLINE between different rules.
+    """
     rules = [
         (
             [Token.NEWLINE, Token.NEWLINE, Token.heading],
@@ -86,12 +91,27 @@ class ContainerTransformerRules:
         ),
         (
             [Token.paragraph, Token.NEWLINE, Token.paragraph],
-            lambda a, n, b: Tree(Token.paragraph.name, a.children + b.children),  # noqa: E501
+            lambda a, n, b: Tree(Token.paragraph.name, a.children + b.children, meta=a.meta),  # noqa: E501
             True,
         ),
         (
             [Token.paragraph, Token.paragraph],
-            lambda a, b: Tree(Token.paragraph.name, a.children + b.children),  # noqa: E501
+            lambda a, b: Tree(Token.paragraph.name, a.children + b.children, meta=a.meta),  # noqa: E501
+            True,
+        ),
+        (
+            [Token.paragraph, Token.NEWLINE, Token.NEWLINE],
+            lambda para, n1, n2: para,  # noqa: E501
+            False,
+        ),
+        (
+            [Token.proc_item, Token.NEWLINE, Token.NEWLINE],
+            lambda proc, n1, n2: proc,  # noqa: E501
+            False,
+        ),
+        (
+            [Token.NOTE, Token.NEWLINE, Token.NEWLINE],
+            lambda note, n1, n2: note,  # noqa: E501
             False,
         ),
     ]
@@ -100,119 +120,174 @@ class ContainerTransformerRules:
 class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
     """Transformer for pass 1."""
 
+    def _get_meta(self, node: lexer.Token) -> Meta:
+        assert isinstance(node, lexer.Token)
+
+        meta = Meta()
+        meta.line = node.line
+        meta.column = node.column
+        meta.start_pos = node.start_pos
+        meta.end_pos = getattr(
+            node, 'end_pos',
+            node.start_pos + len(node)
+        )
+        meta.end_line = getattr(node, 'end_line', node.line)
+        meta.end_column = getattr(
+            node, 'end_column',
+            node.column + len(node)
+        )
+
+        return meta
+
     def _process_token_pair(
         self,
         children,
-        token: Token,
+        token: str,
+        meta: Meta,
         start: Char,
         end: Char | None = None,
     ):
         assert isinstance(children, list), children
         assert 3 <= len(children), len(children)
+        assert isinstance(token, str)
+        assert isinstance(meta, Meta)
 
         first, *mid, last = children
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         if end is None:
             end = start
         assert isinstance(first, str) and start == first
         assert isinstance(last, str) and end == last
 
-        result = Tree(token.name, mid)
+        result = Tree(token, mid, meta=meta)
         return result
 
     def _process_empty_token_pair(
         self,
         children,
-        token: Token,
+        token: str,
+        meta: Meta,
         start: Char,
         end: Char | None = None,
     ):
         assert isinstance(children, list), children
         assert 2 <= len(children), len(children)
+        assert isinstance(token, str)
+        assert isinstance(meta, Meta)
 
         first, *mid, last = children
         if 2 == len(children):
             mid = Char.EMPTY
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         if end is None:
             end = start
         assert isinstance(first, str) and start == first, first
         assert isinstance(last, str) and end == last, last
 
-        result = Tree(token.name, mid)
+        result = Tree(token, mid, meta=meta)
         return result
 
-    def bold(self, children):
-        return self._process_token_pair(children, Token.bold, Char.STAR)
-
-    def emph(self, children):
-        return self._process_token_pair(children, Token.emph, Char.UNDER)
-
-    def bold_emph(self, children):
+    @v_args(meta=True)
+    def bold(self, meta, children):
         return self._process_token_pair(
             children,
-            Token.bold_emph,
+            Token.bold.name,
+            meta,
+            Char.STAR
+        )
+
+    @v_args(meta=True)
+    def emph(self, meta, children):
+        return self._process_token_pair(
+            children,
+            Token.emph.name,
+            meta,
+            Char.UNDER
+        )
+
+    @v_args(meta=True)
+    def bold_emph(self, meta, children):
+        return self._process_token_pair(
+            children,
+            Token.bold_emph.name,
+            meta,
             Char.BOLD_EMPH_OPEN,
             Char.BOLD_EMPH_CLOSE
         )
 
-    def code(self, children):
+    @v_args(meta=True)
+    def code(self, meta, children):
         assert isinstance(children, list)
         assert 3 == len(children), len(children)
 
         first, mid, last = children
 
-        token = Token.CODE
-        self.print(children, token.name)
+        token = Token.CODE.name
+        self.print(children, token)
 
         assert isinstance(first, str) and Char.CODE == first
         assert isinstance(last, str) and Char.CODE == last
 
-        result = Tree(token.name, [mid.value])
+        result = Tree(token, [mid.value], meta=meta)
 
         return result
 
-    def dquote(self, children):
-        return self._process_token_pair(children, Token.dquote, Char.DQUOTE)
+    @v_args(meta=True)
+    def dquote(self, meta, children):
+        return self._process_token_pair(
+            children,
+            Token.dquote.name,
+            meta,
+            Char.DQUOTE
+        )
 
-    def squote(self, children):
-        return self._process_token_pair(children, Token.squote, Char.SQUOTE)
+    @v_args(meta=True)
+    def squote(self, meta, children):
+        return self._process_token_pair(
+            children,
+            Token.squote.name,
+            meta,
+            Char.SQUOTE
+        )
 
-    def paren(self, children):
+    @v_args(meta=True)
+    def paren(self, meta, children):
         return self._process_empty_token_pair(
-            children, Token.paren, Char.PAREN_OPEN, Char.PAREN_CLOSE)
+            children, Token.paren.name, meta, Char.PAREN_OPEN, Char.PAREN_CLOSE)
 
-    def paren_sl(self, children):
+    @v_args(meta=True)
+    def paren_sl(self, meta, children):
         """Single line parentheses change to standard parentheses."""
         return self._process_empty_token_pair(
-            children, Token.paren, Char.PAREN_OPEN, Char.PAREN_CLOSE)
+            children, Token.paren.name, meta, Char.PAREN_OPEN, Char.PAREN_CLOSE)
 
-    def cite(self, children):
+    @v_args(meta=True)
+    def cite(self, meta, children):
         assert isinstance(children, list)
         assert 1 <= len(children), len(children)
 
-        token = Token.cite
+        token = Token.cite.name
 
         items = []
         for line in children:
             items.extend(line)
 
-        result = Tree(token.name, items)
+        result = Tree(token, items, meta=meta)
         return result
 
     def cite_line(self, children):
         assert isinstance(children, list)
         assert 2 <= len(children), len(children)
 
-        token = Token.cite
+        token = Token.cite.name
 
         _, *mid = children
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         result = mid
         return result
@@ -221,33 +296,36 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, lexer.Token)
         assert 1 <= len(children)
 
-        token = Token.NEWLINE
+        token = Token.NEWLINE.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
-        result = Tree(token.name, [Char.LF])
+        meta = self._get_meta(children)
+        result = Tree(token, [Char.LF], meta=meta)
         return result
 
     def WS(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token)
         assert 1 <= len(children)
 
-        token = Token.WS
+        token = Token.WS.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
-        result = Tree(token.name, [str(len(children))])
+        meta = self._get_meta(children)
+        result = Tree(token, [str(len(children))], meta=meta)
         return result
 
     def MULTIPLY(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token)
         assert 1 <= len(children)
 
-        token = Token.MULTIPLY
+        token = Token.MULTIPLY.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
-        result = Tree(token.name, [f" {Char.MULTIPLY} "])
+        meta = self._get_meta(children)
+        result = Tree(token, [f" {Char.MULTIPLY} "], meta=meta)
         return result
 
     def char_paren_open(self, children):
@@ -269,12 +347,13 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, list)
         assert 1 == len(children), children
 
-        token = Token.CHAR
+        token = Token.CHAR.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         value = children[0]
-        result = Tree(token.name, [value])
+        meta = self._get_meta(value)
+        result = Tree(token, [value], meta=meta)
         return result
 
     def proc_indent_prefix(self, children):
@@ -293,24 +372,26 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, lexer.Token), type(children)
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.PROC_STEP
+        token = Token.PROC_STEP.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         items = [str(children)]
-        result = Tree(token.name, items)
+        meta = self._get_meta(children)
+        result = Tree(token, items, meta=meta)
         return result
 
     def PROC_DELIMITER(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token), type(children)
         assert 1 == len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.PROC_DELIMITER
+        token = Token.PROC_DELIMITER.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         items = [str(children)]
-        result = Tree(token.name, items)
+        meta = self._get_meta(children)
+        result = Tree(token, items, meta=meta)
         return result
 
     def PROC_LINE_START(self, children):  # pylint: disable=C0103
@@ -319,13 +400,14 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         return Discard
 
-    def proc_line(self, children):
+    @v_args(meta=True)
+    def proc_line(self, meta, children):
         assert isinstance(children, list), children
         assert 4 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.proc_item
+        token = Token.proc_item.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         item = children[0]
         assert isinstance(item, Tree)
@@ -338,28 +420,34 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
             delimiter,
             *remaining
         ]
-        result = Tree(token.name, items)
+        proc_item_meta = Meta()
+        proc_item_meta.line = step.meta.line
+        proc_item_meta.column = step.meta.column
+        proc_item_meta.start_pos = step.meta.start_pos
+        proc_item_meta.end_pos = meta.end_pos
+        result = Tree(token, items, meta=proc_item_meta)
         return result
 
     def TEXT(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token), type(children)
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.TEXT
+        token = Token.TEXT.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
-        result = Tree(token.name, [str(children)])
+        meta = self._get_meta(children)
+        result = Tree(token, [str(children)], meta=meta)
         return result
 
     def APOSTROPHE(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token)
         assert 2 >= len(children)
 
-        token = Token.APOSTROPHE
+        token = Token.APOSTROPHE.name
 
         *_, last = children
-        self.print(last, token.name)
+        self.print(last, token)
 
         assert isinstance(last, str)
         assert last in (Char.SQUOTE, Char.CHAR_LOWER_S)
@@ -367,7 +455,8 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         if Char.SQUOTE == last:
             last = Char.EMPTY
 
-        result = Tree(token.name, [last])
+        meta = self._get_meta(children)
+        result = Tree(token, [last], meta=meta)
         return result
 
     def heading_marker_suffix(self, children):
@@ -380,20 +469,21 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, lexer.Token)
         assert 1 <= len(children)
 
-        token = Token.HEADING_LEVEL
+        token = Token.HEADING_LEVEL.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
-        result = Tree(token.name, [str(len(children))])
+        meta = self._get_meta(children)
+        result = Tree(token, [str(len(children))], meta=meta)
         return result
 
     def _process_heading_line(self, children):
         assert isinstance(children, list), children
         assert 2 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.heading
+        token = Token.heading.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         level, _, *remaining = children
 
@@ -401,16 +491,16 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
             level,
             *remaining
         ]
-        result = Tree(token.name, items)
+        result = Tree(token, items)
         return result
 
     def heading_first_line(self, children):
         assert isinstance(children, list), children
         assert 2 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.heading
+        token = Token.heading.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         return self._process_heading_line(children)
 
@@ -418,60 +508,64 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, list), children
         assert 2 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.heading
+        token = Token.heading.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         return self._process_heading_line(children)
 
-    def heading(self, children):
+    @v_args(meta=True)
+    def heading(self, meta, children):
         assert isinstance(children, list), children
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.heading
+        token = Token.heading.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         items = []
         for item in children:
             items.extend(item.children)
 
-        result = Tree(token.name, items)
+        result = Tree(token, items, meta=meta)
         return result
 
     def SPACE(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token), children
         assert 1 == len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.SPACE
+        token = Token.SPACE.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         items = children[0]
 
-        result = Tree(token.name, [items])
+        meta = self._get_meta(children)
+        result = Tree(token, [items], meta=meta)
         return result
 
     def SINGLE_NEWLINE(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token), children
         assert 1 == len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.LINEBREAK
+        token = Token.LINEBREAK.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         items = children[0]
 
-        result = Tree(token.name, [items])
+        meta = self._get_meta(children)
+        result = Tree(token, [items], meta=meta)
         return result
 
-    def paragraph(self, children):
+    @v_args(meta=True)
+    def paragraph(self, meta, children):
         assert isinstance(children, list), children
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.paragraph
+        token = Token.paragraph.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         if (
             children and
@@ -482,16 +576,17 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         items = children
 
-        result = Tree(token.name, items)
+        result = Tree(token, items, meta=meta)
         return result
 
-    def list_line(self, children):
+    @v_args(meta=True)
+    def list_line(self, meta, children):
         assert isinstance(children, list), children
         assert 3 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.list_item
+        token = Token.list_item.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         item = children[0]
         if isinstance(item, lexer.Token) and "LIST_LINE_START" == item.type:
@@ -499,26 +594,33 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         item = children[0]
         assert isinstance(item, Tree) and Token.WS.name == item.data
-        indent = Tree(Token.LIST_INDENT.name, item.children[0])
+        indent = Tree(Token.LIST_INDENT.name, item.children[0], meta=item.meta)
         children = children[1:]
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         marker_token = children.pop(0)
         assert isinstance(marker_token, lexer.Token)
-        marker = Tree(Token.LIST_MARKER.name, [marker_token.value])
+        marker_meta = self._get_meta(marker_token)
+        marker = Tree(Token.LIST_MARKER.name, [
+                      marker_token.value], meta=marker_meta)
 
         space_token = children.pop(0)
         assert isinstance(space_token, Tree)
         assert Token.SPACE.name == space_token.data
 
         items = [
-            marker,
             indent,
+            marker,
             *children
         ]
 
-        result = Tree(token.name, items)
+        list_line_meta = Meta()
+        list_line_meta.line = indent.meta.line
+        list_line_meta.column = indent.meta.column
+        list_line_meta.start_pos = indent.meta.start_pos
+        list_line_meta.end_pos = meta.end_pos
+        result = Tree(token, items, meta=list_line_meta)
         return result
 
     def _rewrite_children(self, children: list, rules: list) -> list:
@@ -544,10 +646,8 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
                     new_segment = replacer(*segment)
                     if isinstance(new_segment, list):
                         children[i:i + pattern_length] = new_segment
-                        # new_segment_length = len(new_segment)
                     else:
                         children[i:i + pattern_length] = [new_segment]
-                        # new_segment_length = 1
 
                     if not do_again:
                         i += 1
@@ -557,39 +657,48 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         return children
 
-    def start(self, children):
+    @v_args(meta=True)
+    def start(self, meta, children):
         """start"""
 
         assert isinstance(children, list), children
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        token = Token.start
+        token = Token.start.name
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         rules = ContainerTransformerRules().rules
         children = self._rewrite_children(children, rules)
-        self.print(children, token.name)
+        self.print(children, token)
 
-        result = Tree(token.name, children)
+        result = Tree(token, children, meta=meta)
         return result
 
-    def note(self, children):
-        return self._process_note_or_safety(Token.NOTE, children)
+    @v_args(meta=True)
+    def note(self, meta, children):
+        return self._process_note_or_safety(Token.NOTE.name, children, meta)
 
-    def warning(self, children):
-        return self._process_note_or_safety(Token.WARNING, children)
+    @v_args(meta=True)
+    def warning(self, meta, children):
+        return self._process_note_or_safety(Token.WARNING.name, children, meta)
 
-    def caution(self, children):
-        return self._process_note_or_safety(Token.CAUTION, children)
+    @v_args(meta=True)
+    def caution(self, meta, children):
+        return self._process_note_or_safety(Token.CAUTION.name, children, meta)
 
-    def _process_note_or_safety(self, token: Token, children):
-        assert isinstance(token, Token)
-        assert token in (Token.NOTE, Token.WARNING, Token.CAUTION)
+    def _process_note_or_safety(self, token: str, children, meta):
+        assert isinstance(token, str)
+        assert token in (
+            Token.NOTE.name,
+            Token.WARNING.name,
+            Token.CAUTION.name
+        )
         assert isinstance(children, list), children
         assert 3 <= len(children), f"#{len(children)}: [{children}]."
+        assert isinstance(meta, Meta)
 
-        self.print(children, token.name)
+        self.print(children, token)
 
         item = children.pop(0)
         assert lexer.Token == type(item), item
@@ -600,5 +709,10 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         assert marker.data in (
             "note_marker", "warning_marker", "caution_marker")
 
-        result = Tree(token.name, children)
+        item_meta = Meta()
+        item_meta.line = meta.line + 1
+        item_meta.column = 1
+        item_meta.start_pos = meta.start_pos + 1
+        item_meta.end_pos = meta.end_pos
+        result = Tree(token, children, meta=item_meta)
         return result

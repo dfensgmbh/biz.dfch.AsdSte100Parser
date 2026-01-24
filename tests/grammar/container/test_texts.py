@@ -19,27 +19,217 @@
 
 """test_texts"""
 
+from lark import Tree
+
 from biz.dfch.ste100parser import Token
 
 from ...test_case_container_base import TestCaseContainerBase
 from ...test_data.test_data import TestData
 
 
+def pretty_with_meta1(tree, indent=0):
+    """Print a Lark Tree with metadata."""
+    prefix = "  " * indent
+
+    if isinstance(tree, Tree):
+        # It's a Tree node (non-terminal)
+        meta_str = ""
+        if hasattr(tree, 'meta'):
+            meta = tree.meta
+            parts = []
+            if hasattr(meta, 'line'):
+                parts.append(f"L{meta.line}:C{meta.column}")
+            if hasattr(meta, 'start_pos'):
+                parts.append(f"pos:{meta.start_pos}-{meta.end_pos}")
+            meta_str = f" [{', '.join(parts)}]" if parts else ""
+
+        print(f"{prefix}{tree.data}{meta_str}")
+
+        # Recursively print children
+        for child in tree.children:
+            pretty_with_meta(child, indent + 1)
+
+    elif isinstance(tree, Token):
+        # It's a Token (terminal)
+        token_meta = ""
+        if hasattr(tree, 'line'):
+            token_meta = f" [L{tree.line}:C{tree.column}]"
+        print(f"{prefix}{tree.type}: {repr(str(tree))}{token_meta}")
+
+    else:
+        # It's a plain string or other primitive value
+        print(f"{prefix}{type(tree).__name__}: {repr(tree)}")
+
+
+def pretty_with_meta2(node, indent=0):
+    prefix = "  " * indent
+
+    if isinstance(node, Tree):
+        # 1. Handle Tree Nodes (Non-terminals)
+        meta_str = ""
+        if hasattr(node, 'meta'):
+            m = node.meta
+            # Earley with propagate_positions=True provides these:
+            meta_str = f" [L{m.line}:C{m.column} -> L{m.end_line}:C{m.end_column}]"
+
+        print(f"{prefix}{node.data}{meta_str}")
+
+        for child in node.children:
+            pretty_with_meta(child, indent + 1)
+
+    elif isinstance(node, Token):
+        # 2. Handle Tokens (Terminals)
+        # Tokens store line/column/pos directly on themselves
+        loc = f" [L{node.line}:C{node.column}, pos:{node.start_pos}]"
+        print(f"{prefix}{node.type}: {repr(str(node))}{loc}")
+
+    else:
+        # 3. Handle anything else (Strings, None, etc.)
+        print(f"{prefix}{type(node).__name__}: {repr(node)}")
+
+
+def pretty_with_meta(node, indent=0):
+    prefix = "  " * indent
+
+    # 1. Check if it's a Tree (has 'data' and 'children')
+    if hasattr(node, 'data') and hasattr(node, 'children'):
+        meta_str = ""
+        if hasattr(node, 'meta') and hasattr(node.meta, 'line'):
+            m = node.meta
+            meta_str = f" [L{m.line}:C{m.column} @ {m.start_pos}:{m.end_pos}]"
+
+        print(f"{prefix}{node.data}{meta_str}")
+        for child in node.children:
+            pretty_with_meta(child, indent + 1)
+
+    # 2. Check if it's a Token (has 'type' attribute)
+    elif hasattr(node, 'type'):
+        # Extract location info safely
+        line = getattr(node, 'line', '?')
+        col = getattr(node, 'column', '?')
+        pos = getattr(node, 'start_pos', getattr(node, 'pos_in_stream', '?'))
+
+        loc = f" [L{line}:C{col}, pos:{pos}]"
+        print(f"{prefix}{node.type}: {repr(str(node))}{loc}")
+
+    # 3. Fallback for plain strings or unexpected objects
+    else:
+        print(f"{prefix}{type(node).__name__}: {repr(node)}")
+
+
 class TestTexts(TestCaseContainerBase):
 
-    def assert_tree(self, value: str, expected):
+    def assert_tree(
+        self,
+        value: str,
+        expected,
+        start_token: Token = Token.start,
+        level: int = 0,
+    ):
 
         initial = self.invoke(value)
+        # pretty_with_meta(initial)
         transformed = self.transform(initial)
 
         print(transformed.pretty())
+        pretty_with_meta(transformed)
 
         token_tree = self.get_token_tree(transformed)
         token, children = token_tree
-        self.assertEqual(Token.start, token)
+        for _ in range(level):
+            token, children = children[0]
+        self.assertEqual(start_token, token)
 
         result = self.get_tokens(children)
         self.assertEqual(expected, result)
+
+    def test_proc_newline_para_at_end(self):
+
+        expected = [
+            Token.proc_item,
+            Token.paragraph,
+            Token.paragraph,
+        ]
+
+        value = """
+1. This is work step 1.
+
+This is a paragraph.
+
+This is another paragraph.
+
+"""
+
+        self.assert_tree(value, expected)
+
+    def test_proc_with_warning_at_end(self):
+
+        expected = [
+            Token.proc_item,
+        ]
+
+        value = """
+1. This is work step 1.
+WARNING: This is a safety instruction.
+
+"""
+
+        self.assert_tree(value, expected)
+
+    def test_proc_with_caution_at_end(self):
+
+        expected = [
+            Token.proc_item,
+        ]
+
+        value = """
+1. This is work step 1.
+CAUTION: This is a safety instruction.
+
+"""
+
+        self.assert_tree(value, expected)
+
+    def test_proc_with_note_at_end(self):
+
+        expected = [
+            Token.proc_item,
+        ]
+
+        value = """
+1. This is work step 1.
+NOTE: This is a note.
+
+"""
+        self.assert_tree(value, expected)
+
+    def test_para_with_note_at_end(self):
+
+        expected = [
+            Token.paragraph,
+            Token.NOTE,
+        ]
+
+        value = """This is a paragraph.
+NOTE: This is a note.
+
+"""
+
+        self.assert_tree(value, expected)
+
+    def test_para_with_cite_at_end(self):
+
+        expected = [
+            Token.paragraph,
+            Token.cite,
+        ]
+
+        value = """This is a paragraph.
+> This is a citation.
+
+"""
+
+        self.assert_tree(value, expected)
 
     def test_single_paragraph(self):
 

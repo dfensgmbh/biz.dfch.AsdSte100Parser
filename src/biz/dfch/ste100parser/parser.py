@@ -36,7 +36,11 @@ class Parser:
         self._grammar = grammar
 
         path = Path("grammar") / grammar
-        self._lark = Lark.open(path.as_posix(), rel_to=__file__)  # type: ignore
+        self._lark = Lark.open(
+            path.as_posix(),
+            rel_to=__file__,
+            propagate_positions=True,
+        )  # type: ignore
 
     def is_valid(self, text: str) -> bool:
         """Returns True, if the text is valid. False, otherwise."""
