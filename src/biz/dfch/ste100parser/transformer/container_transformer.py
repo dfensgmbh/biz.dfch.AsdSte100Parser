@@ -37,7 +37,17 @@ __all__ = [
 
 
 class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
-    """Transformer for pass 1."""
+    """
+    Transformer for pass 1 (with significant white space).
+
+    This transformer creates the container structure of the input text:
+      * heading
+      * paragraph
+      * proc_item
+      * cite.
+
+    Inside paragraph, there are still only TEXT and WS tokens (and no WORDs).
+    """
 
     def _get_meta(self, node: lexer.Token) -> Meta:
         assert isinstance(node, lexer.Token)

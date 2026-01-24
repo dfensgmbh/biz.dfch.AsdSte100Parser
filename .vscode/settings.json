@@ -37,6 +37,7 @@
         "getframe",
         "guillemets",
         "NOSONAR",
+        "PUNCT",
         "pylint",
         "pypa",
         "pypi",
