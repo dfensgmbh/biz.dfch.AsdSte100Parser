@@ -38,6 +38,8 @@
         "guillemets",
         "NOSONAR",
         "pylint",
+        "pypa",
+        "pypi",
         "PYTHONPATH",
         "rtype",
         "setuptools",
