@@ -97,6 +97,21 @@ class ContainerTransformerRules:
         (
             [Token.paragraph, Token.paragraph],
             lambda a, b: Tree(Token.paragraph.name, a.children + b.children, meta=a.meta),  # noqa: E501
+            True,
+        ),
+        (
+            [Token.paragraph, Token.NEWLINE, Token.NEWLINE],
+            lambda para, n1, n2: para,  # noqa: E501
+            False,
+        ),
+        (
+            [Token.proc_item, Token.NEWLINE, Token.NEWLINE],
+            lambda proc, n1, n2: proc,  # noqa: E501
+            False,
+        ),
+        (
+            [Token.NOTE, Token.NEWLINE, Token.NEWLINE],
+            lambda note, n1, n2: note,  # noqa: E501
             False,
         ),
     ]
