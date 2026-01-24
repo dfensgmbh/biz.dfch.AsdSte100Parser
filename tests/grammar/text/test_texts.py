@@ -345,7 +345,7 @@ This sentence continues the paragraph.
             Token.WORD,     # List
             Token.WS,
             Token.WORD,     # item
-            Token.EOS,     # :
+            Token.EOS,      # :
         ]
         self.assert_tree(value, expected, Token.sentence, level=2)
 
