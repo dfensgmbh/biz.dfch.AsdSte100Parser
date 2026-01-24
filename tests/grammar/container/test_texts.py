@@ -19,73 +19,10 @@
 
 """test_texts"""
 
-from lark import Tree
-
 from biz.dfch.ste100parser import Token
 
 from ...test_case_container_base import TestCaseContainerBase
 from ...test_data.test_data import TestData
-
-
-def pretty_with_meta1(tree, indent=0):
-    """Print a Lark Tree with metadata."""
-    prefix = "  " * indent
-
-    if isinstance(tree, Tree):
-        # It's a Tree node (non-terminal)
-        meta_str = ""
-        if hasattr(tree, 'meta'):
-            meta = tree.meta
-            parts = []
-            if hasattr(meta, 'line'):
-                parts.append(f"L{meta.line}:C{meta.column}")
-            if hasattr(meta, 'start_pos'):
-                parts.append(f"pos:{meta.start_pos}-{meta.end_pos}")
-            meta_str = f" [{', '.join(parts)}]" if parts else ""
-
-        print(f"{prefix}{tree.data}{meta_str}")
-
-        # Recursively print children
-        for child in tree.children:
-            pretty_with_meta(child, indent + 1)
-
-    elif isinstance(tree, Token):
-        # It's a Token (terminal)
-        token_meta = ""
-        if hasattr(tree, 'line'):
-            token_meta = f" [L{tree.line}:C{tree.column}]"
-        print(f"{prefix}{tree.type}: {repr(str(tree))}{token_meta}")
-
-    else:
-        # It's a plain string or other primitive value
-        print(f"{prefix}{type(tree).__name__}: {repr(tree)}")
-
-
-def pretty_with_meta2(node, indent=0):
-    prefix = "  " * indent
-
-    if isinstance(node, Tree):
-        # 1. Handle Tree Nodes (Non-terminals)
-        meta_str = ""
-        if hasattr(node, 'meta'):
-            m = node.meta
-            # Earley with propagate_positions=True provides these:
-            meta_str = f" [L{m.line}:C{m.column} -> L{m.end_line}:C{m.end_column}]"
-
-        print(f"{prefix}{node.data}{meta_str}")
-
-        for child in node.children:
-            pretty_with_meta(child, indent + 1)
-
-    elif isinstance(node, Token):
-        # 2. Handle Tokens (Terminals)
-        # Tokens store line/column/pos directly on themselves
-        loc = f" [L{node.line}:C{node.column}, pos:{node.start_pos}]"
-        print(f"{prefix}{node.type}: {repr(str(node))}{loc}")
-
-    else:
-        # 3. Handle anything else (Strings, None, etc.)
-        print(f"{prefix}{type(node).__name__}: {repr(node)}")
 
 
 def pretty_with_meta(node, indent=0):
