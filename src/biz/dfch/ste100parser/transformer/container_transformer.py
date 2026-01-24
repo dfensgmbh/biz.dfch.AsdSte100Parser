@@ -525,7 +525,11 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         item = children[0]
         assert isinstance(item, Tree) and Token.WS.name == item.data
-        indent = Tree(Token.LIST_INDENT.name, item.children[0], meta=item.meta)
+        indent = Tree(
+            Token.LIST_INDENT.name,
+            [item.children[0]],
+            meta=item.meta
+        )
         children = children[1:]
 
         self.print(children, token)
@@ -533,8 +537,11 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         marker_token = children.pop(0)
         assert isinstance(marker_token, lexer.Token)
         marker_meta = self._get_meta(marker_token)
-        marker = Tree(Token.LIST_MARKER.name, [
-                      marker_token.value], meta=marker_meta)
+        marker = Tree(
+            Token.LIST_MARKER.name,
+            [marker_token.value],
+            meta=marker_meta
+        )
 
         space_token = children.pop(0)
         assert isinstance(space_token, Tree)
