@@ -34,8 +34,10 @@ keywords = [
 
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
   "Intended Audience :: Information Technology",
+  "Natural Language :: English",
   "Topic :: Text Processing :: Linguistic",
   "Topic :: Text Processing :: Markup",
   "Topic :: Text Processing :: Markup :: Markdown",
