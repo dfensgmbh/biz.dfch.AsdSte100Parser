@@ -30,7 +30,7 @@ class ContainerTransformerRules:
     """
     Rules for ContainerTransformer start.
 
-    These rules removed NEWLINE between different rules.
+    These rules remove NEWLINE and LINEBREAK between different rules.
     """
 
     @classmethod

@@ -26,6 +26,11 @@ from lark.tree import Meta
 
 from biz.dfch.ste100parser.transformer.transformer_base import TransformerBase
 
+from biz.dfch.ste100parser.transformer.text_transformer_rules import (
+    TextTransformerRules
+)
+from biz.dfch.ste100parser.transformer.tree_rewriter import TreeRewriter
+
 from ..token import Token
 from ..char import Char
 
@@ -39,6 +44,24 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
       * PUNCT
     From these, the transformer creates sentences inside a paragraph.
     """
+
+    @v_args(meta=True)
+    def start(self, meta, children):
+        """start"""
+
+        assert isinstance(children, list), children
+        assert 1 <= len(children), f"#{len(children)}: [{children}]."
+
+        token = Token.start.name
+
+        self.print(children, token)
+
+        rules = TextTransformerRules().get_rules()
+        children = TreeRewriter().invoke(children, rules)
+        self.print(children, token)
+
+        result = Tree(token, children, meta=meta)
+        return result
 
     @v_args(meta=True)
     def TEXT(self, meta, children):  # pylint: disable=C0103

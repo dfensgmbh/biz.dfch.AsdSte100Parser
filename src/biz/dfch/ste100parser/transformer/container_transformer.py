@@ -25,6 +25,7 @@ from lark.tree import Meta
 from biz.dfch.ste100parser.transformer.container_transformer_rules import (
     ContainerTransformerRules
 )
+from biz.dfch.ste100parser.transformer.tree_rewriter import TreeRewriter
 
 from ..char import Char
 from ..token import Token
@@ -561,40 +562,6 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         result = Tree(token, items, meta=list_line_meta)
         return result
 
-    def _rewrite_children(self, children: list, rules: list) -> list:
-        """Rewrites the children based ony rules."""
-
-        assert isinstance(children, list)
-        assert isinstance(rules, list)
-
-        i = 0
-        while i < len(children):
-            for pattern, replacer, do_again in rules:
-                pattern_length = len(pattern)
-
-                if i + pattern_length > len(children):
-                    continue
-
-                segment = children[i:i + pattern_length]
-
-                if all(
-                    isinstance(node, Tree) and token.name == node.data
-                    for node, token in zip(segment, pattern)
-                ):
-                    new_segment = replacer(*segment)
-                    if isinstance(new_segment, list):
-                        children[i:i + pattern_length] = new_segment
-                    else:
-                        children[i:i + pattern_length] = [new_segment]
-
-                    if not do_again:
-                        i += 1
-                    break
-            else:
-                i += 1
-
-        return children
-
     @v_args(meta=True)
     def start(self, meta, children):
         """start"""
@@ -607,7 +574,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         self.print(children, token)
 
         rules = ContainerTransformerRules().get_rules()
-        children = self._rewrite_children(children, rules)
+        children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 
         result = Tree(token, children, meta=meta)
