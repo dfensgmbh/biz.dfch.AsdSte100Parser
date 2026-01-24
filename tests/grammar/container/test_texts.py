@@ -26,32 +26,35 @@ from ...test_data.test_data import TestData
 
 
 def pretty_with_meta(node, indent=0):
+
+    assert not hasattr(node, 'type'), repr(node)
+    assert hasattr(node, 'data'), repr(node)
+    assert hasattr(node, 'children'), repr(node)
+    assert hasattr(node, 'meta'), repr(node)
+    assert hasattr(node.meta, 'line'), repr(node.meta)
+    assert hasattr(node.meta, 'column'), repr(node.meta)
+    assert hasattr(node.meta, 'start_pos'), repr(node.meta)
+    assert hasattr(node.meta, 'end_pos'), repr(node.meta)
+
     prefix = "  " * indent
 
-    # 1. Check if it's a Tree (has 'data' and 'children')
-    if hasattr(node, 'data') and hasattr(node, 'children'):
-        meta_str = ""
-        if hasattr(node, 'meta') and hasattr(node.meta, 'line'):
-            m = node.meta
-            meta_str = f" [L{m.line}:C{m.column} @ {m.start_pos}:{m.end_pos}]"
+    meta_str = ""
+    m = node.meta
+    meta_str = f"L{m.line}:C{m.column} @ {m.start_pos}:{m.end_pos}"
 
-        print(f"{prefix}{node.data}{meta_str}")
+    if (
+        isinstance(node.children, list) and
+        1 == len(node.children) and
+        not hasattr(node.children[0], 'data') and
+        isinstance(node.children[0], str)
+    ):
+        child = node.children[0]
+        print(f"{prefix}{node.data}: '{child}' [{meta_str}]")
+    else:
+        print(f"{prefix}{node.data}: [{meta_str}]")
+
         for child in node.children:
             pretty_with_meta(child, indent + 1)
-
-    # 2. Check if it's a Token (has 'type' attribute)
-    elif hasattr(node, 'type'):
-        # Extract location info safely
-        line = getattr(node, 'line', '?')
-        col = getattr(node, 'column', '?')
-        pos = getattr(node, 'start_pos', getattr(node, 'pos_in_stream', '?'))
-
-        loc = f" [L{line}:C{col}, pos:{pos}]"
-        print(f"{prefix}{node.type}: {repr(str(node))}{loc}")
-
-    # 3. Fallback for plain strings or unexpected objects
-    else:
-        print(f"{prefix}{type(node).__name__}: {repr(node)}")
 
 
 class TestTexts(TestCaseContainerBase):
