@@ -72,3 +72,10 @@ class Token(StrEnum):
     WARNING = auto()
     CAUTION = auto()
     NOTE_OR_SAFETY_MARKER = auto()
+
+    # Pass 2 tokens
+    WORD = auto()
+    COMMA = auto()
+    EOS = auto()
+    sentence = auto()
+    FLATTEN = auto()

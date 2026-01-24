@@ -36,7 +36,7 @@ class Char(StrEnum):
     DOT = '.'
     QUESTION = '?'
     EXCLAMATION = '!'
-    COMMA = '.'
+    COMMA = ','
     COLON = ':'
 
     PAREN_OPEN = '('
