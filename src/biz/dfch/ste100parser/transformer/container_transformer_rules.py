@@ -143,7 +143,7 @@ class ContainerTransformerRules:
         result = Tree(
             Token.paragraph.name,
             para1.children + para2.children,
-            meta=para1.meta,
+            meta=meta,
         )
 
         return result
