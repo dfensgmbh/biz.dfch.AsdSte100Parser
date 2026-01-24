@@ -42,6 +42,7 @@
         "pypi",
         "PYTHONPATH",
         "rtype",
+        "sdist",
         "setuptools",
         "squote",
         "venv"
