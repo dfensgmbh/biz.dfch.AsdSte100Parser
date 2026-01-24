@@ -280,8 +280,10 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        value = children[0]
-        meta = self._get_meta(value)
+        meta = self._get_meta(children[0])
+        # children[0] is a `lexer.Token` (token).
+        # children[0][0] is the contents of that token.
+        value = children[0][0]
         result = Tree(token, [value], meta=meta)
         return result
 
