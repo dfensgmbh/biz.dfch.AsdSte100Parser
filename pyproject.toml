@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "biz-dfch-ste100parser"
-version = "0.1.5"
+version = "0.1.6"
 description = "An ASD-STE100 (Simplified Technical English) parser."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -37,6 +37,8 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Information Technology",
   "Topic :: Text Processing :: Linguistic",
+  "Topic :: Text Processing :: Markup",
+  "Topic :: Text Processing :: Markup :: Markdown",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
