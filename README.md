@@ -27,7 +27,7 @@ You must use a special structure of **Markdown** as the input text.
 
 ## Installation
 
-Create a virtual environment and install the library with `pip`:
+[biz-dfch-ste100parser](https://pypi.org/project/biz-dfch-ste100parser) is on [PyPI](https://pypi.org). Create a virtual environment and install the library with `pip`:
 
 ```
 pip install biz-dfch-ste100parser
