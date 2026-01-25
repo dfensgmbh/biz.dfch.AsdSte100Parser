@@ -171,6 +171,34 @@ NOTE: This is a note.
 
         self.assert_tree(value, expected)
 
+    def test_paragraph_continues_after_list_item(self):
+
+        value = self.load_test_data(TestData.TEST_SENTENCE_IN_LIST_ITEM)
+
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+            Token.list_item,
+            Token.list_item,
+            Token.list_item,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+            Token.WS,
+            Token.TEXT,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
+
     def test_single_paragraph(self):
 
         expected = [

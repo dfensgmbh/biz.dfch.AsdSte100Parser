@@ -319,13 +319,7 @@ NOTE: This is a note.
 
     def test_sentence_in_list_item(self):
 
-        value = '''List item:
-  - This is item 1.
-  - Item 2
-  - The last item.
-This sentence continues the paragraph.
-
-'''
+        value = self.load_test_data(TestData.TEST_SENTENCE_IN_LIST_ITEM)
 
         expected = [
             Token.paragraph,

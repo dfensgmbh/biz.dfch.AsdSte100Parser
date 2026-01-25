@@ -34,6 +34,15 @@ class ContainerTransformerRules:
     """
 
     @classmethod
+    def get_rules_paragraph(cls):
+        return [
+            (
+                [Token.list_item, Token.LINEBREAK],
+                lambda list, line: list,
+                True,
+            ),
+        ]
+
     @classmethod
     def get_rules_start(cls):
         return [

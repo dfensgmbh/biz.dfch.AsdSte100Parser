@@ -506,9 +506,10 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         ):
             children = children[:-1]
 
-        items = children
+        rules = ContainerTransformerRules().get_rules_paragraph()
+        children = TreeRewriter().invoke(children, rules)
 
-        result = Tree(token, items, meta=meta)
+        result = Tree(token, children, meta=meta)
         return result
 
     @v_args(meta=True)
