@@ -29,3 +29,5 @@ class TestData(StrEnum):
 
     LIST_IN_PARAGRAPH = "list_in_paragraph.md"
     LIST_IN_PROC = "list_in_proc.md"
+
+    TEST_SENTENCE_IN_LIST_ITEM = "test_sentence_in_list_item.md"

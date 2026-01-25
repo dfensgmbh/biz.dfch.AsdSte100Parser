@@ -13,14 +13,4 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""transformer module."""
-
-from .container_transformer import ContainerTransformer  # type: ignore
-from .text_transformer import TextTransformer  # type: ignore
-from .token_converter import TokenConverter
-
-__all__ = [
-    "ContainerTransformer",
-    "TextTransformer",
-    "TokenConverter",
-]
+"""Tests for container grammar and transformer."""

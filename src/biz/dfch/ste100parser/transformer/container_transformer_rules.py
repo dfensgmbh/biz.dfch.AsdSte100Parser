@@ -30,11 +30,21 @@ class ContainerTransformerRules:
     """
     Rules for ContainerTransformer start.
 
-    These rules removed NEWLINE between different rules.
+    These rules remove NEWLINE and LINEBREAK between different rules.
     """
 
     @classmethod
-    def get_rules(cls):
+    def get_rules_paragraph(cls):
+        return [
+            (
+                [Token.list_item, Token.LINEBREAK],
+                lambda list, line: list,
+                True,
+            ),
+        ]
+
+    @classmethod
+    def get_rules_start(cls):
         return [
             (
                 [Token.NEWLINE, Token.NEWLINE, Token.heading],
@@ -83,7 +93,7 @@ class ContainerTransformerRules:
             ),
             (
                 [Token.paragraph, Token.NEWLINE, Token.proc_item],
-                lambda para, n, proc: [para, proc],  # noqa: E501
+                lambda para, n, proc: [para, proc],
                 True,
             ),
             (
@@ -93,22 +103,22 @@ class ContainerTransformerRules:
             ),
             (
                 [Token.paragraph, Token.paragraph],
-                cls.process_paragraph_paragraph,  # noqa: E501
+                cls.process_paragraph_paragraph,
                 True,
             ),
             (
                 [Token.paragraph, Token.NEWLINE, Token.NEWLINE],
-                lambda para, n1, n2: para,  # noqa: E501
+                lambda para, n1, n2: para,
                 False,
             ),
             (
                 [Token.proc_item, Token.NEWLINE, Token.NEWLINE],
-                lambda proc, n1, n2: proc,  # noqa: E501
+                lambda proc, n1, n2: proc,
                 False,
             ),
             (
                 [Token.NOTE, Token.NEWLINE, Token.NEWLINE],
-                lambda note, n1, n2: note,  # noqa: E501
+                lambda note, n1, n2: note,
                 False,
             ),
         ]
@@ -143,7 +153,7 @@ class ContainerTransformerRules:
         result = Tree(
             Token.paragraph.name,
             para1.children + para2.children,
-            meta=para1.meta,
+            meta=meta,
         )
 
         return result

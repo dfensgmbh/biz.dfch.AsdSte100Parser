@@ -13,50 +13,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""char enum."""
-
 # pylint: disable=C0116
+# pylint: disable=R0903
+# pylint: disable=W0212
 # type: ignore
 
-from enum import StrEnum
+"""text_transformer_rules"""
 
-__all__ = [
-    "Char",
-]
+from biz.dfch.ste100parser.token import Token
 
 
-class Char(StrEnum):
-    """Character definitions."""
+class TextTransformerRules:
+    """
+    Rules for TextTransformer start.
 
-    EMPTY = ''
+    These rules remove NEWLINE and LINEBREAK between different rules.
+    """
 
-    DQUOTE = '"'
-    SQUOTE = "'"
+    @classmethod
+    def get_rules_start(cls):
+        _ = Token.start.name
 
-    DOT = '.'
-    QUESTION = '?'
-    EXCLAMATION = '!'
-    COMMA = ','
-    COLON = ':'
-
-    PAREN_OPEN = '('
-    PAREN_CLOSE = ')'
-
-    STAR = '*'
-    UNDER = '_'
-    CODE = '`'
-    BOLD_EMPH_OPEN = '*_'
-    BOLD_EMPH_CLOSE = '_*'
-
-    WS = r"[ \t]+"
-    MULTIPLY = '*'
-    SPACE = ' '
-    TAB = '\t'
-    NEWLINE = r"\r?\n"
-    LF = "\n"
-    TEXT = r"""[^"'*_`\s]+"""
-    APOSTROPHE = r"""(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)"""
-    CHAR_LOWER_S = 's'
-    YEAR_SHORT = r"""'\d{2}s?(?=[\s.,!?;:]|$)"""
-
-    HASH = '#'
+        return [
+        ]

@@ -30,7 +30,7 @@ class TestCaseBase(unittest.TestCase):
 
     _test_data_dir = Path(__file__).parent / "test_data"
 
-    def load_test_file(self, filename: str) -> str:
+    def load_test_data(self, filename: str) -> str:
         """
         Utility function that loads test files from the test_data
         directory.

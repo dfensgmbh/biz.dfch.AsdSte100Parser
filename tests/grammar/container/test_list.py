@@ -72,7 +72,7 @@ class TestList(TestCaseContainerBase):
             Token.paragraph,
         ]
 
-        value = self.load_test_file(TestData.LIST_IN_PARAGRAPH)
+        value = self.load_test_data(TestData.LIST_IN_PARAGRAPH)
         self._invoke(value, expected)
 
     def test_list_in_proc(self):
@@ -83,5 +83,5 @@ class TestList(TestCaseContainerBase):
             Token.paragraph,
         ]
 
-        value = self.load_test_file(TestData.LIST_IN_PROC)
+        value = self.load_test_data(TestData.LIST_IN_PROC)
         self._invoke(value, expected)

@@ -21,7 +21,7 @@
 
 from biz.dfch.ste100parser import Token
 
-from ...test_case_container_base import TestCaseContainerBase
+from ...test_case_text_base import TestCaseTextBase
 from ...test_data.test_data import TestData
 
 
@@ -57,7 +57,7 @@ def pretty_with_meta(node, indent=0):
             pretty_with_meta(child, indent + 1)
 
 
-class TestTexts(TestCaseContainerBase):
+class TestTexts(TestCaseTextBase):
 
     def assert_tree(
         self,
@@ -171,34 +171,6 @@ NOTE: This is a note.
 
         self.assert_tree(value, expected)
 
-    def test_paragraph_continues_after_list_item(self):
-
-        value = self.load_test_data(TestData.TEST_SENTENCE_IN_LIST_ITEM)
-
-        expected = [
-            Token.paragraph,
-        ]
-        self.assert_tree(value, expected)
-
-        expected = [
-            Token.TEXT,
-            Token.WS,
-            Token.TEXT,
-            Token.list_item,
-            Token.list_item,
-            Token.list_item,
-            Token.TEXT,
-            Token.WS,
-            Token.TEXT,
-            Token.WS,
-            Token.TEXT,
-            Token.WS,
-            Token.TEXT,
-            Token.WS,
-            Token.TEXT,
-        ]
-        self.assert_tree(value, expected, Token.paragraph, level=1)
-
     def test_single_paragraph(self):
 
         expected = [
@@ -208,6 +180,168 @@ NOTE: This is a note.
         value = self.load_test_data(TestData.SINGLE_PARAGRAPH)
 
         self.assert_tree(value, expected)
+
+    def test_sentence_in_cite(self):
+
+        value = "> Yes, this is a cite block. With two sentences."
+
+        expected = [
+            Token.sentence,
+            Token.sentence,
+        ]
+
+        self.assert_tree(value, expected, Token.cite)
+
+        expected = [
+            Token.WORD,     # Yes
+            Token.COMMA,    # ,
+            Token.WS,
+            Token.WORD,     # This
+            Token.WS,
+            Token.WORD,     # is
+            Token.WS,
+            Token.WORD,     # a
+            Token.WS,
+            Token.WORD,     # cite
+            Token.WS,
+            Token.WORD,     # block
+            Token.EOS,      # .
+        ]
+
+        self.assert_tree(value, expected, Token.sentence, level=1)
+
+    def test_sentence_extraction(self):
+
+        value = """Thus, we have no '.' choice."""
+        value = """AndX yes, after 1.25 hours, there is a sign: 'Do not enter'."""
+
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.sentence,
+            Token.sentence,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
+
+        expected = [
+            Token.WORD,     # AndX
+            Token.WS,
+            Token.WORD,     # yes
+            Token.COMMA,    # ,
+            Token.WS,
+            Token.WORD,     # after
+            Token.WS,
+            Token.WORD,     # 1.25
+            Token.WS,
+            Token.WORD,     # hours
+            Token.COMMA,    # ,
+            Token.WS,
+            Token.WORD,     # there
+            Token.WS,
+            Token.WORD,     # is
+            Token.WS,
+            Token.WORD,     # a
+            Token.WS,
+            Token.WORD,     # sign
+            Token.EOS,      # :
+        ]
+        self.assert_tree(value, expected, Token.sentence, level=2)
+
+    def test_eos_in_dquote(self):
+
+        value = '''This is a sentence, where the end-of-sentence marker (".") is inside a "double quote."'''
+
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.sentence,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
+
+        expected = [
+            Token.WORD,     # This
+            Token.WS,
+            Token.WORD,     # is
+            Token.WS,
+            Token.WORD,     # a
+            Token.WS,
+            Token.WORD,     # sentence
+            Token.COMMA,
+            Token.WS,
+            Token.WORD,     # where
+            Token.WS,
+            Token.WORD,     # the
+            Token.WS,
+            Token.WORD,     # end-of-sentence
+            Token.WS,
+            Token.WORD,     # marker
+            Token.WS,
+            Token.paren,    # (".")
+            Token.WS,
+            Token.WORD,     # is
+            Token.WS,
+            Token.WORD,     # inside
+            Token.WS,
+            Token.WORD,     # a
+            Token.WS,
+            Token.dquote,   # "double quote."
+        ]
+        self.assert_tree(value, expected, Token.sentence, level=2)
+
+    def test_sentence_in_proc_item(self):
+
+        value = '''
+1. This is the first work step.
+2. This is the second work step (with an error: no EOS)
+3. This is the last work step. Here are two sentences.
+
+'''
+
+        expected = [
+            Token.proc_item,
+            Token.proc_item,
+            Token.proc_item,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.PROC_STEP,
+            Token.PROC_DELIMITER,
+            Token.sentence,
+        ]
+        self.assert_tree(value, expected, Token.proc_item, level=1)
+
+    def test_sentence_in_list_item(self):
+
+        value = self.load_test_data(TestData.TEST_SENTENCE_IN_LIST_ITEM)
+
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.sentence,
+            Token.list_item,
+            Token.list_item,
+            Token.list_item,
+            Token.sentence,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
+
+        expected = [
+            Token.WORD,     # List
+            Token.WS,
+            Token.WORD,     # item
+            Token.EOS,      # :
+        ]
+        self.assert_tree(value, expected, Token.sentence, level=2)
 
     def test_single_paragraph_with_linebreak(self):
 

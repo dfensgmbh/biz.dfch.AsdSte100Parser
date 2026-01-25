@@ -25,6 +25,7 @@ from lark.tree import Meta
 from biz.dfch.ste100parser.transformer.container_transformer_rules import (
     ContainerTransformerRules
 )
+from biz.dfch.ste100parser.transformer.tree_rewriter import TreeRewriter
 
 from ..char import Char
 from ..token import Token
@@ -37,7 +38,17 @@ __all__ = [
 
 
 class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
-    """Transformer for pass 1."""
+    """
+    Transformer for pass 1 (with significant white space).
+
+    This transformer creates the container structure of the input text:
+      * heading
+      * paragraph
+      * proc_item
+      * cite.
+
+    Inside paragraph, there are still only TEXT and WS tokens (and no WORDs).
+    """
 
     def _get_meta(self, node: lexer.Token) -> Meta:
         assert isinstance(node, lexer.Token)
@@ -270,8 +281,10 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        value = children[0]
-        meta = self._get_meta(value)
+        meta = self._get_meta(children[0])
+        # children[0] is a `lexer.Token` (token).
+        # children[0][0] is the contents of that token.
+        value = children[0][0]
         result = Tree(token, [value], meta=meta)
         return result
 
@@ -493,9 +506,10 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         ):
             children = children[:-1]
 
-        items = children
+        rules = ContainerTransformerRules().get_rules_paragraph()
+        children = TreeRewriter().invoke(children, rules)
 
-        result = Tree(token, items, meta=meta)
+        result = Tree(token, children, meta=meta)
         return result
 
     @v_args(meta=True)
@@ -513,7 +527,11 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         item = children[0]
         assert isinstance(item, Tree) and Token.WS.name == item.data
-        indent = Tree(Token.LIST_INDENT.name, item.children[0], meta=item.meta)
+        indent = Tree(
+            Token.LIST_INDENT.name,
+            [item.children[0]],
+            meta=item.meta
+        )
         children = children[1:]
 
         self.print(children, token)
@@ -521,8 +539,11 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         marker_token = children.pop(0)
         assert isinstance(marker_token, lexer.Token)
         marker_meta = self._get_meta(marker_token)
-        marker = Tree(Token.LIST_MARKER.name, [
-                      marker_token.value], meta=marker_meta)
+        marker = Tree(
+            Token.LIST_MARKER.name,
+            [marker_token.value],
+            meta=marker_meta
+        )
 
         space_token = children.pop(0)
         assert isinstance(space_token, Tree)
@@ -542,40 +563,6 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         result = Tree(token, items, meta=list_line_meta)
         return result
 
-    def _rewrite_children(self, children: list, rules: list) -> list:
-        """Rewrites the children based ony rules."""
-
-        assert isinstance(children, list)
-        assert isinstance(rules, list)
-
-        i = 0
-        while i < len(children):
-            for pattern, replacer, do_again in rules:
-                pattern_length = len(pattern)
-
-                if i + pattern_length > len(children):
-                    continue
-
-                segment = children[i:i + pattern_length]
-
-                if all(
-                    isinstance(node, Tree) and token.name == node.data
-                    for node, token in zip(segment, pattern)
-                ):
-                    new_segment = replacer(*segment)
-                    if isinstance(new_segment, list):
-                        children[i:i + pattern_length] = new_segment
-                    else:
-                        children[i:i + pattern_length] = [new_segment]
-
-                    if not do_again:
-                        i += 1
-                    break
-            else:
-                i += 1
-
-        return children
-
     @v_args(meta=True)
     def start(self, meta, children):
         """start"""
@@ -587,8 +574,8 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = ContainerTransformerRules().get_rules()
-        children = self._rewrite_children(children, rules)
+        rules = ContainerTransformerRules().get_rules_start()
+        children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 
         result = Tree(token, children, meta=meta)
