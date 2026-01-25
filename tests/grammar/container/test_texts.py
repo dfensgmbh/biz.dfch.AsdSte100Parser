@@ -177,7 +177,7 @@ NOTE: This is a note.
             Token.paragraph,
         ]
 
-        value = self.load_test_file(TestData.SINGLE_PARAGRAPH)
+        value = self.load_test_data(TestData.SINGLE_PARAGRAPH)
 
         self.assert_tree(value, expected)
 
@@ -187,7 +187,7 @@ NOTE: This is a note.
             Token.paragraph,
         ]
 
-        value = self.load_test_file(TestData.SINGLE_PARAGRAPH_WITH_LINEBREAK)
+        value = self.load_test_data(TestData.SINGLE_PARAGRAPH_WITH_LINEBREAK)
         self.assert_tree(value, expected)
 
     def test_complex_headings_para_proc_list(self):
@@ -209,7 +209,7 @@ NOTE: This is a note.
             Token.paragraph,
         ]
 
-        value = self.load_test_file(TestData.COMPLEX_HEADINGS_PARA_PROC_LIST)
+        value = self.load_test_data(TestData.COMPLEX_HEADINGS_PARA_PROC_LIST)
         self.assert_tree(value, expected)
 
     def test_complex_headings_proc_cite_para_list(self):
@@ -234,6 +234,6 @@ NOTE: This is a note.
             Token.cite,
         ]
 
-        value = self.load_test_file(
+        value = self.load_test_data(
             TestData.COMPLEX_HEADINGS_PROC_CITE_PARA_LIST)
         self.assert_tree(value, expected)
