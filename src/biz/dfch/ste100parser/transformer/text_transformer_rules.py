@@ -32,6 +32,7 @@ class TextTransformerRules:
 
     @classmethod
     def get_rules_start(cls):
-        _ = Token("start", "")
+        _ = Token.start.name
+
         return [
         ]
