@@ -31,6 +31,7 @@ class TextTransformerRules:
     """
 
     @classmethod
-    def get_rules(cls):
+    def get_rules_start(cls):
+        _ = Token("start", "")
         return [
         ]

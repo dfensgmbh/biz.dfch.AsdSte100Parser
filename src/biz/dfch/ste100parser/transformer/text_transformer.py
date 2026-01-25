@@ -56,7 +56,7 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = TextTransformerRules().get_rules()
+        rules = TextTransformerRules().get_rules_start()
         children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 

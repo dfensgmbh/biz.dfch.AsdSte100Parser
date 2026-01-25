@@ -573,7 +573,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = ContainerTransformerRules().get_rules()
+        rules = ContainerTransformerRules().get_rules_start()
         children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 
