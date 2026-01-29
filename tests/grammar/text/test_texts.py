@@ -317,6 +317,69 @@ NOTE: This is a note.
         ]
         self.assert_tree(value, expected, Token.proc_item, level=1)
 
+    def test_ireb_template(self):
+
+        value = '''When the system recognizes a applicable debit card, 
+the system must show this message in less than 0.2 second:
+"Type in the PIN."
+
+'''
+
+        expected = [
+            Token.paragraph,
+        ]
+        self.assert_tree(value, expected)
+
+        expected = [
+            Token.sentence,
+            Token.sentence,
+        ]
+        self.assert_tree(value, expected, Token.paragraph, level=1)
+
+        expected = [
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.COMMA,
+            Token.WS,
+            Token.LINEBREAK,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.WS,
+            Token.WORD,
+            Token.EOS,
+        ]
+        self.assert_tree(value, expected, Token.sentence, level=2)
+
     def test_sentence_in_list_item(self):
 
         value = self.load_test_data(TestData.TEST_SENTENCE_IN_LIST_ITEM)

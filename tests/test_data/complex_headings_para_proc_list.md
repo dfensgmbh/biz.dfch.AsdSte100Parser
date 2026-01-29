@@ -15,8 +15,8 @@ WARNING: This is not a warning. It is just text in a paragraph.
 1. This is work step 1. And there is no safety instruction.
 1A. This is work step 1A.
 WARNING: This is a warning A in work step 1A.
-    * Vertical list item 1 (EBNF correct, but STE invalid)
-    * Vertical list item 2 (EBNF correct, but STE invalid)
+    * Vertical list item 1 (EBNF correct, and STE valid)
+    * Vertical list item 2 (EBNF correct, and STE valid)
 WARNING: This is a warning B in work step 1A.
 2. This is work step 2.
 CAUTION: This is a caution C in work step 2.
