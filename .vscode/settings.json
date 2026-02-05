@@ -23,6 +23,7 @@
     "python.autoComplete.extraPaths": [
         "${workspaceFolder}"
     ],
+    "python.envFile": "${workspaceFolder}/venv",
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "cSpell.words": [

@@ -20,11 +20,13 @@ from .grammar import GrammarType
 from .parser import Parser
 from .token import Token
 from .transformer import ContainerTransformer
+from .transformer import TextTransformer
 
 __all__ = [
     "Char",
     "ContainerTransformer",
     "GrammarType",
     "Parser",
+    "TextTransformer",
     "Token",
 ]
