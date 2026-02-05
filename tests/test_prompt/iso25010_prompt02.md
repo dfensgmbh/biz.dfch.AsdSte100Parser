@@ -16,14 +16,54 @@ For each characteristic:
 
 ### ISO 25010 CHARACTERISTICS
 1. Functional Suitability
+    * functional completeness
+    * functional correctness
+    * functional appropriateness
 2. Performance Efficiency
+    * time behavior
+    * resource utilization
+    * capacity
 3. Compatibility
+    * co-existence
+    * interoperability
 4. Interaction Capability
+    * appropriateness recognizability
+    * learnability
+    * operability
+    * user error protection
+    * user engagement
+    * inclusivity
+    * user assistance
+    * self-descriptiveness
 5. Reliability
+    * faultlessness
+    * availability
+    * fault tolerance
+    * recoverability
 6. Security
+    * confidentiality
+    * integrity
+    * non-repudiation
+    * accountability
+    * authenticity
+    * resistance
 7. Maintainability
+    * modularity
+    * reusability
+    * analyzability
+    * modifiability
+    * testability
 8. Flexibility
+    * adaptability
+    * scalability
+    * installability
+    * replaceability
 9. Safety
+    * operational constraint
+    * risk identification
+    * fail safe
+    * hazard warning
+    * safe integration
 
 ### INPUT_TEXT
 <input_text>
