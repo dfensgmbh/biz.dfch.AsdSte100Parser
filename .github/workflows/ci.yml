@@ -31,6 +31,7 @@ jobs:
       # I install spaCy as a dependency. This command downloads the model only.
       run: |
         python -m spacy download en_core_web_sm
+        python -m spacy download en_core_web_trf
 
     - name: Analyzing the code with pylint
       run: |
