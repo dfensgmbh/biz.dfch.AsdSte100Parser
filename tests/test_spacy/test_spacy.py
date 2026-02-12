@@ -26,10 +26,15 @@ import spacy
 
 class TestSpacy(unittest.TestCase):
 
+    nlp: spacy.language.Language
+
+    def setUp(self) -> None:
+
+        self.nlp = spacy.load("en_core_web_sm")
+
     def test_spacy(self):
         text = """ASD-STE100 Simplified Technical English (STE for short) """ \
             """is a controlled natural language and an international """ \
             """standard to write technical documentation."""
-        nlp = spacy.load("en_core_web_sm")
-        doc = nlp(text)
+        doc = self.nlp(text)
         print([(token.text, token.pos_, token.dep_) for token in doc])
