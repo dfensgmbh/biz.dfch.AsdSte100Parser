@@ -16,6 +16,7 @@
 # pylint: disable=C0114
 # pylint: disable=C0115
 # pylint: disable=C0116
+# pylint: disable=C0301
 
 """test_spacy"""
 
@@ -38,3 +39,10 @@ class TestSpacy(unittest.TestCase):
             """standard to write technical documentation."""
         doc = self.nlp(text)
         print([(token.text, token.pos_, token.dep_) for token in doc])
+
+    def test_spacy2(self):
+        text = '''The U.K. is an abbreviation for "United Kingdom." In the U.K. people often write "UK" instead of "U.K."'''
+        doc = self.nlp(text)
+        print([(token.text, token.pos_, token.dep_) for token in doc])
+        for sent in doc.sents:
+            print(sent.text)
