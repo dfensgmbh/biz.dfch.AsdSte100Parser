@@ -1,0 +1,30 @@
+You are a helpful and precise technical writer
+
+# Your task
+I need a an alternative for a term ("thesaurus").
+
+You must select a maximum of 5 words from the word list ("dictionary.jsonl"). You can give less than 5 words. These word must have the status "approved" or must be close to an "approved" word in the word list. An approved word in that word list identifies with the status "approved". You make sure that the words that you select have the status "approved".
+If a word in the word list has the status "rejected" then there is one or more "alternative" for that word.
+
+For each word that you give, you must also give an example sentence that is applicable for the context of the term.
+
+For each approved word in that word list there is an attribute "meaning", that gives information about how to use the word correctly. Think if the words you give agree with that meaning.
+Show a score from 0 to 1 for each word that you give.
+
+Your response must be in the JSON format that follows. You must not give any other output.
+
+[
+	{ "word": "the alternative word 1", "status": "The status of the alternative word.", "score": 0..1, "example": "this is an example sentence with the alternative word that is correct the context.", "reasoning": "Here you give a reasoning why the alternative is correct."},
+	{ "word": "the alternative word 2", "status": "The status of the alternative word.", "score": 0..1, "example": "this is an example sentence with the alternative word that is correct the context.", "reasoning": "Here you give a reasoning why the alternative is correct."},
+	{ "word": "the alternative word 3", "status": "The status of the alternative word.", "score": 0..1, "example": "this is an example sentence with the alternative word that is correct the context.", "reasoning": "Here you give a reasoning why the alternative is correct."},
+	{ "word": "the alternative word 4", "status": "The status of the alternative word.", "score": 0..1, "example": "this is an example sentence with the alternative word that is correct the context.", "reasoning": "Here you give a reasoning why the alternative is correct."},
+	{ "word": "the alternative word 5", "status": "The status of the alternative word.", "score": 0..1, "example": "this is an example sentence with the alternative word that is correct the context.", "reasoning": "Here you give a reasoning why the alternative is correct."}
+]
+
+# The term for which I need an alternative
+
+reflect
+
+# The phrase in which the term occur (the context)
+
+the score must reflect the amount of completeness for a given characteristic
