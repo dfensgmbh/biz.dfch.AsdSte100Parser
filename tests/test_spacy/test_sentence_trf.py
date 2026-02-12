@@ -27,7 +27,7 @@ from parameterized import parameterized
 import spacy
 
 
-# @unittest.skipIf(os.getenv('GITHUB_ACTIONS') == 'true', "Do not do these tests on Github.")
+@unittest.skipIf(os.getenv('GITHUB_ACTIONS') == 'true', "Do not do these tests on Github.")
 class TestSentenceTrf(unittest.TestCase):
 
     nlp: spacy.language.Language
