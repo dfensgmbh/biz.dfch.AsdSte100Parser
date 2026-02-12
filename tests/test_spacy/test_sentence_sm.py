@@ -66,15 +66,7 @@ class TestSentenceSm(unittest.TestCase):
         ("propn_cconj_pron_and", "London is the capital of the U.K. And, it has the Tower of London.", 2),
         ("propn_propn_uk", "London is the capital of the U.K. The U.K. has many inhabitants.", 2),
         ("propn_cconj_propn", "London is the capital of the U.K. And the U.K. has many inhabitants.", 2),
-    ])
-    def test_sentences_correct(self, name, text, expected):
 
-        doc = self.nlp(text)
-
-        self.assertEqual(expected, len(list(doc.sents)), name)
-        print([(token.text, token.pos_, token.dep_) for token in doc])
-
-    @parameterized.expand([
         ("abbrev_cconj_pron", "The store opens at 9 a.m. And it closes at 4 p.m.", 2),
         ("propn_cconj_pron1_pl", "London is the capital of the U.K. And they have the Tower of London.", 2),
         ("propn_cconj_pron_sg", "London is the capital of the U.K. And it has the Tower of London.", 2),
@@ -83,7 +75,7 @@ class TestSentenceSm(unittest.TestCase):
         ("propn_det_propn", "London is the capital of the U.K. The U.K. is very rainy.", 2),
         ("propn_cconj_propn", "London is the capital of the U.K. And the U.K. is very rainy.", 2),
     ])
-    def test_sentence_incorrect(self, name, text, expected):
+    def test_sentences(self, name, text, expected):
 
         doc = self.nlp(text)
 
