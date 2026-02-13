@@ -46,7 +46,7 @@ class TestBoldEmph(TestCaseContainerBase):
         value = "*_bold-emph text_* at the start"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_multi_line_fails(self):
@@ -78,12 +78,12 @@ class TestBoldEmph(TestCaseContainerBase):
         value = '"*__*"'
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_in_squote(self):
         value = "'*__*'"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())

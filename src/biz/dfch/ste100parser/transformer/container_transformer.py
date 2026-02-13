@@ -22,15 +22,13 @@
 from lark import Discard, lexer, Tree, v_args
 from lark.tree import Meta
 
-from biz.dfch.ste100parser.transformer.container_transformer_rules import (
-    ContainerTransformerRules
-)
-from biz.dfch.ste100parser.transformer.tree_rewriter import TreeRewriter
-
 from ..char import Char
 from ..token import Token
 
+from .container_transformer_rules import ContainerTransformerRules
 from .transformer_base import TransformerBase
+from .transformer_configuration import TransformerConfiguration
+from .tree_rewriter import TreeRewriter
 
 __all__ = [
     "ContainerTransformer",
@@ -49,6 +47,18 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
     Inside paragraph, there are still only TEXT and WS tokens (and no WORDs).
     """
+
+    def __init__(
+        self,
+        cfg: TransformerConfiguration = TransformerConfiguration(
+            log=True,
+            visit_tokens=True
+        ),
+    ) -> None:
+
+        assert isinstance(cfg, TransformerConfiguration)
+
+        super().__init__(cfg)
 
     def _get_meta(self, node: lexer.Token) -> Meta:
         assert isinstance(node, lexer.Token)

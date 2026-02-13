@@ -31,7 +31,7 @@ class TestCaseTextBase(TestCaseBase):
     _parser = None
 
     pass1_transformer: ContainerTransformer
-    transformer: TextTransformer
+    pass2_transformer: TextTransformer
     converter: TokenConverter
 
     @classmethod
@@ -42,8 +42,8 @@ class TestCaseTextBase(TestCaseBase):
     def setUp(self):
         """Initialize fresh transformer and converter for every test."""
         self.pass1_transformer = ContainerTransformer()
-        # self.transformer = TextTransformer(log=True)
-        self.transformer = TextTransformer()
+        # self.pass2_transformer = TextTransformer(log=True)
+        self.pass2_transformer = TextTransformer()
         self.converter = TokenConverter()
 
     def invoke(self, value: str):
@@ -51,4 +51,4 @@ class TestCaseTextBase(TestCaseBase):
 
     def transform(self, parse_tree):
         pass1 = self.pass1_transformer.transform(parse_tree)
-        return self.transformer.transform(pass1)  # type: ignore
+        return self.pass2_transformer.transform(pass1)  # type: ignore

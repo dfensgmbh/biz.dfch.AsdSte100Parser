@@ -34,7 +34,7 @@ class ContainerTransformerRules:
     """
 
     @classmethod
-    def get_rules_paragraph(cls):
+    def get_rules_paragraph(cls) -> list:
         return [
             (
                 [Token.list_item, Token.LINEBREAK],
@@ -44,7 +44,7 @@ class ContainerTransformerRules:
         ]
 
     @classmethod
-    def get_rules_start(cls):
+    def get_rules_start(cls) -> list:
         return [
             (
                 [Token.NEWLINE, Token.NEWLINE, Token.heading],

@@ -146,7 +146,7 @@ class TestGeneric(TestCaseContainerBase):
 
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     @parameterized.expand([
@@ -165,5 +165,5 @@ class TestGeneric(TestCaseContainerBase):
 
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())

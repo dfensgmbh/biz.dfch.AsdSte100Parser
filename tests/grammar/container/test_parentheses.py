@@ -140,7 +140,7 @@ class TestParentheses(TestCaseContainerBase):
         value = """(some-text-in-parentheses "round-brackets")"""
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_dquote_in_paren2(self):
@@ -148,7 +148,7 @@ class TestParentheses(TestCaseContainerBase):
         value = """(some-text-in-parentheses "(round-brackets)")"""
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     @parameterized.expand([
@@ -167,14 +167,14 @@ class TestParentheses(TestCaseContainerBase):
         value = "()"
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_empty_in_dquote(self):
         value = '"()"'
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_paren_open_fails(self):
@@ -193,12 +193,12 @@ class TestParentheses(TestCaseContainerBase):
         value = '"("'
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_close_in_dquote(self):
         value = '")"'
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())

@@ -24,15 +24,13 @@ from collections import deque
 from lark import Tree, v_args
 from lark.tree import Meta
 
-from biz.dfch.ste100parser.transformer.transformer_base import TransformerBase
-
-from biz.dfch.ste100parser.transformer.text_transformer_rules import (
-    TextTransformerRules
-)
-from biz.dfch.ste100parser.transformer.tree_rewriter import TreeRewriter
-
 from ..token import Token
 from ..char import Char
+
+from .transformer_base import TransformerBase
+from .transformer_configuration import TransformerConfiguration
+from .text_transformer_rules import TextTransformerRules
+from .tree_rewriter import TreeRewriter
 
 
 class TextTransformer(TransformerBase):  # pylint: disable=R0904
@@ -44,6 +42,19 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
       * PUNCT
     From these, the transformer creates sentences inside a paragraph.
     """
+
+
+    def __init__(
+        self,
+        cfg: TransformerConfiguration = TransformerConfiguration(
+            log=False,
+            visit_tokens=False,
+        ),
+    ) -> None:
+
+        assert isinstance(cfg, TransformerConfiguration)
+
+        super().__init__(cfg)
 
     @v_args(meta=True)
     def start(self, meta, children):

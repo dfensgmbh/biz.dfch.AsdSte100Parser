@@ -63,7 +63,7 @@ class TestList(TestCaseContainerBase):
 
         initial = Parser(GrammarType.CONTAINER).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = ContainerTransformer().transform(initial)
         print(transformed.pretty())
 
     def test_list_in_paragraph(self):
