@@ -13,22 +13,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""biz.dfch.ste100parser package root"""
+# pylint: disable=C0103
+# pylint: disable=C0116
+# pylint: disable=W0212
 
-from .char import Char
-from .grammar import GrammarType
-from .note_or_safety_keyword import NoteOrSafetyKeyword
-from .parser import Parser
-from .token import Token
-from .transformer import ContainerTransformer
-from .transformer import TextTransformer
+"""Keyword class."""
 
-__all__ = [
-    "Char",
-    "ContainerTransformer",
-    "GrammarType",
-    "NoteOrSafetyKeyword",
-    "Parser",
-    "TextTransformer",
-    "Token",
-]
+from enum import StrEnum
+
+
+class NoteOrSafetyKeyword(StrEnum):
+    """ASD-STE100 keywords."""
+
+    NOTE = "NOTE"
+    WARNING = "WARNING"
+    CAUTION = "CAUTION"
