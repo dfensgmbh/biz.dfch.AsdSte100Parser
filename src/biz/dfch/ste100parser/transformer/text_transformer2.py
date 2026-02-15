@@ -17,15 +17,20 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""text_transformer"""
+"""text_transformer2"""
 
 from collections import deque
 
 from lark import Tree, v_args
 from lark.tree import Meta
+import spacy
 
-from ..token import Token
+from biz.dfch.asdste100vocab import Vocab
+
 from ..char import Char
+from ..token import Token
+from ..serializer.text_interpreter import TextInterpreter
+from ..serializer.token_base import TokenBase
 
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration
@@ -33,7 +38,7 @@ from .text_transformer_rules import TextTransformerRules
 from .tree_rewriter import TreeRewriter
 
 
-class TextTransformer(TransformerBase):  # pylint: disable=R0904
+class TextTransformer2(TransformerBase):  # pylint: disable=R0904
     """Transformer for pass 2.
 
     This transformer creates theses tokens from TEXT:
@@ -42,6 +47,10 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
       * PUNCT
     From these, the transformer creates sentences inside a paragraph.
     """
+
+    _vocab: Vocab
+    _nlp: spacy.language.Language
+    _interpreter: TextInterpreter
 
     def __init__(
         self,
@@ -53,6 +62,10 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(cfg, TransformerConfiguration)
 
         super().__init__(cfg)
+
+        self._vocab = Vocab()
+        self._nlp = spacy.load("en_core_web_sm")
+        self._interpreter = TextInterpreter()
 
     @v_args(meta=True)
     def start(self, meta, children):
@@ -72,30 +85,32 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
         result = Tree(token, children, meta=meta)
         return result
 
-    @v_args(meta=True)
-    def TEXT(self, meta, children):  # pylint: disable=C0103
-        assert isinstance(children, list), type(children)
-        assert 1 == len(children), f"#{len(children)}: [{children}]."
+    # @v_args(meta=True)
+    # def TEXT(self, meta, children):  # pylint: disable=C0103
+    #     assert isinstance(children, list), type(children)
+    #     assert 1 == len(children), f"#{len(children)}: [{children}]."
 
-        _ = meta
+    #     _ = meta
 
-        token = Token.TEXT.name
+    #     return children
 
-        value: str = children[0]
-        assert isinstance(value, str)
-        assert 0 < len(value)
+    #     token = Token.TEXT.name
 
-        flattened = self.divide_text(meta, children)
+    #     value: str = children[0]
+    #     assert isinstance(value, str)
+    #     assert 0 < len(value)
 
-        if 1 < len(flattened):
-            token = Token.FLATTEN.name
-            result = Tree(token, flattened, meta=meta)
-            return result
+    #     flattened = self.divide_text(meta, children)
 
-        node = flattened[0]
-        token = node.data
-        result = Tree(token, [str(node.children[0])], meta=node.meta)
-        return result
+    #     if 1 < len(flattened):
+    #         token = Token.FLATTEN.name
+    #         result = Tree(token, flattened, meta=meta)
+    #         return result
+
+    #     node = flattened[0]
+    #     token = node.data
+    #     result = Tree(token, [str(node.children[0])], meta=node.meta)
+    #     return result
 
     @v_args(meta=True)
     def proc_item(self, meta, children):
@@ -127,9 +142,26 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
             remaining,
             fill=True,
         )
+
         items.extend(processed_items)
         result = Tree(token, items, meta=meta)
         return result
+
+    def process_text(self, children) -> list:
+        items: list[TokenBase] = []
+        for child in children:
+            visited = self._interpreter.visit(child)
+            flattened = self._interpreter.flatten_result(visited)
+            items.extend(flattened)
+
+        text = Char.EMPTY.join([item.text for item in items])
+        print(f"#### text: '{text}'")
+        doc = self._nlp(text)
+        print(f"#### {[(token.text, token.pos_, token.dep_) for token in list(doc)]}")
+        for i, sent in enumerate(doc.sents):
+            print(f"####[{i}] {[(token.text, token.pos_, token.dep_) for token in list(sent)]}")
+
+        return items
 
     @v_args(meta=True)
     def paren(self, meta, children):
@@ -210,6 +242,10 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
         fill: bool,
         terminators: list[Token] | None = None,
     ) -> list[Tree]:
+
+        self.process_text(children)
+
+        return children
 
         flattened = self.flatten_text_nodes(children)
         sentences = self.get_sentences(

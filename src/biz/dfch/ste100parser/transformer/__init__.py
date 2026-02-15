@@ -17,10 +17,12 @@
 
 from .container_transformer import ContainerTransformer  # type: ignore
 from .text_transformer import TextTransformer  # type: ignore
+from .text_transformer2 import TextTransformer2  # type: ignore
 from .token_converter import TokenConverter
 
 __all__ = [
     "ContainerTransformer",
     "TextTransformer",
+    "TextTransformer2",
     "TokenConverter",
 ]
