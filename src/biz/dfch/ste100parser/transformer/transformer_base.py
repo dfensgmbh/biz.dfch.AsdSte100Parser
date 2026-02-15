@@ -37,7 +37,6 @@ class TransformerBase(Transformer):
         self,
         cfg: TransformerConfiguration = TransformerConfiguration(
             log=False,
-            visit_tokens=False
         ),
     ) -> None:
 
