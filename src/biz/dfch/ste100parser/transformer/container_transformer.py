@@ -311,6 +311,18 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         result = Tree(token, [str(len(children))], meta=meta)
         return result
 
+    def PLURAL_S(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token)
+        assert 1 <= len(children)
+
+        token = Token.PLURAL_S.name
+
+        self.print(children, token)
+
+        meta = self._get_meta(children)
+        result = Tree(token, [f"{Char.CHAR_LOWER_S}"], meta=meta)
+        return result
+
     def MULTIPLY(self, children):  # pylint: disable=C0103
         assert isinstance(children, lexer.Token)
         assert 1 <= len(children)
