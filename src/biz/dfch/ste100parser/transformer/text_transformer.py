@@ -168,6 +168,7 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
 
         token = Token.dquote.name
 
+        # DFTODO - why do I want to process a "sentence" inside a squote?
         items = self.process_sentences(
             children,
             fill=False,
@@ -182,6 +183,7 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
 
         token = Token.squote.name
 
+        # DFTODO - why do I want to process a "sentence" inside a squote?
         items = self.process_sentences(
             children,
             fill=False,

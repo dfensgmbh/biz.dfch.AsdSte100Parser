@@ -39,6 +39,8 @@ class Token(StrEnum):
     cite = auto()
 
     CODE = auto()
+    code_block = auto()
+    LANGUAGE = auto()
     bold = auto()
     emph = auto()
     bold_emph = auto()
@@ -53,6 +55,7 @@ class Token(StrEnum):
     TEXT = auto()
     CHAR = auto()
     APOSTROPHE = auto()
+    PLURAL_S = auto()
     YEAR_SHORT = auto()
 
     proc_item = auto()

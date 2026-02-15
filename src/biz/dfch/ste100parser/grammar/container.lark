@@ -23,6 +23,7 @@
     | proc
     | note
     | cite
+    | code_block
 
 // ---------- Top-level inline stream ----------
 ?inline_next: NEWLINE
@@ -191,10 +192,11 @@ LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
 
 ?proc.1: proc_line+
 ?proc_line: PROC_LINE_START proc_marker proc_delimiter proc_indent_suffix proc_item+
-?proc_item.1: WS  
-    | format_containers  
-    | quote_containers  
-    | paren_sl  
+?proc_item.1: WS
+    | format_containers
+    | code
+    | quote_containers
+    | paren_sl
     | common_text
     | list
     | note_or_safety_instruction
@@ -223,10 +225,14 @@ paren_sl: PAREN_OPEN paren_item_sl* PAREN_CLOSE
 // ---------- Code (literal until ending backtick) ----------
 code: BACK_TICK CODE BACK_TICK
 
+code_block: BACK_TICK BACK_TICK BACK_TICK (LANGUAGE? NEWLINE)? CODE_BLOCK BACK_TICK BACK_TICK BACK_TICK
+
 // ---------- Terminals ----------
 
 // Highest priority: code and year abbreviations
-CODE.40: /[^`]+/
+CODE.40: /[^`\n]+/
+LANGUAGE: /[^` \n]+/
+CODE_BLOCK.41: /[^`]+/
 YEAR_SHORT.40: /'\d{2}s?(?=[\s.,!?;:]|$)/
 
 // Plural (s) - Matches (s) if preceded by a letter  

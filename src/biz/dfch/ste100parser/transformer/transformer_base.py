@@ -35,7 +35,10 @@ class TransformerBase(Transformer):
 
     def __init__(
         self,
-        cfg: TransformerConfiguration = TransformerConfiguration(),
+        cfg: TransformerConfiguration = TransformerConfiguration(
+            log=False,
+            visit_tokens=False
+        ),
     ) -> None:
 
         assert isinstance(cfg, TransformerConfiguration)

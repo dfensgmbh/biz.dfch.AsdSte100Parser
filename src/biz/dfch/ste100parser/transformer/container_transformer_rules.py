@@ -121,6 +121,11 @@ class ContainerTransformerRules:
                 lambda note, n1, n2: note,
                 False,
             ),
+            (
+                [Token.code_block, Token.NEWLINE, Token.NEWLINE],
+                lambda code_block, n1, n2: code_block,
+                False,
+            ),
         ]
 
     @classmethod

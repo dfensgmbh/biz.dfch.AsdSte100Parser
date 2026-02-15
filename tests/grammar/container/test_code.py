@@ -19,7 +19,9 @@
 
 """test_code"""
 
-from biz.dfch.ste100parser import GrammarType, Parser, Token
+from biz.dfch.ste100parser import GrammarType
+from biz.dfch.ste100parser import Parser
+from biz.dfch.ste100parser import Token
 
 from ...test_case_container_base import TestCaseContainerBase
 
@@ -80,15 +82,12 @@ class TestCode(TestCaseContainerBase):
         ]
         self.assert_tree(value, expected, Token.paragraph, level=1)
 
-    def test_multi_line(self):
+    def test_multi_line_fails(self):
 
         value = "`some_code\nmore code` "
+        result = Parser(GrammarType.CONTAINER).is_valid(value)
 
-        expected = [
-            Token.CODE,
-            Token.WS,
-        ]
-        self.assert_tree(value, expected, Token.paragraph)
+        self.assertFalse(result)
 
     def test_single_fails(self):
         value = "`"

@@ -23,5 +23,5 @@ from dataclasses import dataclass
 class TransformerConfiguration():
     """TransformerConfiguration"""
 
-    log: bool = False
-    visit_tokens: bool = True
+    log: bool
+    visit_tokens: bool

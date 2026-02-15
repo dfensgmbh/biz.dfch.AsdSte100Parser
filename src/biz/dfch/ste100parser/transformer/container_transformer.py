@@ -52,7 +52,6 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         self,
         cfg: TransformerConfiguration = TransformerConfiguration(
             log=True,
-            visit_tokens=True
         ),
     ) -> None:
 
@@ -174,6 +173,62 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         result = Tree(token, [mid.value], meta=meta)
 
+        return result
+
+    @v_args(meta=True)
+    def LANGUAGE(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), type(children)
+        assert isinstance(children.value, str)
+        value = children.value.strip()
+        assert "" != value, "Empty LANGUAGE in code_block found."
+
+        token = Token.LANGUAGE.name
+
+        result = Tree(token, [value])
+        return result
+
+    @v_args(meta=True)
+    def CODE_BLOCK(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), type(children)
+        assert isinstance(children.value, str)
+        value = children.value
+
+        token = Token.CODE.name
+
+        result = Tree(token, [value])
+        return result
+
+    @v_args(meta=True)
+    def code_block(self, meta, children):
+        assert isinstance(children, list)
+        # Each code_block starts and stops with three back ticks.
+        assert 6 < len(children), len(children)
+
+        token = Token.code_block.name
+
+        s1, s2, s3, *mid, l1, l2, l3 = children
+
+        assert Char.CODE == s1
+        assert Char.CODE == s2
+        assert Char.CODE == s3
+        assert Char.CODE == l1
+        assert Char.CODE == l2
+        assert Char.CODE == l3
+
+        self.print(mid, token)
+
+        assert len(mid) in (1, 3), len(mid)
+        code = mid[-1]
+        if 3 == len(mid):
+            language = mid[0]
+        else:
+            language = Tree(Token.LANGUAGE.name, Char.EMPTY)
+
+        items = [
+            language,
+            code,
+        ]
+        result = Tree(token, items, meta=meta)
         return result
 
     @v_args(meta=True)
