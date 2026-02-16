@@ -68,6 +68,7 @@ class Parser:
     def invoke(
         self,
         text: str,
+        *,
         do_transform: bool = False,
     ) -> ParseTree:
         """

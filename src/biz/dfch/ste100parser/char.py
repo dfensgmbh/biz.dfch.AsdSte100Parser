@@ -43,6 +43,7 @@ class Char(StrEnum):
     PAREN_CLOSE = ')'
 
     STAR = '*'
+    HYPHEN = '-'
     UNDER = '_'
     CODE = '`'
     BOLD_EMPH_OPEN = '*_'
