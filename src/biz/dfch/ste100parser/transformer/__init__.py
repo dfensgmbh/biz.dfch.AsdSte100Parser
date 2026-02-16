@@ -13,15 +13,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# noqa: E501
-
 """transformer module."""
 
-from .asd_ste100_9_pass1_transformer import (
-    AsdSte1009Pass1Transformer  # type: ignore
+from .asd_ste100_9_pass1_transformer import (  # type: ignore
+    AsdSte1009Pass1Transformer
+)
+from .asd_ste100_9_pass2_transformer import (  # type: ignore
+    AsdSte1009Pass2Transformer
 )
 from .text_transformer import TextTransformer  # type: ignore
-from .asd_ste100_9_pass2_transformer import AsdSte1009Pass2Transformer  # type: ignore
 from .token_converter import TokenConverter
 
 __all__ = [

@@ -77,6 +77,7 @@ class Parser:
             text (str): The text to parse.
             do_transform (bool): If `True`, the parser transforms the text.
                 If `False`, the transformer only parses the text.
+                Default value is `False`.
 
         Returns:
             ParseTree: The `ParseTree` from `text`.
