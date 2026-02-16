@@ -20,10 +20,14 @@
 
 """container_transformer_rules"""
 
+from typing import Callable
+
 from lark import Tree
 from lark.tree import Meta
 
 from biz.dfch.ste100parser.token import Token
+
+RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
 
 
 class ContainerTransformerRules:
@@ -34,7 +38,7 @@ class ContainerTransformerRules:
     """
 
     @classmethod
-    def get_rules_paragraph(cls) -> list:
+    def get_rules_paragraph(cls) -> list[RuleType]:
         return [
             (
                 [Token.list_item, Token.LINEBREAK],
@@ -44,7 +48,7 @@ class ContainerTransformerRules:
         ]
 
     @classmethod
-    def get_rules_start(cls) -> list:
+    def get_rules_start(cls) -> list[RuleType]:
         return [
             (
                 [Token.NEWLINE, Token.NEWLINE, Token.heading],

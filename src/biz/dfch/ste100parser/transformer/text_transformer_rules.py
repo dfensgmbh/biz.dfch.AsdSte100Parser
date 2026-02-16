@@ -20,7 +20,13 @@
 
 """text_transformer_rules"""
 
+from typing import Callable
+
+from lark import Tree
+
 from biz.dfch.ste100parser.token import Token
+
+RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
 
 
 class TextTransformerRules:
@@ -31,7 +37,7 @@ class TextTransformerRules:
     """
 
     @classmethod
-    def get_rules_start(cls) -> list:
+    def get_rules_start(cls) -> list[RuleType]:
         _ = Token.start.name
 
         return [

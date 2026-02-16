@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -32,13 +33,27 @@ from .span import Span
 
 
 @dataclass
-class TokenBase:
-    """This is an abstract base token."""
+class TokenBase(ABC):
+    """
+    This is an abstract base token. It represents the smallest unit of language
+        syntax in a document.
+
+    Attributes:
+        span (Span): The location and length of this token within its context
+            or container.
+
+    Args:
+        text (str): A string representation of the `Span`.
+            This is used to get the actual text represented by the token, which
+            may be different from the span itself in some cases.
+    """
+
     span: Span
 
     @property
+    @abstractmethod
     def text(self) -> str:
-        return str(self.span)
+        pass
 
 
 @dataclass
@@ -172,6 +187,11 @@ class Text(ValueToken):
 
 
 @dataclass
+class SpecialText(ValueToken):
+    """This is a base class for special text tokens."""
+
+
+@dataclass
 class Code(ValueToken):
     """This is a code token."""
 
@@ -189,7 +209,7 @@ class WhiteSpace(ValueToken):
 
 
 @dataclass
-class Apostrophe(ValueToken):
+class Apostrophe(SpecialText):
     """This is an apostrophe token."""
 
     @property

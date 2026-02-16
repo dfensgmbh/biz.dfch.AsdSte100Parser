@@ -24,7 +24,19 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Span:
-    """This class describes the location and length of a textual object."""
+    """
+    A `Span` represents the location and length of a textual object.
+
+    Attributes:
+        line (int): The line number where the span starts.
+        column (int): The column number on the specified line where the span
+            starts.
+        start_pos (int): The starting position of the span within its context
+            or container.
+        end_pos (int): The ending position of the span within its context or
+            container.
+    """
+
     line: int
     column: int
     start_pos: int
