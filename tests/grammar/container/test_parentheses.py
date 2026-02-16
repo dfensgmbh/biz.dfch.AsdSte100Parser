@@ -22,7 +22,7 @@
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
 
 from ...test_case_container_base import TestCaseContainerBase
 
@@ -138,17 +138,17 @@ class TestParentheses(TestCaseContainerBase):
     def test_dquote_in_paren1(self):
 
         value = """(some-text-in-parentheses "round-brackets")"""
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_dquote_in_paren2(self):
 
         value = """(some-text-in-parentheses "(round-brackets)")"""
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     @parameterized.expand([
@@ -160,45 +160,45 @@ class TestParentheses(TestCaseContainerBase):
     # NOSONAR(54144)
     def test_newline_in_paren_in_quote(self, rule, value, expected):
 
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
         self.assertEqual(expected, result, rule)
 
     def test_empty(self):
         value = "()"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_empty_in_dquote(self):
         value = '"()"'
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_paren_open_fails(self):
         value = ")"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_paren_close_fails(self):
         value = ")"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_open_in_dquote(self):
         value = '"("'
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_close_in_dquote(self):
         value = '")"'
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())

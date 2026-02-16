@@ -22,7 +22,7 @@
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import Char, GrammarType, Parser, Token
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
 
 from ...test_case_container_base import TestCaseContainerBase
 
@@ -118,7 +118,7 @@ class TestGeneric(TestCaseContainerBase):
     ])
     def test_text0(self, rule, value, expected):
 
-        sut = Parser(GrammarType.CONTAINER)
+        sut = Parser(GrammarType.ASD_STE100_9)
 
         if expected is False:
             self.assertFalse(sut.is_valid(value), rule)
@@ -139,14 +139,14 @@ class TestGeneric(TestCaseContainerBase):
         _ = expected
 
         if not expected:
-            result = Parser(GrammarType.CONTAINER).is_valid(value)
+            result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
             self.assertFalse(result)
 
             return
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     @parameterized.expand([
@@ -158,12 +158,12 @@ class TestGeneric(TestCaseContainerBase):
         _ = rule
 
         if not expected:
-            result = Parser(GrammarType.CONTAINER).is_valid(value)
+            result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
             self.assertFalse(result)
 
             return
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())

@@ -25,7 +25,6 @@ import unittest
 from biz.dfch.ste100parser import Parser
 from biz.dfch.ste100parser import GrammarType
 from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
-from biz.dfch.ste100parser.transformer import ContainerTransformer, TextTransformer2
 
 
 class TextTextInterpreter(unittest.TestCase):
@@ -70,13 +69,11 @@ This is the final paragraph It has two sentences.
 
 """
 
-        parser = Parser(GrammarType.CONTAINER)
-        parsed = parser.invoke(value)
-        pass1 = ContainerTransformer().transform(parsed)
-        pass2 = TextTransformer2().transform(pass1)
+        parser = Parser(GrammarType.ASD_STE100_9)
+        parsed = parser.invoke(value, do_transform=True)
         sut = TextInterpreter()
         # result = sut.visit_children(parsed)
-        nested = sut.visit_children(pass2)
+        nested = sut.visit_children(parsed)
         self.assertIsNotNone(nested, nested)
 
         result = sut.flatten_result(nested)

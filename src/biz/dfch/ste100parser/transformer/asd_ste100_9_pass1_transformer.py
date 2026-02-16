@@ -17,7 +17,7 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""container_transformer"""
+"""asd_ste100_9_pass1_transformer"""
 
 from lark import Discard, lexer, Tree, v_args
 from lark.tree import Meta
@@ -31,11 +31,11 @@ from .transformer_configuration import TransformerConfiguration
 from .tree_rewriter import TreeRewriter
 
 __all__ = [
-    "ContainerTransformer",
+    "AsdSte1009Pass1Transformer",
 ]
 
 
-class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
+class AsdSte1009Pass1Transformer(TransformerBase):  # pylint: disable=R0904
     """
     Transformer for pass 1 (with significant white space).
 

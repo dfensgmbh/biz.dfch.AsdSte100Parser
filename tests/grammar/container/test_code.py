@@ -85,13 +85,13 @@ class TestCode(TestCaseContainerBase):
     def test_multi_line_fails(self):
 
         value = "`some_code\nmore code` "
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_single_fails(self):
         value = "`"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 

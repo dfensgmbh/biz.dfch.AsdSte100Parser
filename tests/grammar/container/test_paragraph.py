@@ -43,7 +43,7 @@ class TestParagraph(TestCaseContainerBase):
     def test_leading_ws_at_sof_fails(self):
         value = " leading-space-is-not-valid"
 
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
         self.assertFalse(result)
 
     def test_newline_is_part_of_para(self):

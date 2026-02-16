@@ -19,7 +19,7 @@
 """test_case_container_base"""
 
 from biz.dfch.ste100parser import GrammarType, Parser
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
 from biz.dfch.ste100parser.transformer import TokenConverter
 from tests.test_case_base import TestCaseBase
 
@@ -28,18 +28,18 @@ class TestCaseContainerBase(TestCaseBase):
 
     _parser = None
 
-    transformer: ContainerTransformer
+    transformer: AsdSte1009Pass1Transformer
     converter: TokenConverter
 
     @classmethod
     def setUpClass(cls) -> None:
         if cls._parser is None:
-            cls._parser = Parser(GrammarType.CONTAINER)
+            cls._parser = Parser(GrammarType.ASD_STE100_9)
 
     def setUp(self):
         """Initialize fresh transformer and converter for every test."""
         # self.transformer = ContainerTransformer(log=True)
-        self.transformer = ContainerTransformer()
+        self.transformer = AsdSte1009Pass1Transformer()
         self.converter = TokenConverter()
 
     def invoke(self, value: str):

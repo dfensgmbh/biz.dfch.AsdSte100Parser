@@ -22,7 +22,7 @@
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
 
 from ...test_case_container_base import TestCaseContainerBase
 from ...test_data.test_data import TestData
@@ -61,9 +61,9 @@ class TestList(TestCaseContainerBase):
         _ = rule
         _ = expected
 
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer().transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_list_in_paragraph(self):

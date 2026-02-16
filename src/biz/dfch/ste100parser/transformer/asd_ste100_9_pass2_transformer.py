@@ -17,7 +17,7 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""text_transformer2"""
+"""asd_ste100_9_pass2_transformer"""
 
 from collections import deque
 
@@ -37,8 +37,12 @@ from .transformer_configuration import TransformerConfiguration
 from .text_transformer_rules import TextTransformerRules
 from .tree_rewriter import TreeRewriter
 
+__all__ = [
+    "AsdSte1009Pass2Transformer",
+]
 
-class TextTransformer2(TransformerBase):  # pylint: disable=R0904
+
+class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
     """Transformer for pass 2.
 
     This transformer creates theses tokens from TEXT:
@@ -147,9 +151,12 @@ class TextTransformer2(TransformerBase):  # pylint: disable=R0904
         result = Tree(token, items, meta=meta)
         return result
 
-    def process_text(self, children) -> list:
+    def process_text(self, children: list[Tree]) -> list:
+        assert isinstance(children, list), type(children)
+
         items: list[TokenBase] = []
         for child in children:
+            assert isinstance(child, Tree), type(child)
             visited = self._interpreter.visit(child)
             flattened = self._interpreter.flatten_result(visited)
             items.extend(flattened)
@@ -157,9 +164,11 @@ class TextTransformer2(TransformerBase):  # pylint: disable=R0904
         text = Char.EMPTY.join([item.text for item in items])
         print(f"#### text: '{text}'")
         doc = self._nlp(text)
-        print(f"#### {[(token.text, token.pos_, token.dep_) for token in list(doc)]}")
+        print(
+            f"#### {[(token.text, token.pos_, token.dep_) for token in list(doc)]}")
         for i, sent in enumerate(doc.sents):
-            print(f"####[{i}] {[(token.text, token.pos_, token.dep_) for token in list(sent)]}")
+            print(
+                f"####[{i}] {[(token.text, token.pos_, token.dep_) for token in list(sent)]}")
 
         return items
 
