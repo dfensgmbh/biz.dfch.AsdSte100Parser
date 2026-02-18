@@ -113,6 +113,11 @@ class Paragraph(ListToken):
     """This is a paragraph in a descriptive text."""
 
 
+@dataclass
+class Sentence(ListToken):
+    """This is a sentence in an ASD-STE100 text."""
+
+
 class QuoteType(StrEnum):
     """Define available quote types."""
     SINGLE = "SINGLE"
@@ -184,6 +189,16 @@ class Plural(EmptyToken):
 @dataclass
 class Text(ValueToken):
     """This is a text token."""
+
+
+@dataclass
+class Word(ValueToken):
+    """This is a word token."""
+
+
+@dataclass
+class Punct(ValueToken):
+    """This is a punctuation token."""
 
 
 @dataclass
