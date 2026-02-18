@@ -59,6 +59,7 @@
         "replaceability",
         "rtype",
         "sdist",
+        "Sentencizer",
         "sents",
         "setuptools",
         "spacy",

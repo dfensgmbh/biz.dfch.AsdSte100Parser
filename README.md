@@ -657,7 +657,7 @@ _this is text in emphasis_
 
 ### Bold emphasis
 
-  * This formatter shows text is **_bold emphasis_** (`boldemph`).
+  * This formatter shows text is **_bold emphasis_** (`bold_emph`).
   * This token cannot contain `NEWLINE`.
 
 ```
