@@ -192,6 +192,11 @@ class Text(ValueToken):
 
 
 @dataclass
+class Number(ValueToken):
+    """This is a number token."""
+
+
+@dataclass
 class Word(ValueToken):
     """This is a word token."""
 
