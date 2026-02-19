@@ -19,6 +19,7 @@
 
 """test_parentheses"""
 
+from lark.exceptions import UnexpectedCharacters
 from parameterized import parameterized
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token
@@ -163,15 +164,23 @@ class TestParentheses(TestCaseContainerBase):
         result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
         self.assertEqual(expected, result, rule)
 
-    def test_empty(self):
+    def test_empty_fails(self):
         value = "()"
+
+        with self.assertRaises(UnexpectedCharacters) as ctx:
+            _ = Parser(GrammarType.ASD_STE100_9).invoke(value)
+
+        print(ctx.exception)
+
+    def test_empty_in_dquote_succeeds(self):
+        value = '"()"'
         initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
         transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
-    def test_empty_in_dquote(self):
-        value = '"()"'
+    def test_empty_in_squote_succeeds(self):
+        value = "'()'"
         initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
         transformed = AsdSte1009Pass1Transformer().transform(initial)
