@@ -307,8 +307,11 @@ class AsdSte1009Pass1Transformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
+        length = children.value.count(
+            Char.SPACE) + children.value.count(
+            Char.TAB) * self._cfg.tab_size
         meta = self._get_meta(children)
-        result = Tree(token, [str(len(children))], meta=meta)
+        result = Tree(token, [str(length)], meta=meta)
         return result
 
     def PLURAL_S(self, children):  # pylint: disable=C0103

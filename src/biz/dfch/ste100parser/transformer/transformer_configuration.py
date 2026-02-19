@@ -25,3 +25,4 @@ class TransformerConfiguration():
 
     log: bool = False
     visit_tokens: bool = True
+    tab_size: int = 4
