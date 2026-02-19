@@ -20,6 +20,7 @@
 """test_texts"""
 
 from biz.dfch.ste100parser import Token
+from biz.dfch.ste100parser import Char
 
 from ...test_case_text_base import TestCaseTextBase
 from ...test_data.test_data import TestData
@@ -36,9 +37,9 @@ def pretty_with_meta(node, indent=0):
     assert hasattr(node.meta, 'start_pos'), repr(node.meta)
     assert hasattr(node.meta, 'end_pos'), repr(node.meta)
 
-    prefix = "  " * indent
+    prefix = Char.SPACE * indent
 
-    meta_str = ""
+    meta_str = Char.EMPTY
     m = node.meta
     meta_str = f"L{m.line}:C{m.column} @ {m.start_pos}:{m.end_pos}"
 
