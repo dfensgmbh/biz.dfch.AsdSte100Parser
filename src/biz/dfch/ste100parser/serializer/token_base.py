@@ -41,6 +41,7 @@ class TokenBase(ABC):
     Attributes:
         span (Span): The location and length of this token within its context
             or container.
+        parent (TokenBase): The parent token of this token.
 
     Args:
         text (str): A string representation of the `Span`.
@@ -49,6 +50,7 @@ class TokenBase(ABC):
     """
 
     span: Span
+    parent: TokenBase
 
     @property
     @abstractmethod
@@ -86,6 +88,11 @@ class ListToken(TokenBase):
             sb.append(token.text)
 
         return sb.to_string()
+
+
+@dataclass
+class TokenRoot(ListToken):
+    """This is the start token."""
 
 
 @dataclass
@@ -224,7 +231,7 @@ class CodeBlock(ValueToken):
 
 
 @dataclass
-class WhiteSpace(ValueToken):
+class Ws(ValueToken):
     """This is a normalized whitespace token."""
 
 
