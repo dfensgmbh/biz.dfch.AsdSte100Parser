@@ -217,8 +217,9 @@ paren: PAREN_OPEN paren_item_first paren_item_ml_next* PAREN_CLOSE
 // Single line container. Use it within single line containers.
 paren_sl: PAREN_OPEN paren_item_first paren_item_sl_next* PAREN_CLOSE
 ?paren_item_first: format_containers
+    | code
     | quote_containers
-    | paren
+    | paren_sl
     | common_text
 ?paren_item_sl_next: WS
     | paren_item_first
