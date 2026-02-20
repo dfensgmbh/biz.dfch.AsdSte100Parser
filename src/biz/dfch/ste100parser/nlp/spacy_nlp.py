@@ -21,34 +21,72 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
 from threading import Lock
 from typing import ClassVar
 
 
 import spacy
-from spacy.tokens import Doc
 from spacy.language import Language
+from spacy.tokens import Doc
+from spacy.tokens import Token
+from spacy.vocab import Vocab  # pylint: disable=E0611
+
+
+class SpacyExtension(StrEnum):
+    """spaCy extensions."""
+
+    ste100_doc = "ste100_doc"
+    ste100_token = "ste100_token"
+
+
+@Language.component("ste100_sentencizer")
+def ste100_sentencizer(doc: Doc) -> Doc:
+    assert isinstance(doc, Doc), type(doc)
+
+    return doc
 
 
 class SpacyNlp:  # pylint: disable=R0903
     """A wrapper for spaCy NLP."""
 
-    _model_name = "en_core_web_sm"
-
+    _model_name: str
     _nlp: Language
 
-    def __init__(self) -> None:
-        self._nlp = spacy.load(SpacyNlp._model_name)
+    vocab: Vocab
 
-    def __call__(self, text: str) -> Doc:
-        assert isinstance(text, str), type(text)
+    @staticmethod
+    def _register_ste100_extensions() -> None:
+        if not Doc.has_extension(SpacyExtension.ste100_doc):
+            Doc.set_extension(SpacyExtension.ste100_doc, default=None)
+        if not Token.has_extension(SpacyExtension.ste100_token):
+            Token.set_extension(SpacyExtension.ste100_token, default=None)
+
+    def __init__(self, model_name: str) -> None:
+        assert isinstance(model_name, str), type(model_name)
+        assert model_name.strip()
+
+        self._model_name = model_name
+        self._nlp = spacy.load(self._model_name)
+        self._nlp.add_pipe("ste100_sentencizer", before="ner")
+
+        self.vocab = self._nlp.vocab
+
+        SpacyNlp._register_ste100_extensions()
+
+    def __call__(self, text: str | Doc) -> Doc:
+        assert isinstance(text, (str, Doc)), type(text)
+
+        if isinstance(text, Doc):
+            return self._nlp(text)
+
         assert text.strip()
-
         return self._nlp(text)
 
     class Factory:  # pylint: disable=R0903
         """Singleton factory."""
 
+        _model_name: ClassVar[str] = "en_core_web_sm"
         _lock: ClassVar[Lock] = Lock()
         _instance: ClassVar[SpacyNlp | None] = None
 
@@ -60,5 +98,5 @@ class SpacyNlp:  # pylint: disable=R0903
                 if SpacyNlp.Factory._instance is not None:
                     assert isinstance(cls._instance, SpacyNlp)
                     return cls._instance
-                cls._instance = SpacyNlp()
+                cls._instance = SpacyNlp(SpacyNlp.Factory._model_name)
                 return cls._instance
