@@ -27,7 +27,10 @@ from .token_base import TokenBase
 
 from .token_base import Apostrophe
 from .token_base import Text
-from .token_base import WhiteSpace
+from .token_base import Word
+from .token_base import Number
+from .token_base import Punct
+from .token_base import Ws
 from .token_base import Plural
 from .token_base import Multiply
 from .token_base import LineBreak
@@ -41,8 +44,10 @@ from .token_base import CodeBlock
 from .token_base import NoteOrSafetyInstruction
 from .token_base import NoteOrSafetyKeyword
 
+from .token_base import TokenRoot
 from .token_base import Heading
 from .token_base import Paragraph
+from .token_base import Sentence
 from .token_base import ProcItem
 from .token_base import ListItem
 
@@ -74,143 +79,204 @@ class TokenFactory:
     @staticmethod
     def ProcItem(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
         step: str,
         delimiter: str,
     ):
-        return ProcItem(from_lark_meta(meta), tokens, step, delimiter)
+        return ProcItem(from_lark_meta(meta), parent, tokens, step, delimiter)
 
     @staticmethod
     def ListItem(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
         indent: int,
         marker: str,
     ):
-        return ListItem(from_lark_meta(meta), tokens, indent, marker)
+        return ListItem(from_lark_meta(meta), parent, tokens, indent, marker)
+
+    @staticmethod
+    def TokenRoot(
+        meta: Meta,
+        tokens: list[TokenBase],
+    ):
+        return TokenRoot(from_lark_meta(meta), None, tokens)  # type: ignore
 
     @staticmethod
     def Paragraph(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Paragraph(from_lark_meta(meta), tokens)
+        return Paragraph(from_lark_meta(meta), parent, tokens)
 
     @staticmethod
     def NoteOrSafetyInstruction(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
         keyword: NoteOrSafetyKeyword,
     ):
-        return NoteOrSafetyInstruction(from_lark_meta(meta), tokens, keyword)
+        return NoteOrSafetyInstruction(
+            from_lark_meta(meta), parent, tokens, keyword)
 
     @staticmethod
     def Heading(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
         level: int,
     ):
-        return Heading(from_lark_meta(meta), tokens, level)
+        return Heading(from_lark_meta(meta), parent, tokens, level)
 
     @staticmethod
     def Squote(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Quote(from_lark_meta(meta), tokens, QuoteType.SINGLE)
+        return Quote(from_lark_meta(meta), parent, tokens, QuoteType.SINGLE)
+
+    @staticmethod
+    def Sentence(
+        meta: Meta,
+        parent: TokenBase,
+        tokens: list[TokenBase],
+    ):
+        return Sentence(from_lark_meta(meta), parent, tokens)
 
     @staticmethod
     def Dquote(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Quote(from_lark_meta(meta), tokens, QuoteType.DOUBLE)
+        return Quote(from_lark_meta(meta), parent, tokens, QuoteType.DOUBLE)
 
     @staticmethod
     def Cite(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Quote(from_lark_meta(meta), tokens, QuoteType.CITE)
+        return Quote(from_lark_meta(meta), parent, tokens, QuoteType.CITE)
 
     @staticmethod
     def Bold(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Format(from_lark_meta(meta), tokens, FormatType.BOLD)
+        return Format(from_lark_meta(meta), parent, tokens, FormatType.BOLD)
 
     @staticmethod
     def Emph(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Format(from_lark_meta(meta), tokens, FormatType.EMPH)
+        return Format(from_lark_meta(meta), parent, tokens, FormatType.EMPH)
 
     @staticmethod
     def BoldEmph(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Format(from_lark_meta(meta), tokens, FormatType.BOLD_EMPH)
+        return Format(
+            from_lark_meta(meta), parent, tokens, FormatType.BOLD_EMPH)
 
     @staticmethod
     def Parentheses(
         meta: Meta,
+        parent: TokenBase,
         tokens: list[TokenBase],
     ):
-        return Parentheses(from_lark_meta(meta), tokens)
+        return Parentheses(from_lark_meta(meta), parent, tokens)
 
     @staticmethod
     def Text(
         meta: Meta,
+        parent: TokenBase,
         value: str,
     ):
-        return Text(from_lark_meta(meta), value)
+        return Text(from_lark_meta(meta), parent, value)
 
     @staticmethod
-    def WhiteSpace(
+    def Word(
         meta: Meta,
+        parent: TokenBase,
         value: str,
     ):
-        return WhiteSpace(from_lark_meta(meta), value)
+        return Word(from_lark_meta(meta), parent, value)
+
+    @staticmethod
+    def Number(
+        meta: Meta,
+        parent: TokenBase,
+        value: str,
+    ):
+        return Number(from_lark_meta(meta), parent, value)
+
+    @staticmethod
+    def Punct(
+        meta: Meta,
+        parent: TokenBase,
+        value: str,
+    ):
+        return Punct(from_lark_meta(meta), parent, value)
+
+    @staticmethod
+    def Ws(
+        meta: Meta,
+        parent: TokenBase,
+        value: str,
+    ):
+        return Ws(from_lark_meta(meta), parent, value)
 
     @staticmethod
     def Apostrophe(
         meta: Meta,
+        parent: TokenBase,
         value: str,
     ):
-        return Apostrophe(from_lark_meta(meta), value)
+        return Apostrophe(from_lark_meta(meta), parent, value)
 
     @staticmethod
     def Plural(
         meta: Meta,
+        parent: TokenBase,
     ):
-        return Plural(from_lark_meta(meta))
+        return Plural(from_lark_meta(meta), parent)
 
     @staticmethod
     def Multiply(
         meta: Meta,
+        parent: TokenBase,
     ):
-        return Multiply(from_lark_meta(meta))
+        return Multiply(from_lark_meta(meta), parent)
 
     @staticmethod
     def LineBreak(
         meta: Meta,
+        parent: TokenBase,
     ):
-        return LineBreak(from_lark_meta(meta))
+        return LineBreak(from_lark_meta(meta), parent)
 
     @staticmethod
     def Code(
         meta: Meta,
+        parent: TokenBase,
         value: str,
     ):
-        return Code(from_lark_meta(meta), value)
+        return Code(from_lark_meta(meta), parent, value)
 
     @staticmethod
     def CodeBlock(
         meta: Meta,
+        parent: TokenBase,
         value: str,
         language: str,
     ):
-        return CodeBlock(from_lark_meta(meta), value, language)
+        return CodeBlock(from_lark_meta(meta), parent, value, language)
