@@ -19,6 +19,8 @@
 
 """StringBuilder class."""
 
+from __future__ import annotations
+
 from .char import Char
 
 
@@ -38,7 +40,7 @@ class StringBuilder:
         self._items = []
         self._new_line = new_line
 
-    def append(self, value: str = Char.EMPTY) -> 'StringBuilder':
+    def append(self, value: str = Char.EMPTY) -> StringBuilder:
         """
         Add text to the StringBuilder object. This does not add a new line.
         """
@@ -49,7 +51,7 @@ class StringBuilder:
 
         return self
 
-    def append_line(self, value: str = Char.EMPTY) -> 'StringBuilder':
+    def append_line(self, value: str = Char.EMPTY) -> StringBuilder:
         """
         Add text to the StringBuilder object. This does add a new line.
         """
@@ -57,6 +59,21 @@ class StringBuilder:
         self.append(value)
         self.append(self._new_line)
 
+        return self
+
+    def extend(self, other: StringBuilder) -> StringBuilder:
+        """
+        Add one StringBuilder instance to this StringBuilder instance.
+
+        :param other: The other instance that adds to this instance.
+        :type other: StringBuilder
+        :return: This instance.
+        :rtype: StringBuilder
+        """
+
+        assert isinstance(other, StringBuilder), type(other)
+
+        self._items.extend(other._items)
         return self
 
     def to_string(self) -> str:
