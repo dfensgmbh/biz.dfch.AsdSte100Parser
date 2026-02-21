@@ -153,6 +153,7 @@ NOTE_OR_SAFETY_LINE_START: NEWLINE
     | format_containers
     | code
     | quote_containers
+    | paren_sl
 ?note_or_safety_next.1: WS
     | note_or_safety_first
 
