@@ -183,13 +183,16 @@ class Sentencizer:
                 ste_token = cast(TokenBase, token._.ste100_token)
                 sent_text_tokens.append(ste_token)
                 sent_container = ste_token.parent
+                token_info = (
+                    token.text,
+                    token.pos_,
+                    token.dep_,
+                    type(ste_token).__name__,
+                    type(sent_container).__name__,
+                )
                 print(
                     f"[{i}/{j}/{k}] "
-                    f"{(token.text,
-                       token.pos_,
-                       token.dep_,
-                       type(ste_token).__name__,
-                       type(sent_container).__name__)} "
+                    f"{token_info} "
                     f"[i:{token_map[ste_token]:02}]"
                     f"[p:{token_map[sent_container]:02}]"
                 )
