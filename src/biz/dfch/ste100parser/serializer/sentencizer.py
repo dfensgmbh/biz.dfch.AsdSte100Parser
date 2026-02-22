@@ -26,7 +26,7 @@ from typing import cast
 from lark import Tree
 from lark.tree import Meta
 
-from spacy.tokens import Doc
+from spacy.tokens import Doc, Span
 
 from biz.dfch.asdste100vocab import Vocab
 
@@ -51,33 +51,8 @@ class Sentencizer:
     """
     Identify sentences in a list of text tokens.
 
-    This is our approach to divide text into sentences. We identify these
-    tokens:
-      * Format, Quote containers (A)
-        This token can contain partially (A), (B), (D), (I).
-      * Parentheses (B)
-        This token can contain (A), (B), (D), (I).
-      * Cite (C)
-        This token can contain (A), (B), (D), (I).
-      * Code (D)
-        I use the contents of this token without modification.
-      * CodeBlock (E).
-        I use the contents of this token without modification.
-      * Paragraph, ProcItem
-        This token can contain (A), (B), (D), (F), (H), (I).
-      * Note, SafetyInstruction (F)
-        This token can contain (A), (B), (D), (I).
-      * Heading (G)
-        This token can contain (A), (B), (D), (I).
-      * ListItem (H)
-        This token can contain (A), (B), (D), (I).
-      * CommonText (I)
-        Text, WhiteSpace, Apostrophe, Plural, YearShort.
-        I ignore Plural.
-
-    First, we examine parentheses and get their contents and change it into
-    sentences.
-
+    This is our approach to divide text into sentences. We identify parentheses
+    first and the process block tokens.
     """
 
     _nlp: SpacyNlp
@@ -126,7 +101,112 @@ class Sentencizer:
 
         return spacy_doc
 
-    def extract_sentences(self, tree: Tree) -> Ste100Doc:
+    def _extract_sentence(
+        self,
+        sent: Span,
+        container: ListToken,
+        token_map: TokenMap,
+        *,
+        token_count: int,
+        sentence_count: int,
+    ) -> Sentence:
+        assert isinstance(sent, Span), type(sent)
+        assert isinstance(container, ListToken), type(container)
+        assert isinstance(token_map, TokenMap), type(token_map)
+        assert isinstance(token_count, int), type(token_count)
+        assert isinstance(sentence_count, int), type(sentence_count)
+
+        sent_text_tokens = []
+        for j, token in enumerate(sent):
+            token_count += 1
+            ste_token = cast(TokenBase, token._.ste100_token)
+            ste_token.nlp_token = token
+            sent_text_tokens.append(ste_token)
+            sent_container = ste_token.parent
+            # In Python v3.11 we cannot use f-strings with tuples.
+            # This is why we create the `token_info` first.
+            token_info = (
+                token.text,
+                token.pos_,
+                token.dep_,
+                type(ste_token).__name__,
+                type(sent_container).__name__,
+            )
+            print(
+                f"[{sentence_count}/{j}/{token_count}] "
+                f"{token_info} "
+                f"[i:{token_map[ste_token]:02}]"
+                f"[p:{token_map[sent_container]:02}]"
+            )
+
+        sent_start = self.get_child_of_container(
+            sent_text_tokens[0], container)
+        assert sent_start is not None
+        print(
+            f"Container '{container.text}' "
+            f"[{type(container).__name__}] "
+            f"[i:{token_map[container]:02}] "
+            f"[p:{token_map[container.parent]:02}]"
+        )
+        print(
+            f"SentStart '{sent_start.text}' "
+            f"[{type(sent_start).__name__}] "
+            f"[i:{token_map[sent_start]:02}] "
+            f"[p:{token_map[sent_start.parent]:02}]"
+        )
+        print(
+            f"SentEnd '{sent_text_tokens[-1].text}' "
+            f"[{type(sent_text_tokens[-1]).__name__}] "
+            f"[i:{token_map[sent_text_tokens[-1]]:02}] "
+            f"[p:{token_map[sent_text_tokens[-1].parent]:02}]"
+        )
+
+        sentence = Sentence(sent_start.span, container, [])  # type: ignore
+        sentence.nlp_sent = sent
+
+        first = token_map[sent_start]
+        last = token_map[sent_text_tokens[-1]]
+        container.tokens.insert(
+            container.tokens.index(sent_start),
+            sentence
+        )
+        to_be_removed = []
+        for t in container.tokens:
+            assert isinstance(t, TokenBase), type(t)
+
+            if token_map[t] == token_map[sentence]:
+                continue
+            if token_map[t.parent] == token_map[sentence]:
+                continue
+
+            if not first <= token_map[t] <= last:
+                print(
+                    f"Skip '{t.text}' "
+                    f"[{type(t).__name__}] "
+                    f"[i:{token_map[t]:02}] "
+                    f"[p:{token_map[t.parent]:02}]"
+                )
+                continue
+
+            print(
+                f"Token '{t.text}' "
+                f"[{type(t).__name__}] "
+                f"[i:{token_map[t]:02}] "
+                f"[p:{token_map[t.parent]:02}]"
+            )
+
+            # Change parent of token to new sentence.
+            t.parent = sentence
+            sentence.tokens.append(t)
+            to_be_removed.append(t)
+
+        # Remove token from existing parent container.
+        for t in to_be_removed:
+            container.tokens.remove(t)
+
+        return sentence
+
+    def _extract_sentences(self, tree: Tree) -> Ste100Doc:
         """
         Find sentences in the children of a lark Tree.
 
@@ -163,91 +243,15 @@ class Sentencizer:
             source=extract[2],
         )
 
-        k = -1
+        token_count = -1
         for i, sent in enumerate(doc.sents):
-            sent_text_tokens = []
-            for j, token in enumerate(sent):
-                k += 1
-                ste_token = cast(TokenBase, token._.ste100_token)
-                sent_text_tokens.append(ste_token)
-                sent_container = ste_token.parent
-                token_info = (
-                    token.text,
-                    token.pos_,
-                    token.dep_,
-                    type(ste_token).__name__,
-                    type(sent_container).__name__,
-                )
-                print(
-                    f"[{i}/{j}/{k}] "
-                    f"{token_info} "
-                    f"[i:{token_map[ste_token]:02}]"
-                    f"[p:{token_map[sent_container]:02}]"
-                )
-
-            sent_start = self.get_child_of_container(
-                sent_text_tokens[0], container)
-            assert sent_start is not None
-            print(
-                f"Container '{container.text}' "
-                f"[{type(container).__name__}] "
-                f"[i:{token_map[container]:02}] "
-                f"[p:{token_map[container.parent]:02}]"
+            _ = self._extract_sentence(
+                sent,
+                container,
+                token_map,
+                token_count=token_count,
+                sentence_count=i,
             )
-            print(
-                f"SentStart '{sent_start.text}' "
-                f"[{type(sent_start).__name__}] "
-                f"[i:{token_map[sent_start]:02}] "
-                f"[p:{token_map[sent_start.parent]:02}]"
-            )
-            print(
-                f"SentEnd '{sent_text_tokens[-1].text}' "
-                f"[{type(sent_text_tokens[-1]).__name__}] "
-                f"[i:{token_map[sent_text_tokens[-1]]:02}] "
-                f"[p:{token_map[sent_text_tokens[-1].parent]:02}]"
-            )
-
-            sentence = Sentence(sent_start.span, container, [])  # type: ignore
-
-            first = token_map[sent_start]
-            last = token_map[sent_text_tokens[-1]]
-            container.tokens.insert(
-                container.tokens.index(sent_start),
-                sentence
-            )
-            to_be_removed = []
-            for t in container.tokens:
-                assert isinstance(t, TokenBase), type(t)
-
-                if token_map[t] == token_map[sentence]:
-                    continue
-                if token_map[t.parent] == token_map[sentence]:
-                    continue
-
-                if not first <= token_map[t] <= last:
-                    print(
-                        f"Skip '{t.text}' "
-                        f"[{type(t).__name__}] "
-                        f"[i:{token_map[t]:02}] "
-                        f"[p:{token_map[t.parent]:02}]"
-                    )
-                    continue
-
-                # print(f"[{first} <= {token_map[t]} <= {last}]")
-                print(
-                    f"Token '{t.text}' "
-                    f"[{type(t).__name__}] "
-                    f"[i:{token_map[t]:02}] "
-                    f"[p:{token_map[t.parent]:02}]"
-                )
-
-                # Change parent of token to new sentence.
-                t.parent = sentence
-                sentence.tokens.append(t)
-                to_be_removed.append(t)
-
-            for t in to_be_removed:
-                container.tokens.remove(t)
 
         ste100_structure = self._inspector.ste100doc(ste100doc, token_map)
         print(ste100_structure)
@@ -255,10 +259,13 @@ class Sentencizer:
         return ste100doc
 
     def invoke(self, children: list, meta: Meta) -> list[Tree]:
-        # I simulate that the contents of these parentheses is inside a
+        # I simulate that the contents of these children is inside a
         # paragraph.
+        # DFTODO - maybe I should move the root token Tree into the
+        # `_extract_sentences` method and accept list[Tree] and return
+        # `Ste100Doc` or `list[TokenBase]`?
         temp_tree = Tree(Token.paragraph.name, children, meta=meta)
-        temp_ste100doc = self.extract_sentences(temp_tree)
+        temp_ste100doc = self._extract_sentences(temp_tree)
         assert 1 == len(temp_ste100doc), len(temp_ste100doc)
         temp_root = temp_ste100doc[0]
         assert isinstance(temp_root, Paragraph), type(temp_root)
@@ -266,6 +273,8 @@ class Sentencizer:
         ste100doc = Ste100Doc(temp_root.tokens)
         result = self._serializer.to_lark_tree(ste100doc)
         # Remove all empty sentences.
+        # DFTODO - Why are there empty sentences in the first place?
+        # Are these line breaks?
         for i in reversed(range(len(result))):
             sent = result[i]
             if 0 == len(sent.children):
