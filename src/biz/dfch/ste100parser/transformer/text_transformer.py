@@ -29,8 +29,8 @@ from ..char import Char
 
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration
-from .asd_ste100_9_pass2_transformer_rules (
-    import AsdSte1009Pass2TransformerRules
+from .asd_ste100_9_pass2_transformer_rules import (
+    AsdSte1009Pass2TransformerRules
 )
 from .tree_rewriter import TreeRewriter
 

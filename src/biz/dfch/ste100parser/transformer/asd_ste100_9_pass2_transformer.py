@@ -24,8 +24,8 @@ from lark import Tree, v_args
 from ..token import Token
 from ..serializer.sentencizer import Sentencizer
 
-from .asd_ste100_9_pass2_transformer_rules (
-    import AsdSte1009Pass2TransformerRules
+from .asd_ste100_9_pass2_transformer_rules import (
+    AsdSte1009Pass2TransformerRules
 )
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration

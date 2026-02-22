@@ -25,8 +25,8 @@ from lark.tree import Meta
 from ..char import Char
 from ..token import Token
 
-from .asd_ste100_9_pass1_transformer_rules (
-    import AsdSte1009Pass1TransformerRules
+from .asd_ste100_9_pass1_transformer_rules import (
+    AsdSte1009Pass1TransformerRules
 )
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration
