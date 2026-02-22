@@ -28,7 +28,6 @@ from biz.dfch.ste100parser.serializer.token_base import TokenBase
 from biz.dfch.ste100parser.serializer.token_base import TokenRoot
 from biz.dfch.ste100parser.serializer.token_base import Paragraph
 from biz.dfch.ste100parser.serializer.token_base import Sentence
-from biz.dfch.ste100parser.serializer.token_base import Text
 from biz.dfch.ste100parser.serializer.token_base import Word
 from biz.dfch.ste100parser.serializer.token_base import Ws
 from biz.dfch.ste100parser.serializer.token_base import Punct

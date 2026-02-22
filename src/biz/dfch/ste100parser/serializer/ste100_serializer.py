@@ -17,7 +17,7 @@
 # pylint: disable=C0116
 # pylint: disable=W0212
 
-"""TextInterpreter class."""
+"""ste100_serializer class."""
 
 from __future__ import annotations
 
@@ -26,7 +26,6 @@ from typing import Callable
 from lark import Tree
 from lark.tree import Meta
 
-from ..char import Char
 from ..ste100doc import Ste100Doc as Ste100DDoc
 from ..token import Token
 
@@ -39,8 +38,6 @@ from .token_base import ValueToken
 from .token_base import Sentence
 from .token_base import Heading
 from .token_base import Paragraph
-from .token_base import ProcItem
-from .token_base import ListItem
 from .token_base import NoteOrSafetyInstruction
 
 from .token_base import Parentheses
