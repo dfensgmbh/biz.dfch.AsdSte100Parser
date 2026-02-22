@@ -22,6 +22,8 @@
 
 import unittest
 
+from biz.dfch.asdste100vocab.vocab import Vocab
+
 from biz.dfch.ste100parser import GrammarType
 from biz.dfch.ste100parser import Inspector
 from biz.dfch.ste100parser import Parser
@@ -82,7 +84,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vel arcu at enim
         tree = parser.invoke(text, action=ParserAction.PASS2)
         print(tree.pretty())
 
-        interpreter = TextInterpreter()
+        vocab = Vocab()
+        interpreter = TextInterpreter(vocab=vocab)
         tokens = interpreter.invoke(tree)
         doc = Ste100Doc(tokens)
         inspector = Inspector()
