@@ -85,7 +85,7 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
         token = Token.heading.name
 
         level, *remaining = children
-        trees = self._sentencizer.get_trees(remaining, meta=meta)
+        trees = self._sentencizer.invoke(remaining, meta=meta)
         items = [level, *trees]
         result = Tree(token, items, meta=meta)
         return result
@@ -113,7 +113,7 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
         token = Token.list_item.name
 
         indent, marker, *remaining = children
-        trees = self._sentencizer.get_trees(remaining, meta)
+        trees = self._sentencizer.invoke(remaining, meta)
         items = [indent, marker, *trees]
         result = Tree(token, items, meta=meta)
         return result
@@ -146,7 +146,7 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
         assert isinstance(children, list), type(children)
         assert 1 <= len(children), f"#{len(children)}: [{children}]."
 
-        trees = self._sentencizer.get_trees(children, meta)
+        trees = self._sentencizer.invoke(children, meta)
         for tree in trees:
             print(tree.pretty())
         items = [*trees]
@@ -160,7 +160,7 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
 
         token = Token.paren.name
 
-        trees = self._sentencizer.get_trees(children, meta)
+        trees = self._sentencizer.invoke(children, meta)
         items = [*trees]
 
         result = Tree(token, items, meta=meta)
@@ -216,13 +216,13 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
                 continue
 
             if chunk:
-                trees = self._sentencizer.get_trees(children=chunk, meta=meta)
+                trees = self._sentencizer.invoke(children=chunk, meta=meta)
                 chunk.clear()
                 result.extend(trees)
             result.append(item)
 
         if chunk:
-            trees = self._sentencizer.get_trees(children=chunk, meta=meta)
+            trees = self._sentencizer.invoke(children=chunk, meta=meta)
             chunk.clear()
             result.extend(trees)
 

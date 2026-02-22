@@ -106,60 +106,6 @@ class Sentencizer:
         self._inspector = Inspector()
         self._serializer = Ste100Serializer()
 
-    def _process_paragraph(self, token: Paragraph) -> list[TokenBase]:
-        assert isinstance(token, Paragraph), type(token)
-
-        tokens: list[TokenBase] = []
-        for i, t in enumerate(token.tokens):
-            # When we find a Sentence or Word we skip.
-            if isinstance(t, (Sentence, Word)):
-                continue
-            # When we find a ListItem we stop.
-            if ListItem == type(t):
-                break
-            # We do use the contents of parentheses.
-            if Parentheses == type(t):
-                # DFTODO: process_parentheses()
-                continue
-            # We only use the contents of format.
-            if Format == type(t):
-                pass
-            # We only use the contents of quote.
-            if Quote == type(t):
-                pass
-
-            tokens.append(t)
-
-        result = tokens
-        return result
-
-    def invoke(self, tokens: list[TokenBase]) -> Sequence[TokenBase]:
-        assert isinstance(tokens, list), type(tokens)
-
-        sentences: list[Sentence] = []
-
-        for token in tokens:
-            print(f"#### '{token}' ...")
-            if Paragraph == type(token):  # pylint: disable=C0123
-                assert isinstance(token, Paragraph)
-                partial = self._process_paragraph(token)
-                assert 0 < len(partial)
-                text = partial.get_text()
-                spacy_doc = self._nlp(text)
-                for i, spacy_sent in enumerate(spacy_doc.sents):
-                    sentence = Sentence(
-                        span=partial.get_token(0).span,
-                        tokens=[],
-                    )
-                    for spacy_t in spacy_sent:
-                        print(f"#### [{i}]: {(
-                            spacy_t.text, spacy_t.pos_, spacy_t.dep_)}")
-                    sentences.append(sentence)
-            else:
-                raise NotImplementedError(token)
-
-        return sentences
-
     @staticmethod
     def get_child_of_container(
         token: TokenBase,
@@ -317,7 +263,7 @@ class Sentencizer:
 
         return ste100doc
 
-    def get_trees(self, children: list, meta: Meta) -> list[Tree]:
+    def invoke(self, children: list, meta: Meta) -> list[Tree]:
         # I simulate that the contents of these parentheses is inside a
         # paragraph.
         temp_tree = Tree(Token.paragraph.name, children, meta=meta)
