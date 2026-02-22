@@ -34,11 +34,8 @@ from ..note_or_safety_keyword import NoteOrSafetyKeyword
 
 from .span import Span
 from .token_base import TokenBase
-from .token_base import ListToken
 from .token_base import TokenRoot
-from .token_base import Heading
 from .token_base import Paragraph
-from .token_base import ProcItem
 from .token_base import Sentence
 
 from .token_base import NoteOrSafetyInstruction
@@ -50,10 +47,6 @@ from .token_base import Number
 from .token_base import Punct
 from .token_base import Ws
 from .token_base import LineBreak
-from .token_base import SpecialText
-from .token_base import Apostrophe
-from .token_base import Multiply
-from .token_base import Plural
 
 from .token_base import Parentheses
 from .token_base import Format
@@ -269,8 +262,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         delimiter = delimiter_tree.children[0]
         assert isinstance(delimiter, str)
 
-        print(f"[step {step}] [delimiter {delimiter}] [remaining {len(remaining)}]")
-        print(f"remaining {remaining}")
+        print(f"[step '{step}'] [delimiter '{delimiter}'] [remaining #{len(remaining)}]")
 
         result = TokenFactory.ProcItem(
             meta=tree.meta,
@@ -284,44 +276,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         self._parent.pop()
 
         return [result]
-
-    # def heading(self, tree) -> list[TokenBase]:
-    #     assert isinstance(tree, Tree), type(tree)
-
-    #     level_tree, *remaining = tree.children
-
-    #     assert isinstance(level_tree, Tree)
-    #     assert 1 == len(level_tree.children), len(level_tree.children)
-    #     level = level_tree.children[0]
-    #     assert isinstance(level, str), type(level)
-    #     assert level.isdigit(), level
-
-    #     result = TokenFactory.Heading(
-    #         meta=tree.meta,
-    #         parent=self._parent[-1] if self._parent else None,  # type: ignore
-    #         tokens=[],
-    #         level=int(level),
-    #     )
-    #     self._parent.append(result)
-    #     result.tokens = self._get_items(remaining)
-    #     self._parent.pop()
-
-    #     return [result]
-
-    # def HEADING_LEVEL(self, tree) -> list[TokenBase]:
-    #     assert isinstance(tree, Tree), type(tree)
-    #     assert 1 == len(tree.children), len(tree.children)
-
-    #     level = tree.children[0]
-    #     assert isinstance(level, str), type(level)
-    #     assert level.isdigit(), level
-
-    #     # result = TokenFactory.Text(
-    #     #     meta=tree.meta,
-    #     #     parent=self._parent[-1],
-    #     #     value=str(level),
-    #     # )
-    #     return []
 
     def list_item(self, tree) -> list[TokenBase]:
         # print(f"TextInterpreter.list_item")
@@ -470,7 +424,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def APOSTROPHE(self, tree) -> list[TokenBase]:
-        ## print(f"TextInterpreter.APOSTROPHE")
+        # print(f"TextInterpreter.APOSTROPHE")
         assert isinstance(tree, Tree), type(tree)
         assert 1 == len(tree.children), len(tree.children)
         value = tree.children[0]
