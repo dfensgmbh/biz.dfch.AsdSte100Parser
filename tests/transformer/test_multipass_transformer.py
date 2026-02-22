@@ -18,7 +18,7 @@
 # pylint: disable=C0116
 # pylint: disable=C0301
 
-"""test_asd_ste100_9_pass1_transformer module."""
+"""multipass_transformer module."""
 
 import unittest
 
@@ -30,49 +30,9 @@ from biz.dfch.ste100parser import Ste100Doc
 from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 
 
-class TestAsdSte1009Pass1Transformer(unittest.TestCase):
+class TestMultiPassTransformer(unittest.TestCase):
 
-    def test_pass1(self):
-        text = """# Topmost heading
-
-A) This is work step A.
- * Vertical list item 1
- * This is another vertical list item.
- * The last (3) vertical list item.
-B) Work step B
-C) The last work step (C).
-
-"""
-        parser = Parser(GrammarType.ASD_STE100_9)
-        tree = parser.invoke(text, action=ParserAction.PASS1)
-        print(tree.pretty())
-
-    def test_pass2(self):
-        text = """### Topmost "heading" (with parentheses)
-
-A) This is work step A. And we have 2 sentences:
- * Vertical list item 1. There are 2 sentences.
- * This is another vertical list item.
- * The last (3) vertical list item.
-CAUTION: Safety instruction. 2 sentences.
-B) Work step B
-WARNING: This is a *safety* instruction (with parentheses).
-C) The last work step (C).
-CAUTION: This is a `safety` instruction without parentheses.
-
-Paragraph with a NOTE. And in this paragraph we have more than one sentence. This sentence starts a list:
- 1 First list item
- 2 This is another list item that is a full sentence.
- 3 The last list item.
-The paragraph continues after the vertical list.
-NOTE: This is a note. And this note has more than one sentence (this is sentence 2).
-"""
-        parser = Parser(GrammarType.ASD_STE100_9)
-        tree = parser.invoke(text, action=ParserAction.PASS2)
-        print(tree.pretty())
-
-    def test_pass2_and_interpret(self):
-        text = """# Topmost "heading" (with parentheses)
+    text = """# Topmost "heading" (with parentheses)
 
 ## Procedural Writing
 
@@ -103,6 +63,21 @@ NOTE: This is a note. And this note has more than one sentence (this is sentence
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vel arcu at enim elementum porttitor. Duis ante purus, condimentum eu nulla quis, molestie pharetra est. Proin sed mattis libero. Maecenas lacinia sem nec hendrerit pulvinar. Suspendisse ante nulla, mattis ut justo vel, pharetra finibus tortor. Aliquam ullamcorper malesuada ultricies. Nullam lacinia, ligula vel ultricies rutrum, lorem libero luctus neque, ut feugiat est justo vel sapien. Etiam suscipit mi vel sollicitudin vestibulum. Mauris feugiat volutpat quam sed venenatis. Praesent sit amet nunc volutpat lacus eleifend ornare. 
 """
+
+    def test_pass1(self):
+        text = self.text
+        parser = Parser(GrammarType.ASD_STE100_9)
+        tree = parser.invoke(text, action=ParserAction.PASS1)
+        print(tree.pretty())
+
+    def test_pass2(self):
+        text = self.text
+        parser = Parser(GrammarType.ASD_STE100_9)
+        tree = parser.invoke(text, action=ParserAction.PASS2)
+        print(tree.pretty())
+
+    def test_pass2_and_interpret(self):
+        text = self.text
         parser = Parser(GrammarType.ASD_STE100_9)
         tree = parser.invoke(text, action=ParserAction.PASS2)
         print(tree.pretty())

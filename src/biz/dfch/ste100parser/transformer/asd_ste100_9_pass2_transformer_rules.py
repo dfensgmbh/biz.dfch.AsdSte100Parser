@@ -18,7 +18,7 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""text_transformer_rules"""
+"""asd_ste100_9_pass2_transformer_rules"""
 
 from typing import Callable
 
@@ -29,7 +29,7 @@ from biz.dfch.ste100parser.token import Token
 RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
 
 
-class TextTransformerRules:
+class AsdSte1009Pass2TransformerRules:
     """
     Rules for TextTransformer start.
 
@@ -41,9 +41,4 @@ class TextTransformerRules:
         _ = Token.start.name
 
         return [
-            (
-                [Token.paragraph, Token.NEWLINE],
-                lambda para, _: para,
-                False,
-            ),
         ]

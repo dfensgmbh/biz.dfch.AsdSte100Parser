@@ -29,7 +29,9 @@ from ..char import Char
 
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration
-from .text_transformer_rules import TextTransformerRules
+from .asd_ste100_9_pass2_transformer_rules (
+    import AsdSte1009Pass2TransformerRules
+)
 from .tree_rewriter import TreeRewriter
 
 
@@ -65,7 +67,7 @@ class TextTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = TextTransformerRules().get_rules_start()
+        rules = AsdSte1009Pass2TransformerRules().get_rules_start()
         children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 

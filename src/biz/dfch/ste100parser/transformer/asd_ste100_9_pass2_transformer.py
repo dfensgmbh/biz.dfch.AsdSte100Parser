@@ -24,7 +24,9 @@ from lark import Tree, v_args
 from ..token import Token
 from ..serializer.sentencizer import Sentencizer
 
-from .text_transformer_rules import TextTransformerRules
+from .asd_ste100_9_pass2_transformer_rules (
+    import AsdSte1009Pass2TransformerRules
+)
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration
 from .tree_rewriter import TreeRewriter
@@ -70,7 +72,7 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = TextTransformerRules().get_rules_start()
+        rules = AsdSte1009Pass2TransformerRules().get_rules_start()
         children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 

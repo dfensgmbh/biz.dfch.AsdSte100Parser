@@ -25,7 +25,9 @@ from lark.tree import Meta
 from ..char import Char
 from ..token import Token
 
-from .container_transformer_rules import ContainerTransformerRules
+from .asd_ste100_9_pass1_transformer_rules (
+    import AsdSte1009Pass1TransformerRules
+)
 from .transformer_base import TransformerBase
 from .transformer_configuration import TransformerConfiguration
 from .tree_rewriter import TreeRewriter
@@ -586,7 +588,7 @@ class AsdSte1009Pass1Transformer(TransformerBase):  # pylint: disable=R0904
         ):
             children = children[:-1]
 
-        rules = ContainerTransformerRules().get_rules_paragraph()
+        rules = AsdSte1009Pass1TransformerRules().get_rules_paragraph()
         children = TreeRewriter().invoke(children, rules)
 
         result = Tree(token, children, meta=meta)
@@ -654,7 +656,7 @@ class AsdSte1009Pass1Transformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = ContainerTransformerRules().get_rules_start()
+        rules = AsdSte1009Pass1TransformerRules().get_rules_start()
         children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 
