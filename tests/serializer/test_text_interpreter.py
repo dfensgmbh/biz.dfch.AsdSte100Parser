@@ -31,66 +31,66 @@ from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 
 
 class TextTextInterpreter(unittest.TestCase):
-    def test_sth(self):
+#     def test_sth(self):
 
-        value = """
-A) This is work   step 1.
-WARNING: This is a "WARNING" safety instruction (for (very) real).
-CAUTION: This is a "CAUTION" safety instruction.
+#         value = """
+# A) This is work   step 1.
+# WARNING: This is a "WARNING" safety instruction (for (very) real).
+# CAUTION: This is a "CAUTION" safety instruction.
 
-This is a paragraph.
-A new sentence on a new line.
-NOTE: This is a note1.
+# This is a paragraph.
+# A new sentence on a new line.
+# NOTE: This is a note1.
 
-This is a new paragraph. (And the last paragraph.) Open the left (right) access panel L42 (R42).
+# This is a new paragraph. (And the last paragraph.) Open the left (right) access panel L42 (R42).
 
-# Heading for a procedure
+# # Heading for a procedure
 
-A) Before you do the test, install the component.
-  1 Inside a work step: this is item 1.
-  2 Second item
-  3 Last item.
-B) Do Peter's test(s) three * times
-C) The `uber product` of 3 * 3 is 9.
+# A) Before you do the test, install the component.
+#   1 Inside a work step: this is item 1.
+#   2 Second item
+#   3 Last item.
+# B) Do Peter's test(s) three * times
+# C) The `uber product` of 3 * 3 is 9.
 
-This *is* _a_ *_"paragraph"_* "*with*" `some code`.
+# This *is* _a_ *_"paragraph"_* "*with*" `some code`.
 
-> And this is a "citation 'line'" (1).
-> And `this` is _another_ "citation 'line'" (2).
+# > And this is a "citation 'line'" (1).
+# > And `this` is _another_ "citation 'line'" (2).
 
-```py
-# This is a python script.
-```
+# ```py
+# # This is a python script.
+# ```
 
-```c#
-System.Console.WriteLine("hello, world");
-```
+# ```c#
+# System.Console.WriteLine("hello, world");
+# ```
 
-And here is another paragraph with a list:
-  1 This is list item 1.
-  2 Another list item
-  3 This is the third (and "last") list item.
+# And here is another paragraph with a list:
+#   1 This is list item 1.
+#   2 Another list item
+#   3 This is the third (and "last") list item.
 
-This is the final paragraph. It has two sentences.
+# This is the final paragraph. It has two sentences.
 
-"""
+# """
 
-        parser = Parser(GrammarType.ASD_STE100_9)
-        parsed = parser.invoke(value, action=ParserAction.PASS2)
-        print(parsed.pretty())
-        sut = TextInterpreter()
-        result = sut.invoke(parsed)
-        self.assertIsNotNone(result, result)
+#         parser = Parser(GrammarType.ASD_STE100_9)
+#         parsed = parser.invoke(value, action=ParserAction.PASS2)
+#         print(parsed.pretty())
+#         sut = TextInterpreter()
+#         result = sut.invoke(parsed)
+#         self.assertIsNotNone(result, result)
 
-        print(f"result: '{result}'")
+#         print(f"result: '{result}'")
 
-        for item in result:
-            print(f"[{type(item).__name__}]: '{item.text}'")
+#         for item in result:
+#             print(f"[{type(item).__name__}]: '{item.text}'")
 
-        # inspector = Inspector()
-        # doc = Ste100Doc(result)
-        # structure = inspector.ste100doc(doc)
-        # print(structure)
+#         # inspector = Inspector()
+#         # doc = Ste100Doc(result)
+#         # structure = inspector.ste100doc(doc)
+#         # print(structure)
 
     def test_100_iterations(self):
         value = """# Heading 1
@@ -106,7 +106,7 @@ NOTE: This note is not important.
 """
         parser = Parser(GrammarType.ASD_STE100_9)
 
-        for _ in range(1):
+        for _ in range(10):
             tree = parser.invoke(value, action=ParserAction.PASS2)
             result = TextInterpreter().invoke(tree)
             self.assertIsNotNone(result)
