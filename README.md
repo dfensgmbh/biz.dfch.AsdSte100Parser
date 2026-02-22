@@ -726,3 +726,56 @@ This is another paragraph. In _that_ paragraph we have 'text in single quotes'.
 At last, this is another paragraph. In *_that_* paragraph we have "text in 'double' quotes" that contains "'single' quotes".   
 
 ```
+
+# ASD-STE100 Questions
+
+## Parentheses within parentheses?
+
+Is it allowed to place parentheses within parentheses? I would say yes, because:
+    * There is no direct "no" that this is not allowed. R8.3
+    * You can use parentheses to include a reference to a figure.
+    * And you can use parentheses to explain something.
+    * This explanation could potentially include a reference to a figure.
+    * So, it should be possible to have nested parentheses.
+However, this leaves open the option to include more "explanatory" text within a pair of parentheses.
+
+An from R8.5 we would therefore have an infinite nesting of sentences.
+
+I therefore suggest, to explicitly forbid to nest "explanatory" parentheses:
+"To explain words or a part of a sentence"
+
+## Multiple sentences in parentheses
+
+Can we have multiple sentences in parentheses? 
+
+## Multiple uses for one set of parentheses?
+
+Can I have an explanation AND an abbreviation inside the same parentheses? Or must I use 2 different parentheses?
+
+Example:
+Lock the door (the door on the left side, L1).
+Why would I use a COMMA instead of a DOT here? 
+---OR---
+Lock the door (the door on the left side) (L1).
+
+## Sentence count in vertical lists
+
+R8.4 states:
+
+> Each item in a vertical list that comes after the colon counts as a new sentence.
+
+Where is the rule that states, that a vertical list in full counts as only one sentence.
+
+## "-ing" form as part of a technical noun
+
+> You can use a word that has an -ing form as a technical noun (for example, in procedural titles or headings).
+
+Only for TN or also for regular nouns?
+
+Is this _not_ permitted (because it is a noun and not a technical noun): "cleaning person"
+
+# ASD-STE100 Dictionary
+
+## safety-clip
+
+# R8.4 STE Example

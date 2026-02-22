@@ -13,37 +13,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# pylint: disable=C0116
-# pylint: disable=R0903
-# pylint: disable=W0212
-# type: ignore
+"""nlp"""
 
-"""text_transformer_rules"""
-
-from typing import Callable
-
-from lark import Tree
-
-from biz.dfch.ste100parser.token import Token
-
-RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
+from biz.dfch.asdste100vocab import Vocab
 
 
-class TextTransformerRules:
-    """
-    Rules for TextTransformer start.
+class MyClass:
+    """MyClass"""
 
-    These rules remove NEWLINE and LINEBREAK between different rules.
-    """
+    _vocab: Vocab
 
-    @classmethod
-    def get_rules_start(cls) -> list[RuleType]:
-        _ = Token.start.name
+    def __init__(self) -> None:
 
-        return [
-            (
-                [Token.paragraph, Token.NEWLINE],
-                lambda para, _: para,
-                False,
-            ),
-        ]
+        self._vocab = Vocab()

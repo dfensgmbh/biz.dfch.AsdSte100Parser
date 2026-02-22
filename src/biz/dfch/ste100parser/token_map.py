@@ -37,6 +37,8 @@ class TokenMap:
     def __init__(self) -> None:
         self._id_gen = count(self.NONE_IDX)
         self._map = {}
+        # The first entry in the token map is:
+        # id(None) : -1
         self._map[id(None)] = next(self._id_gen)
 
     def contains(self, token: TokenBase) -> bool:

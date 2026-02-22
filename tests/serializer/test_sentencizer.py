@@ -13,37 +13,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""test_text_interpreter tests."""
+
+# pylint: disable=C0114
+# pylint: disable=C0115
 # pylint: disable=C0116
-# pylint: disable=R0903
-# pylint: disable=W0212
-# type: ignore
+# pylint: disable=C0301
 
-"""text_transformer_rules"""
+import unittest
 
-from typing import Callable
-
-from lark import Tree
-
-from biz.dfch.ste100parser.token import Token
-
-RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
+from biz.dfch.ste100parser import GrammarType
+from biz.dfch.ste100parser import Parser
+from biz.dfch.ste100parser.serializer.sentencizer import Sentencizer
 
 
-class TextTransformerRules:
-    """
-    Rules for TextTransformer start.
+class TestSentencizer(unittest.TestCase):
+    def test_init_succeeds(self):
 
-    These rules remove NEWLINE and LINEBREAK between different rules.
-    """
+        sut = Sentencizer()
 
-    @classmethod
-    def get_rules_start(cls) -> list[RuleType]:
-        _ = Token.start.name
-
-        return [
-            (
-                [Token.paragraph, Token.NEWLINE],
-                lambda para, _: para,
-                False,
-            ),
-        ]
+        self.assertIsNotNone(sut)

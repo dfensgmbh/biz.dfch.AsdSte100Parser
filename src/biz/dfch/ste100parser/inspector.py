@@ -23,7 +23,7 @@
 from biz.dfch.ste100parser.token_map import TokenMap
 
 from .char import Char
-from .doc import Doc
+from .ste100doc import Ste100Doc
 from .string_builder import StringBuilder
 
 from .serializer.token_base import EmptyToken
@@ -47,8 +47,12 @@ class Inspector:
         self._indent = indent
         self._delimiter = delimiter
 
-    def ste100doc(self, doc: Doc, token_map: TokenMap | None = None) -> str:
-        assert isinstance(doc, Doc), type(Doc)
+    def ste100doc(
+        self,
+        doc: Ste100Doc,
+        token_map: TokenMap | None = None
+    ) -> str:
+        assert isinstance(doc, Ste100Doc), type(Ste100Doc)
 
         if isinstance(token_map, TokenMap):
             map_ = token_map
@@ -94,7 +98,7 @@ class Inspector:
             return result
 
         result = StringBuilder()
-        result.append_line("[level:count:idx]")
+        result.append_line("[level:total:index]")
 
         tokens = list(doc)
         result.extend(process(tokens, 0, self._delimiter))

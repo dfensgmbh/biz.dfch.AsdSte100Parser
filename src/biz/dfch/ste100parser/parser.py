@@ -15,6 +15,7 @@
 
 """TestMain"""
 
+from enum import auto, Enum
 from pathlib import Path
 
 from lark import Lark, ParseTree
@@ -22,6 +23,14 @@ from lark import Lark, ParseTree
 from .grammar.grammar_type import GrammarType
 from .transformer import AsdSte1009Pass1Transformer
 from .transformer import AsdSte1009Pass2Transformer
+
+
+class ParserAction(Enum):
+    """Define parser action."""
+    PARSE = auto()
+    PASS1 = auto()
+    PASS2 = auto()
+    DEFAULT = PARSE
 
 
 class Parser:
@@ -69,16 +78,14 @@ class Parser:
         self,
         text: str,
         *,
-        do_transform: bool = False,
+        action: ParserAction = ParserAction.DEFAULT,
     ) -> ParseTree:
         """
         Parses the text based on the specified grammar.
 
         Args:
             text (str): The text to parse.
-            do_transform (bool): If `True`, the parser transforms the text.
-                If `False`, the transformer only parses the text.
-                Default value is `False`.
+            action (bool): See `ParseAction` for details.
 
         Returns:
             ParseTree: The `ParseTree` from `text`.
@@ -86,18 +93,23 @@ class Parser:
 
         assert isinstance(text, str), type(text)
         assert text.strip()
-        assert isinstance(do_transform, bool), type(do_transform)
+        assert isinstance(action, ParserAction), type(action)
 
         result = self._lark.parse(text)  # type: ignore
 
         if GrammarType.ASD_STE100_9 != self._grammar:
             return result
 
-        if not do_transform:
+        if ParserAction.PARSE == action:
             return result
 
         pass1 = self._pass1_transformer.transform(result)
+        if ParserAction.PASS1 == action:
+            return pass1
+
         pass2 = self._pass2_transformer.transform(pass1)
+        if ParserAction.PASS2 == action:
+            return pass2
 
         result = pass2
         return result

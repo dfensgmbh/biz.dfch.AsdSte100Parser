@@ -19,6 +19,7 @@
 
 """Span class."""
 
+from __future__ import annotations
 from dataclasses import dataclass
 
 
@@ -41,6 +42,15 @@ class Span:
     column: int
     start_pos: int
     end_pos: int
+
+    @staticmethod
+    def default() -> Span:
+        return Span(
+            line=0,
+            column=1,
+            start_pos=1,
+            end_pos=1,
+        )
 
     def __str__(self) -> str:
         return f"[{self.line}:{self.column}] @ " \

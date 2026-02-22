@@ -23,7 +23,10 @@
 import unittest
 
 from biz.dfch.ste100parser import Parser
+from biz.dfch.ste100parser import ParserAction
 from biz.dfch.ste100parser import GrammarType
+from biz.dfch.ste100parser import Inspector
+from biz.dfch.ste100parser import Ste100Doc
 from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 
 
@@ -44,7 +47,10 @@ This is a new paragraph. (And the last paragraph.) Open the left (right) access 
 # Heading for a procedure
 
 A) Before you do the test, install the component.
-B) Do the Peter's test(s) three * times
+  1 Inside a work step: this is item 1.
+  2 Second item
+  3 Last item.
+B) Do Peter's test(s) three * times
 C) The `uber product` of 3 * 3 is 9.
 
 This *is* _a_ *_"paragraph"_* "*with*" `some code`.
@@ -65,21 +71,42 @@ And here is another paragraph with a list:
   2 Another list item
   3 This is the third (and "last") list item.
 
-This is the final paragraph It has two sentences.
+This is the final paragraph. It has two sentences.
 
 """
 
         parser = Parser(GrammarType.ASD_STE100_9)
-        parsed = parser.invoke(value, do_transform=True)
+        parsed = parser.invoke(value, action=ParserAction.PASS2)
+        print(parsed.pretty())
         sut = TextInterpreter()
-        # result = sut.visit_children(parsed)
-        nested = sut.visit_children(parsed)
-        self.assertIsNotNone(nested, nested)
-
-        result = sut.flatten_result(nested)
+        result = sut.invoke(parsed)
         self.assertIsNotNone(result, result)
 
         print(f"result: '{result}'")
 
         for item in result:
             print(f"[{type(item).__name__}]: '{item.text}'")
+
+        # inspector = Inspector()
+        # doc = Ste100Doc(result)
+        # structure = inspector.ste100doc(doc)
+        # print(structure)
+
+    def test_100_iterations(self):
+        value = """# Heading 1
+
+This is the first paragraph that starts a list:
+  * First itemized list item
+  * This is the second item.
+  2 Last (third) item.
+
+This is another paragraph.
+NOTE: This note is not important.
+
+"""
+        parser = Parser(GrammarType.ASD_STE100_9)
+
+        for _ in range(1):
+            tree = parser.invoke(value, action=ParserAction.PASS2)
+            result = TextInterpreter().invoke(tree)
+            self.assertIsNotNone(result)

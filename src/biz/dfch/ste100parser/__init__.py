@@ -19,18 +19,25 @@ from .char import Char
 from .grammar import GrammarType
 from .note_or_safety_keyword import NoteOrSafetyKeyword
 from .parser import Parser
+from .parser import ParserAction
 from .token import Token
 from .transformer import AsdSte1009Pass1Transformer
 from .transformer import AsdSte1009Pass2Transformer
 from .transformer import TextTransformer
+from .inspector import Inspector
+from .ste100doc import Ste100Doc
+
 
 __all__ = [
     "Char",
     "AsdSte1009Pass1Transformer",
     "AsdSte1009Pass2Transformer",
     "GrammarType",
+    "Inspector",
     "NoteOrSafetyKeyword",
     "Parser",
+    "ParserAction",
+    "Ste100Doc",
     "TextTransformer",
     "Token",
 ]
