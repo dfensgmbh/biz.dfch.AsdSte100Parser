@@ -185,11 +185,11 @@ class Sentencizer:
                 sent_container = ste_token.parent
                 print(
                     f"[{i}/{j}/{k}] "
-                    f"{token.text,
+                    f"{(token.text,
                        token.pos_,
                        token.dep_,
                        type(ste_token).__name__,
-                       type(sent_container).__name__} "
+                       type(sent_container).__name__)} "
                     f"[i:{token_map[ste_token]:02}]"
                     f"[p:{token_map[sent_container]:02}]"
                 )
