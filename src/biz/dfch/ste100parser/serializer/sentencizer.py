@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 from typing import cast
-from typing import Sequence
 
 from lark import Tree
 from lark.tree import Meta
@@ -31,7 +30,6 @@ from spacy.tokens import Doc
 
 from biz.dfch.asdste100vocab import Vocab
 
-from ..char import Char
 from ..ste100doc import Ste100Doc
 from ..serializer.token_base import TokenBase
 from ..serializer.token_base import Paragraph
@@ -47,16 +45,6 @@ from .ste100_serializer import Ste100Serializer
 
 from .text_interpreter import Exclude
 from .text_interpreter import TextInterpreter
-
-from .token_base import Format
-from .token_base import ListItem
-from .token_base import Paragraph
-from .token_base import Parentheses
-from .token_base import Quote
-from .token_base import Sentence
-from .token_base import Text
-from .token_base import TokenBase
-from .token_base import Word
 
 
 class Sentencizer:
