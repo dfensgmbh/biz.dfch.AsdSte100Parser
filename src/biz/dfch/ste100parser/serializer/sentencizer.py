@@ -120,7 +120,6 @@ class Sentencizer:
         for j, token in enumerate(sent):
             token_count += 1
             ste_token = cast(TokenBase, token._.ste100_token)
-            ste_token.nlp_token = token
             sent_text_tokens.append(ste_token)
             sent_container = ste_token.parent
             # In Python v3.11 we cannot use f-strings with tuples.
@@ -162,7 +161,6 @@ class Sentencizer:
         )
 
         sentence = Sentence(sent_start.span, container, [])  # type: ignore
-        sentence.nlp_sent = sent
 
         first = token_map[sent_start]
         last = token_map[sent_text_tokens[-1]]
