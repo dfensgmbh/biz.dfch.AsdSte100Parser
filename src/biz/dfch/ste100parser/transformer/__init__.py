@@ -21,12 +21,10 @@ from .asd_ste100_9_pass1_transformer import (  # type: ignore
 from .asd_ste100_9_pass2_transformer import (  # type: ignore
     AsdSte1009Pass2Transformer
 )
-from .text_transformer import TextTransformer  # type: ignore
 from .token_converter import TokenConverter
 
 __all__ = [
     "AsdSte1009Pass1Transformer",
-    "TextTransformer",
     "AsdSte1009Pass2Transformer",
     "TokenConverter",
 ]

@@ -23,7 +23,6 @@ from .parser import ParserAction
 from .token import Token
 from .transformer import AsdSte1009Pass1Transformer
 from .transformer import AsdSte1009Pass2Transformer
-from .transformer import TextTransformer
 from .inspector import Inspector
 from .ste100doc import Ste100Doc
 
@@ -38,6 +37,5 @@ __all__ = [
     "Parser",
     "ParserAction",
     "Ste100Doc",
-    "TextTransformer",
     "Token",
 ]

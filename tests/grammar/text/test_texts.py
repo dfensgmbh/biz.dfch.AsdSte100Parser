@@ -194,19 +194,19 @@ NOTE: This is a note.
         self.assert_tree(value, expected, Token.cite)
 
         expected = [
-            Token.WORD,     # Yes
-            Token.COMMA,    # ,
+            Token.TEXT,     # Yes
+            Token.TEXT,    # ,
             Token.WS,
-            Token.WORD,     # This
+            Token.TEXT,     # This
             Token.WS,
-            Token.WORD,     # is
+            Token.TEXT,     # is
             Token.WS,
-            Token.WORD,     # a
+            Token.TEXT,     # a
             Token.WS,
-            Token.WORD,     # cite
+            Token.TEXT,     # cite
             Token.WS,
-            Token.WORD,     # block
-            Token.EOS,      # .
+            Token.TEXT,     # block
+            Token.TEXT,      # .
         ]
 
         self.assert_tree(value, expected, Token.sentence, level=1)
@@ -223,31 +223,33 @@ NOTE: This is a note.
 
         expected = [
             Token.sentence,
-            Token.sentence,
         ]
         self.assert_tree(value, expected, Token.paragraph, level=1)
 
         expected = [
-            Token.WORD,     # AndX
+            Token.TEXT,     # AndX
             Token.WS,
-            Token.WORD,     # yes
-            Token.COMMA,    # ,
+            Token.TEXT,     # yes
+            Token.TEXT,    # ,
             Token.WS,
-            Token.WORD,     # after
+            Token.TEXT,     # after
             Token.WS,
-            Token.WORD,     # 1.25
+            Token.TEXT,     # 1.25
             Token.WS,
-            Token.WORD,     # hours
-            Token.COMMA,    # ,
+            Token.TEXT,     # hours
+            Token.TEXT,    # ,
             Token.WS,
-            Token.WORD,     # there
+            Token.TEXT,     # there
             Token.WS,
-            Token.WORD,     # is
+            Token.TEXT,     # is
             Token.WS,
-            Token.WORD,     # a
+            Token.TEXT,     # a
             Token.WS,
-            Token.WORD,     # sign
-            Token.EOS,      # :
+            Token.TEXT,     # sign
+            Token.TEXT,      # :
+            Token.WS,
+            Token.squote,      # '...'
+            Token.TEXT,      # .
         ]
         self.assert_tree(value, expected, Token.sentence, level=2)
 
@@ -266,30 +268,30 @@ NOTE: This is a note.
         self.assert_tree(value, expected, Token.paragraph, level=1)
 
         expected = [
-            Token.WORD,     # This
+            Token.TEXT,    # This
             Token.WS,
-            Token.WORD,     # is
+            Token.TEXT,    # is
             Token.WS,
-            Token.WORD,     # a
+            Token.TEXT,    # a
             Token.WS,
-            Token.WORD,     # sentence
-            Token.COMMA,
+            Token.TEXT,    # sentence
+            Token.TEXT,
             Token.WS,
-            Token.WORD,     # where
+            Token.TEXT,    # where
             Token.WS,
-            Token.WORD,     # the
+            Token.TEXT,    # the
             Token.WS,
-            Token.WORD,     # end-of-sentence
+            Token.TEXT,    # end-of-sentence
             Token.WS,
-            Token.WORD,     # marker
+            Token.TEXT,    # marker
             Token.WS,
             Token.paren,    # (".")
             Token.WS,
-            Token.WORD,     # is
+            Token.TEXT,    # is
             Token.WS,
-            Token.WORD,     # inside
+            Token.TEXT,    # inside
             Token.WS,
-            Token.WORD,     # a
+            Token.TEXT,    # a
             Token.WS,
             Token.dquote,   # "double quote."
         ]
@@ -320,7 +322,7 @@ NOTE: This is a note.
 
     def test_ireb_template(self):
 
-        value = '''When the system recognizes a applicable debit card, 
+        value = '''When the system recognizes an applicable debit card, 
 the system must show this message in less than 0.2 second:
 "Type in the PIN."
 
@@ -333,51 +335,51 @@ the system must show this message in less than 0.2 second:
 
         expected = [
             Token.sentence,
-            Token.sentence,
         ]
         self.assert_tree(value, expected, Token.paragraph, level=1)
 
         expected = [
-            Token.WORD,
+            Token.TEXT,     # When
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # the
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # system
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # recognizes
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # an
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # applicable
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # debit
             Token.WS,
-            Token.WORD,
-            Token.COMMA,
+            Token.TEXT,     # card
+            Token.TEXT,     # ,
             Token.WS,
             Token.LINEBREAK,
-            Token.WORD,
+            Token.TEXT,     # the
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # system
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # must
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # show
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # this
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # message
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # in
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # less
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # than
             Token.WS,
-            Token.WORD,
+            Token.TEXT,     # 0.2
             Token.WS,
-            Token.WORD,
-            Token.EOS,
+            Token.TEXT,     # second
+            Token.TEXT,     # .
+            Token.dquote,   # " ... "
         ]
         self.assert_tree(value, expected, Token.sentence, level=2)
 
@@ -400,10 +402,10 @@ the system must show this message in less than 0.2 second:
         self.assert_tree(value, expected, Token.paragraph, level=1)
 
         expected = [
-            Token.WORD,     # List
+            Token.TEXT,     # List
             Token.WS,
-            Token.WORD,     # item
-            Token.EOS,      # :
+            Token.TEXT,     # item
+            Token.TEXT,      # :
         ]
         self.assert_tree(value, expected, Token.sentence, level=2)
 

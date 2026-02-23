@@ -20,7 +20,7 @@
 
 from biz.dfch.ste100parser import GrammarType, Parser
 from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
-from biz.dfch.ste100parser.transformer import TextTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass2Transformer
 from biz.dfch.ste100parser.transformer import TokenConverter
 
 from tests.test_case_base import TestCaseBase
@@ -31,7 +31,8 @@ class TestCaseTextBase(TestCaseBase):
     _parser = None
 
     pass1_transformer: AsdSte1009Pass1Transformer
-    pass2_transformer: TextTransformer
+    pass2_transformer: AsdSte1009Pass2Transformer
+    # pass2_transformer: TextTransformer
     converter: TokenConverter
 
     @classmethod
@@ -43,7 +44,7 @@ class TestCaseTextBase(TestCaseBase):
         """Initialize fresh transformer and converter for every test."""
         self.pass1_transformer = AsdSte1009Pass1Transformer()
         # self.pass2_transformer = TextTransformer(log=True)
-        self.pass2_transformer = TextTransformer()
+        self.pass2_transformer = AsdSte1009Pass2Transformer()
         self.converter = TokenConverter()
 
     def invoke(self, value: str):
