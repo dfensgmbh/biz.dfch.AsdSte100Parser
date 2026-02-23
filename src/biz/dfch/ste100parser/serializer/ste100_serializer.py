@@ -266,7 +266,4 @@ class Ste100Serializer:
         root = children[0]
         assert isinstance(root, Tree), type(root)
 
-        meta = from_span(Span.default())
-        result = Tree(root.data, children=root.children, meta=meta)
-
         return children
