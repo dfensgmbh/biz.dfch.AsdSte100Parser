@@ -37,7 +37,7 @@ __all__ = [
 
 
 class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
-    """Transformer for pass 2.
+    """Transformer for pass 2 (with sentencizer).
 
     This transformer creates theses tokens from TEXT:
       * WORD

@@ -24,14 +24,14 @@ from typing import Callable
 
 from lark import Tree
 
-from biz.dfch.ste100parser.token import Token
+from ..token import Token
 
 RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
 
 
 class AsdSte1009Pass2TransformerRules:
     """
-    Rules for TextTransformer start.
+    Rules for pass2 start.
 
     These rules remove NEWLINE and LINEBREAK between different rules.
     """

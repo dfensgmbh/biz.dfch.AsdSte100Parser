@@ -25,7 +25,7 @@ from typing import Callable
 from lark import Tree
 from lark.tree import Meta
 
-from biz.dfch.ste100parser.token import Token
+from ..token import Token
 
 RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
 
