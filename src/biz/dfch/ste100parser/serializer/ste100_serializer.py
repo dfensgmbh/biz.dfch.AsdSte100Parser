@@ -49,6 +49,7 @@ from .token_base import Code
 
 from .token_base import Text
 from .token_base import Word
+from .token_base import Char
 from .token_base import Number
 from .token_base import Punct
 from .token_base import Ws
@@ -219,6 +220,7 @@ class Ste100Serializer:
 
         Text: (text, Token.TEXT.name),
         Word: (text, Token.TEXT.name),
+        Char: (text, Token.CHAR.name),
         Number: (text, Token.TEXT.name),
         Ws: (ws, Token.WS.name),
         LineBreak: (line_break, Token.LINEBREAK.name),

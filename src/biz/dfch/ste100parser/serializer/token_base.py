@@ -25,7 +25,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
 
-from ..char import Char
+from ..char import Char as Character
 from ..note_or_safety_keyword import NoteOrSafetyKeyword
 from ..string_builder import StringBuilder
 
@@ -171,7 +171,7 @@ class LineBreak(EmptyToken):
 
     @property
     def text(self) -> str:
-        return Char.SPACE
+        return Character.SPACE
 
 
 @dataclass
@@ -180,7 +180,7 @@ class Multiply(EmptyToken):
 
     @property
     def text(self) -> str:
-        return f"{Char.SPACE}{Char.MULTIPLY}{Char.SPACE}"
+        return f"{Character.SPACE}{Character.MULTIPLY}{Character.SPACE}"
 
 
 @dataclass
@@ -189,7 +189,11 @@ class Plural(EmptyToken):
 
     @property
     def text(self) -> str:
-        result = f"{Char.PAREN_OPEN}{Char.CHAR_LOWER_S}{Char.PAREN_CLOSE}"
+        result = (
+            f"{Character.PAREN_OPEN}"
+            f"{Character.CHAR_LOWER_S}"
+            f"{Character.PAREN_CLOSE}"
+        )
         return result
 
 
@@ -201,6 +205,11 @@ class Text(ValueToken):
 @dataclass
 class Number(ValueToken):
     """This is a number token."""
+
+
+@dataclass
+class Char(ValueToken):
+    """This is a character token."""
 
 
 @dataclass
@@ -241,5 +250,5 @@ class Apostrophe(SpecialText):
 
     @property
     def text(self) -> str:
-        result = f"{Char.SQUOTE}{self.value}"
+        result = f"{Character.SQUOTE}{self.value}"
         return result

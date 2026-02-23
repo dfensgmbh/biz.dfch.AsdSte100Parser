@@ -29,7 +29,7 @@ from lark.visitors import Interpreter
 from biz.dfch.asdste100vocab import Vocab
 
 
-from ..char import Char
+from ..char import Char as Character
 from ..note_or_safety_keyword import NoteOrSafetyKeyword
 
 from .span import Span
@@ -44,6 +44,7 @@ from .token_base import CodeBlock
 from .token_base import Text
 from .token_base import Word
 from .token_base import Number
+from .token_base import Char
 from .token_base import Punct
 from .token_base import Ws
 from .token_base import LineBreak
@@ -262,7 +263,11 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         delimiter = delimiter_tree.children[0]
         assert isinstance(delimiter, str)
 
-        print(f"[step '{step}'] [delimiter '{delimiter}'] [remaining #{len(remaining)}]")
+        print(
+            f"[step '{step}'] ["
+            f"delimiter '{delimiter}'] "
+            f"[remaining #{len(remaining)}]"
+        )
 
         result = TokenFactory.ProcItem(
             meta=tree.meta,
@@ -294,7 +299,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         marker = marker_tree.children[0]
         assert isinstance(marker, str)
         assert marker.isalnum() or marker in (
-            Char.MULTIPLY, Char.HYPHEN), marker
+            Character.MULTIPLY, Character.HYPHEN), marker
 
         result = TokenFactory.ListItem(
             meta=tree.meta,
@@ -380,9 +385,9 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
 
         text, punct = value[:-1], value[-1]
         if punct in (
-            Char.DOT, Char.COMMA,
-            Char.EXCLAMATION, Char.QUESTION,
-            Char.COLON
+            Character.DOT, Character.COMMA,
+            Character.EXCLAMATION, Character.QUESTION,
+            Character.COLON
         ):
             # When a punctuation follows parentheses or quotes or formatters,
             # the TEXT token consists of only one character.
@@ -438,6 +443,21 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
 
         return [result]
 
+    def CHAR(self, tree) -> list[TokenBase]:
+        # print(f"TextInterpreter.CHAR")
+        assert isinstance(tree, Tree), type(tree)
+        assert 1 == len(tree.children), len(tree.children)
+        value = tree.children[0]
+        assert isinstance(value, str), type(value)
+
+        result = TokenFactory.Char(
+            meta=tree.meta,
+            parent=self._parent[-1],
+            value=value,
+        )
+
+        return [result]
+
     def WS(self, tree) -> list[TokenBase]:
         # print(f"TextInterpreter.WS")
         assert isinstance(tree, Tree), type(tree)
@@ -449,7 +469,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         result = TokenFactory.Ws(
             meta=tree.meta,
             parent=self._parent[-1],
-            value=int(value) * Char.SPACE,
+            value=int(value) * Character.SPACE,
         )
 
         return [result]
@@ -691,7 +711,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
 
         def process_parentheses(token):
             if Exclude.PAREN_TOK not in exclude:
-                words.append(Char.PAREN_OPEN.value)
+                words.append(Character.PAREN_OPEN.value)
                 spaces.append(False)
                 source.append(token)
                 sents.append(0 == i)
@@ -705,7 +725,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
                 sents.extend(nested[3])
 
             if Exclude.PAREN_TOK not in exclude:
-                words.append(Char.PAREN_CLOSE.value)
+                words.append(Character.PAREN_CLOSE.value)
                 spaces.append(self.is_next_token_ws(tokens, i))
                 source.append(token)
                 sents.append(0 == i)
@@ -713,9 +733,9 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         def process_quote(token):
             quote_char: str | None = None
             if QuoteType.SINGLE == token.type_:
-                quote_char = Char.SQUOTE.value
+                quote_char = Character.SQUOTE.value
             elif QuoteType.DOUBLE == token.type_:
-                quote_char = Char.DQUOTE.value
+                quote_char = Character.DQUOTE.value
 
             if (
                 QuoteType.DOUBLE == token.type_ and Exclude.DQUOTE_TOK not in exclude or
@@ -756,6 +776,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             LineBreak: process_white_space,
             Text: process_value_token,
             Word: process_value_token,
+            Char: process_value_token,
             Punct: process_value_token,
             Number: process_value_token,
             TokenRoot: process_list_token,

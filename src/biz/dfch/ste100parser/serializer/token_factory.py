@@ -29,6 +29,7 @@ from .token_base import Apostrophe
 from .token_base import Text
 from .token_base import Word
 from .token_base import Number
+from .token_base import Char
 from .token_base import Punct
 from .token_base import Ws
 from .token_base import Plural
@@ -202,6 +203,14 @@ class TokenFactory:
         value: str,
     ):
         return Text(from_lark_meta(meta), parent, value)
+
+    @staticmethod
+    def Char(
+        meta: Meta,
+        parent: TokenBase,
+        value: str,
+    ):
+        return Char(from_lark_meta(meta), parent, value)
 
     @staticmethod
     def Word(

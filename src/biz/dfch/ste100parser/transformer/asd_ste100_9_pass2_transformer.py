@@ -175,7 +175,9 @@ class AsdSte1009Pass2Transformer(TransformerBase):  # pylint: disable=R0904
 
         token = Token.cite.name
 
-        items = children
+        trees = self._sentencizer.invoke(children, meta)
+        items = [*trees]
+
         result = Tree(token, items, meta=meta)
         return result
 
