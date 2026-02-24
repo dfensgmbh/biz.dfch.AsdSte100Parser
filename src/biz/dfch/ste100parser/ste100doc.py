@@ -21,14 +21,18 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Iterator
+from typing import TypeAlias
 
 from lark import Tree
 
-from .char import Char
 from .nlp.spacy_nlp import SpacyNlp
 from .serializer.text_interpreter import TextInterpreter
 from .serializer.token_base import TokenBase
+from .serializer.token_base import ListToken
+
+WalkerFunc: TypeAlias = Callable[[TokenBase, int], bool]
 
 
 class Ste100Doc:
@@ -64,6 +68,67 @@ class Ste100Doc:
     def __len__(self) -> int:
         """Return the number of tokens in the document."""
         return len(self._items)
+
+    def _walk(
+        self,
+        tokens: list[TokenBase],
+        *,
+        func: WalkerFunc,
+        level: int = 0,
+    ) -> None:
+        for token in tokens:
+            try:
+                do_continue = func(token, level)
+            except Exception as ex:  # pylint: disable=W0718
+                print(
+                    f"[{ex}] _walk failed for token: '{token.text}' "
+                    f"[{type(token).__name__}]"
+                )
+                return
+
+            if not do_continue:
+                break
+            if isinstance(token, ListToken):
+                self._walk(
+                    token.tokens,
+                    func=func,
+                    level=level+1
+                )
+
+    def examine(self, func: WalkerFunc) -> None:
+        assert isinstance(func, Callable), type(func)
+
+        self._walk(self._items, func=func)
+
+    def get_height(self) -> int:
+
+        height: int = 0
+
+        def func(token: TokenBase, level: int) -> bool:
+            _ = token
+            _ = level
+            nonlocal height
+            height = max(height, level)
+            return True
+
+        self._walk(self._items, func=func)
+
+        return height
+
+    def get_count(self) -> int:
+
+        count: int = 0
+
+        def func(token: TokenBase, level: int) -> bool:
+            _ = token
+            _ = level
+            nonlocal count
+            count = count+1
+            return True
+
+        self._walk(self._items, func=func)
+
+        return count
 
     def get_token(self, index: int) -> TokenBase:
         """Get token by index.
