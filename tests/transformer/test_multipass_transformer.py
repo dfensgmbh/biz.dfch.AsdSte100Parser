@@ -22,7 +22,12 @@
 
 import unittest
 
-from biz.dfch.asdste100vocab.vocab import Vocab
+import time
+
+from biz.dfch.asdste100vocab import Vocab
+from biz.dfch.asdste100vocab import Word
+from biz.dfch.asdste100vocab import WordStatus
+from biz.dfch.asdste100vocab import WordType
 
 from biz.dfch.ste100parser import GrammarType
 from biz.dfch.ste100parser import Inspector
@@ -34,7 +39,7 @@ from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 
 class TestMultiPassTransformer(unittest.TestCase):
 
-    text = """# Topmost "heading" (with parentheses)
+    text = """# Topmost "heading line" (with parentheses)
 
 ## Procedural Writing
 
@@ -50,7 +55,8 @@ C) When you open the oven, make sure that you do not burn your skin. Do it in th
   2 Set the switch of the oven to 'OFF'.
   3 Carefully, open the door.
 CAUTION: This is a `safety` instruction without parentheses.
-D) The last work step (D).
+D) Open the eenie-weenie self-inflating door.
+E) The last work step (E).
 
 ## Descriptive Writing
 
@@ -63,7 +69,17 @@ NOTE: This is a note. And this note has more than one sentence (this is sentence
 
 ## Lorem ipsum
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vel arcu at enim elementum porttitor. Duis ante purus, condimentum eu nulla quis, molestie pharetra est. Proin sed mattis libero. Maecenas lacinia sem nec hendrerit pulvinar. Suspendisse ante nulla, mattis ut justo vel, pharetra finibus tortor. Aliquam ullamcorper malesuada ultricies. Nullam lacinia, ligula vel ultricies rutrum, lorem libero luctus neque, ut feugiat est justo vel sapien. Etiam suscipit mi vel sollicitudin vestibulum. Mauris feugiat volutpat quam sed venenatis. Praesent sit amet nunc volutpat lacus eleifend ornare. 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+Mauris vel arcu at enim elementum porttitor. 
+Duis ante purus, condimentum eu nulla quis, molestie pharetra est. 
+Proin sed mattis libero. 
+Maecenas lacinia sem nec hendrerit pulvinar. 
+Suspendisse ante nulla, mattis ut justo vel, pharetra finibus tortor. 
+Aliquam ullamcorper malesuada ultricies. 
+Nullam lacinia, ligula vel ultricies rutrum, lorem libero luctus neque, ut feugiat est justo vel sapien. 
+Etiam suscipit mi vel sollicitudin vestibulum. 
+Mauris feugiat volutpat quam sed venenatis. 
+Praesent sit amet nunc volutpat lacus eleifend ornare. 
 """
 
     def test_pass1(self):
@@ -85,6 +101,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vel arcu at enim
         print(tree.pretty())
 
         vocab = Vocab()
+        vocab.append(word=Word(
+            name="eenie-weenie",
+            status=WordStatus.APPROVED,
+            type_=WordType.TECHNICAL_NOUN,
+        ))
         interpreter = TextInterpreter(vocab=vocab)
         tokens = interpreter.invoke(tree)
         doc = Ste100Doc(tokens)
