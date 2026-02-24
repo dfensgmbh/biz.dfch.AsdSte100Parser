@@ -20,11 +20,10 @@
 """Inspector."""
 
 
-from biz.dfch.ste100parser.token_map import TokenMap
-
 from .char import Char
 from .ste100doc import Ste100Doc
 from .string_builder import StringBuilder
+from .token_map import TokenMap
 
 from .serializer.token_base import EmptyToken
 from .serializer.token_base import ListToken
