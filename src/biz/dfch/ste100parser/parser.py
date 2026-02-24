@@ -85,10 +85,10 @@ class Parser:
 
         Args:
             text (str): The text to parse.
-            action (bool): See `ParseAction` for details.
+            action (ParserAction): See `ParseAction` for details.
 
         Returns:
-            ParseTree: The `ParseTree` from `text`.
+            result (ParseTree): The `ParseTree` from `text`.
         """
 
         assert isinstance(text, str), type(text)

@@ -765,8 +765,10 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
                 quote_char = Character.DQUOTE.value
 
             if (
-                QuoteType.DOUBLE == token.type_ and Exclude.DQUOTE_TOK not in exclude or
-                QuoteType.SINGLE == token.type_ and Exclude.SQUOTE_TOK not in exclude
+                QuoteType.DOUBLE == token.type_ and
+                Exclude.DQUOTE_TOK not in exclude or
+                QuoteType.SINGLE == token.type_ and
+                Exclude.SQUOTE_TOK not in exclude
             ):
                 if quote_char is not None:
                     words.append(quote_char)
@@ -774,7 +776,9 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
                     source.append(token)
                     sents.append(0 == i)
 
-            if not any(f in exclude for f in (Exclude.SQUOTE, Exclude.DQUOTE, Exclude.CITE)):
+            if not any(
+                f in exclude for f in (
+                    Exclude.SQUOTE, Exclude.DQUOTE, Exclude.CITE)):
                 nested = self.extract_words(
                     token.tokens, exclude=exclude)
                 words.extend(nested[0])
@@ -783,8 +787,10 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
                 sents.extend(nested[3])
 
             if (
-                QuoteType.DOUBLE == token.type_ and Exclude.DQUOTE_TOK not in exclude or
-                QuoteType.SINGLE == token.type_ and Exclude.SQUOTE_TOK not in exclude
+                QuoteType.DOUBLE == token.type_ and
+                Exclude.DQUOTE_TOK not in exclude or
+                QuoteType.SINGLE == token.type_ and
+                Exclude.SQUOTE_TOK not in exclude
             ):
                 if quote_char is not None:
                     words.append(quote_char)

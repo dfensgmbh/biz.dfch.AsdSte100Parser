@@ -22,8 +22,6 @@
 
 import unittest
 
-import time
-
 from biz.dfch.asdste100vocab import Vocab
 from biz.dfch.asdste100vocab import Word
 from biz.dfch.asdste100vocab import WordStatus
@@ -55,7 +53,7 @@ C) When you open the oven, make sure that you do not burn your skin. Do it in th
   2 Set the switch of the oven to 'OFF'.
   3 Carefully, open the door.
 CAUTION: This is a `safety` instruction without parentheses.
-D) Open the eenie-weenie self-inflating door.
+D) Open the smooth-rounded self-inflating door.
 E) The last work step (E).
 
 ## Descriptive Writing
