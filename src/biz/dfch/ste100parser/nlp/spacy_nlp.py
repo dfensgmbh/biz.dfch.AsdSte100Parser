@@ -25,7 +25,6 @@ from enum import StrEnum
 from threading import Lock
 from typing import ClassVar
 
-
 import spacy
 from spacy.language import Language
 from spacy.tokens import Doc

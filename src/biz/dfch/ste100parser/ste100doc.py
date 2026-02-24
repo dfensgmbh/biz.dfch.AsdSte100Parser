@@ -29,26 +29,6 @@ from .char import Char
 from .nlp.spacy_nlp import SpacyNlp
 from .serializer.text_interpreter import TextInterpreter
 from .serializer.token_base import TokenBase
-# from .serializer.token_base import Apostrophe
-# from .serializer.token_base import Code
-# from .serializer.token_base import CodeBlock
-# from .serializer.token_base import Format
-# from .serializer.token_base import ListItem
-# from .serializer.token_base import Multiply
-# from .serializer.token_base import NoteOrSafetyInstruction
-# from .serializer.token_base import Paragraph
-# from .serializer.token_base import Parentheses
-# from .serializer.token_base import Plural
-# from .serializer.token_base import ProcItem
-# from .serializer.token_base import Punct
-# from .serializer.token_base import Quote
-# from .serializer.token_base import SpecialText
-# from .serializer.token_base import Sentence
-# from .serializer.token_base import Text
-# from .serializer.token_base import Ws
-# from .serializer.token_base import Word
-# from .serializer.token_factory import TokenFactory
-# from .serializer.token_factory import from_lark_meta
 
 
 class Ste100Doc:
