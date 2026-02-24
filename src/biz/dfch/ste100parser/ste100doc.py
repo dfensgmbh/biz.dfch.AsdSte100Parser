@@ -56,11 +56,6 @@ class Ste100Doc:
 
         self._nlp = SpacyNlp.Factory.get_instance()
 
-    def get_text(self) -> str:
-        result = Char.EMPTY.join(
-            [item.text for item in self._items])
-        return result
-
     def __iter__(self) -> Iterator[TokenBase]:
         """This is an iterator over the tokens in the document."""
 
