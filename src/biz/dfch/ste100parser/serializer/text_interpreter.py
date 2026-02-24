@@ -28,9 +28,9 @@ from lark.visitors import Interpreter
 
 from biz.dfch.asdste100vocab import Vocab
 
-
 from ..char import Char as Character
 from ..note_or_safety_keyword import NoteOrSafetyKeyword
+from ..token_registry import TokenRegistry
 
 from .span import Span
 from .token_base import TokenBase
@@ -105,11 +105,13 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
 
     _parent: list[TokenBase]
     _vocab: Vocab
+    _token_registry: TokenRegistry
 
     def __init__(self, vocab: Vocab | None = None) -> None:
         super().__init__()
 
         self._parent = []
+        self._token_registry = TokenRegistry.Factory.get_instance()
         if vocab is None:
             self._vocab = Vocab(use_ste100=False)
         else:
@@ -185,6 +187,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             meta=tree.meta,
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
 
@@ -208,6 +211,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             tokens=[],
             level=int(level),
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(remaining)
         self._parent.pop()
@@ -226,6 +230,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1] if self._parent else None,  # type: ignore
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -241,6 +246,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1] if self._parent else None,  # type: ignore
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -276,6 +282,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             step=step,
             delimiter=delimiter,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(remaining)
         self._parent.pop()
@@ -308,6 +315,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             indent=int(indent),
             marker=marker,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(remaining)
         self._parent.pop()
@@ -343,6 +351,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             keyword=keyword,
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -381,6 +390,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
                 parent=self._parent[-1],
                 value=value,
             )
+            self._token_registry.add_or_update(ste100=result, lark=tree)
             return [result]
 
         text, punct = value[:-1], value[-1]
@@ -416,6 +426,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
                 parent=self._parent[-1],
                 value=str(value),
             )
+            self._token_registry.add_or_update(ste100=result, lark=tree)
             return [result]
         except ValueError:
             pass
@@ -425,6 +436,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             value=value,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -440,6 +452,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             value=value,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -455,6 +468,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             value=value,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -471,6 +485,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             value=int(value) * Character.SPACE,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -482,6 +497,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             meta=tree.meta,
             parent=self._parent[-1],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -493,6 +509,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             meta=tree.meta,
             parent=self._parent[-1],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -504,6 +521,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             meta=tree.meta,
             parent=self._parent[-1],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -525,6 +543,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -540,6 +559,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -555,6 +575,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -570,6 +591,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -585,6 +607,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -600,6 +623,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()
@@ -618,6 +642,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1],
             value=value,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -644,6 +669,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             value=value,
             language=language,
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
 
         return [result]
 
@@ -656,6 +682,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             parent=self._parent[-1] if self._parent else None,  # type: ignore
             tokens=[],
         )
+        self._token_registry.add_or_update(ste100=result, lark=tree)
         self._parent.append(result)
         result.tokens = self._get_items(tree.children)
         self._parent.pop()

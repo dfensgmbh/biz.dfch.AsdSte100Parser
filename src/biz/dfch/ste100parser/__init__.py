@@ -25,6 +25,7 @@ from .transformer import AsdSte1009Pass1Transformer
 from .transformer import AsdSte1009Pass2Transformer
 from .inspector import Inspector
 from .ste100doc import Ste100Doc
+from .token_registry import TokenRegistry
 
 
 __all__ = [
@@ -38,4 +39,5 @@ __all__ = [
     "ParserAction",
     "Ste100Doc",
     "Token",
+    "TokenRegistry",
 ]

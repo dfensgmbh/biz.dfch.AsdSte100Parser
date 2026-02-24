@@ -26,8 +26,9 @@ from typing import Callable
 from lark import Tree
 from lark.tree import Meta
 
-from ..ste100doc import Ste100Doc as Ste100DDoc
+from ..ste100doc import Ste100Doc
 from ..token import Token
+from ..token_registry import TokenRegistry
 
 from .span import Span
 from .token_base import TokenBase
@@ -85,6 +86,24 @@ class Ste100Serializer:
         children = Ste100Serializer._visit(token.tokens)
 
         result = Tree(token_name, children, from_span(token.span))
+
+        return result
+
+    @staticmethod
+    def sentence_token(token: TokenBase) -> Tree:
+        assert isinstance(token, Sentence), type(token)
+
+        token_name = Ste100Serializer._func_map[type(token)][1]
+
+        print(f"{token_name}: '{token.text}' [{type(token).__name__}]")
+
+        children = Ste100Serializer._visit(token.tokens)
+
+        result = Tree(token_name, children, from_span(token.span))
+        TokenRegistry.Factory.get_instance().add_or_update(
+            ste100=token,
+            lark=result,
+        )
 
         return result
 
@@ -208,7 +227,7 @@ class Ste100Serializer:
 
     _func_map: dict[type, tuple[_map, str]] = {
         TokenRoot: (list_token, Token.start.name),
-        Sentence: (list_token, Token.sentence.name),
+        Sentence: (sentence_token, Token.sentence.name),
         Heading: (heading, Token.heading.name),
         Paragraph: (list_token, Token.paragraph.name),
         Parentheses: (list_token, Token.paren.name),
@@ -249,7 +268,7 @@ class Ste100Serializer:
 
         return result
 
-    def to_lark_tree(self, doc: Ste100DDoc) -> list[Tree]:
+    def to_lark_tree(self, doc: Ste100Doc) -> list[Tree]:
         """
         Change the document into the lark tree.
 
@@ -259,7 +278,7 @@ class Ste100Serializer:
         :rtype: Tree[Any]
         """
 
-        assert isinstance(doc, Ste100DDoc), type(doc)
+        assert isinstance(doc, Ste100Doc), type(doc)
         assert 0 < len(doc), len(doc)
 
         children = self._visit(list(doc))

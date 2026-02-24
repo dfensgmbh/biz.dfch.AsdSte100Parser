@@ -31,6 +31,7 @@ from spacy.tokens import Doc, Span
 from biz.dfch.asdste100vocab import Vocab
 
 from ..ste100doc import Ste100Doc
+from ..token_registry import TokenRegistry
 from ..serializer.token_base import TokenBase
 from ..serializer.token_base import Paragraph
 from ..serializer.token_base import ListToken
@@ -60,6 +61,7 @@ class Sentencizer:
     _interpreter: TextInterpreter
     _inspector: Inspector
     _serializer: Ste100Serializer
+    _token_registry: TokenRegistry
 
     def __init__(self) -> None:
 
@@ -68,6 +70,7 @@ class Sentencizer:
         self._interpreter = TextInterpreter()
         self._inspector = Inspector()
         self._serializer = Ste100Serializer()
+        self._token_registry = TokenRegistry.Factory.get_instance()
 
     @staticmethod
     def get_child_of_container(
@@ -160,7 +163,11 @@ class Sentencizer:
             f"[p:{token_map[sent_text_tokens[-1].parent]:02}]"
         )
 
-        sentence = Sentence(sent_start.span, container, [])  # type: ignore
+        sentence = Sentence(sent_start.span, container, [])
+        assert not self._token_registry.get_or_default_ste100(
+            sentence), sentence
+        assert not self._token_registry.get_or_default_spacy(sent), sent
+        _ = self._token_registry.add_or_update(ste100=sentence, spacy=sent)
 
         first = token_map[sent_start]
         last = token_map[sent_text_tokens[-1]]
@@ -256,7 +263,10 @@ class Sentencizer:
 
         return ste100doc
 
-    def invoke(self, children: list, meta: Meta) -> list[Tree]:
+    def invoke(self, children: list[Tree], meta: Meta) -> list[Tree]:
+        """Find sentences inside a container token and rewrite the lark tree."""
+        assert isinstance(children, list), type(children)
+
         # I simulate that the contents of these children is inside a
         # paragraph.
         # DFTODO - maybe I should move the root token Tree into the
