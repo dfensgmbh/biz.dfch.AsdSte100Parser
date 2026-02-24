@@ -446,7 +446,7 @@ start
 
 # Format
 
-  * There a top-level tokens. These are tokens, that must be at the top-most hierarchical level of the text.
+  * There are top-level tokens. These are tokens, that must be at the top-most hierarchical level of the text.
   * There are tokens, that can only appear inside other tokens.
   * A text must end with two `NEWLINE` tokens.
 
