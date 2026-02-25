@@ -4,13 +4,12 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   build:
     name: Build distribution
+    permissions:
+        contents: read
+        id-token: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,6 +42,9 @@ jobs:
 
   publish-testpypi:
     name: Publish to TestPyPI
+    permissions:
+        contents: read
+        id-token: write
     needs: [build]
     runs-on: ubuntu-latest
     environment: testpypi
@@ -60,6 +62,9 @@ jobs:
 
   publish-pypi:
     name: Publish to PyPI
+    permissions:
+        contents: read
+        id-token: write
     needs: [publish-testpypi]
     runs-on: ubuntu-latest
     environment: pypi
