@@ -74,5 +74,5 @@ class TestInspector(unittest.TestCase):
 
         ste100doc = Ste100Doc(tokens)
         token_map = TokenMap()
-        inspect = Inspector()
+        inspect = Inspector(show_nlp=True)
         print(inspect.ste100doc(ste100doc, token_map))
