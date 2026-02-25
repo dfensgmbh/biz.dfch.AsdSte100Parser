@@ -23,9 +23,16 @@ import unittest
 
 from lark import Tree
 
-from biz.dfch.ste100parser.token_registry import TokenRegistry
+from biz.dfch.ste100parser.grammar import GrammarType
+from biz.dfch.ste100parser.inspector import Inspector
+from biz.dfch.ste100parser.parser import Parser
+from biz.dfch.ste100parser.parser import ParserAction
+from biz.dfch.ste100parser.ste100doc import Ste100Doc
+from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 from biz.dfch.ste100parser.serializer.token_base import Sentence
 from biz.dfch.ste100parser.serializer.token_base import Span
+from biz.dfch.ste100parser.token_registry import TokenRegistry
+from biz.dfch.ste100parser.serializer.token_base import TokenBase
 
 
 class TestTokenRegistry(unittest.TestCase):
@@ -93,3 +100,36 @@ class TestTokenRegistry(unittest.TestCase):
 
         self.assertIsNone(result1)
         self.assertIsNone(result2)
+
+    def test_token_is_in_registry(self):
+        text = """This is a paragraph with 2 main sentences.
+This is the 2nd sentence and this sentence has another sentence in parentheses (this is the "nested" sentence).
+"""
+        parser = Parser(GrammarType.ASD_STE100_9)
+        tree = parser.invoke(text, action=ParserAction.PASS2)
+        tokens = TextInterpreter().invoke(tree)
+        ste100doc = Ste100Doc(tokens)
+        self.assertIsNotNone(ste100doc)
+        structure = Inspector().ste100doc(ste100doc)
+        print(structure)
+
+        print(f"height: {ste100doc.get_height()}")
+        print(f"count : {ste100doc.get_count()}")
+
+        sentences: list[Sentence] = []
+
+        def func(token: TokenBase, level: int) -> bool:
+            nonlocal sentences
+            if isinstance(token, Sentence):
+                sentences.append(token)
+            return True
+
+        ste100doc.examine(func)
+        for sentence in sentences:
+            print(sentence.text)
+            token_registry = TokenRegistry.Factory.get_instance()
+            record = token_registry.get_or_default_ste100(sentence)
+            assert isinstance(record, TokenRegistry.Record), type(record)
+            for t in list(record.spacy):
+                print(f"'{t.text}' [{t.pos_}] [{t.dep_}]")
+                record_t = token_registry.get_or_default_spacy(t)
