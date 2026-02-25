@@ -133,18 +133,15 @@ class TokenRegistry:
 
         with self._sync_root:
             record_id: int | None = None
-            record_id_from_ste100: int | None = None
-            record_id_from_spacy: int | None = None
-            record_id_from_lark: int | None = None
             if record_id is None and ste100 is not None:
                 key = id(ste100)
-                record_id = record_id_from_ste100 = self._ste100_map.get(key)
+                record_id = self._ste100_map.get(key)
             if record_id is None and spacy is not None:
                 key = id(spacy)
-                record_id = record_id_from_spacy = self._spacy_map.get(key)
+                record_id = self._spacy_map.get(key)
             if record_id is None and lark is not None:
                 key = id(lark)
-                record_id = record_id_from_lark = self._lark_map.get(key)
+                record_id = self._lark_map.get(key)
 
             if record_id is None:
                 record = self.Record()
@@ -157,16 +154,13 @@ class TokenRegistry:
 
             if ste100 is not None:
                 record.ste100 = ste100
-                if record_id_from_ste100 is None:
-                    self._ste100_map[id(ste100)] = record_id
+                self._ste100_map[id(ste100)] = record_id
             if spacy is not None:
                 record.spacy = spacy
-                if record_id_from_spacy is None:
-                    self._spacy_map[id(spacy)] = record_id
+                self._spacy_map[id(spacy)] = record_id
             if lark is not None:
                 record.lark = lark
-                if record_id_from_lark is None:
-                    self._lark_map[id(lark)] = record_id
+                self._lark_map[id(lark)] = record_id
 
             return record
 
