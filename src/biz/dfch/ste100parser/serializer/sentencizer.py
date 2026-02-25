@@ -87,8 +87,8 @@ class Sentencizer:
 
         return None
 
-    @staticmethod
     def create_spacy_doc(
+        self,
         nlp: SpacyNlp,
         ste100doc: Ste100Doc,
         words: list[str],
@@ -247,6 +247,7 @@ class Sentencizer:
             spaces=extract[1],
             source=extract[2],
         )
+        assert len(extract[0]) == len(doc), f"{len(extract[0])}/{len(doc)}"
 
         token_count = -1
         for i, sent in enumerate(doc.sents):
