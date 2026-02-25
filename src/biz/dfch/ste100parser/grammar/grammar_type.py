@@ -26,4 +26,4 @@ class GrammarType(StrEnum):
     INT = "integer.lark"
     FP = "fp.lark"
     WORD = "word.lark"
-    CONTAINER = "container.lark"
+    ASD_STE100_9 = "asd_ste100_9.lark"

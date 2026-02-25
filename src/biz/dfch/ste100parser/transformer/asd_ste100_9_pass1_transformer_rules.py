@@ -18,23 +18,27 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""container_transformer_rules"""
+"""asd_ste100_9_pass1_transformer_rules"""
+
+from typing import Callable
 
 from lark import Tree
 from lark.tree import Meta
 
-from biz.dfch.ste100parser.token import Token
+from ..token import Token
+
+RuleType = tuple[list[Token], Callable[[..., Tree], Tree | list[Tree]], bool]
 
 
-class ContainerTransformerRules:
+class AsdSte1009Pass1TransformerRules:
     """
-    Rules for ContainerTransformer start.
+    Rules for pass 1 transformer: start.
 
     These rules remove NEWLINE and LINEBREAK between different rules.
     """
 
     @classmethod
-    def get_rules_paragraph(cls):
+    def get_rules_paragraph(cls) -> list[RuleType]:
         return [
             (
                 [Token.list_item, Token.LINEBREAK],
@@ -44,7 +48,7 @@ class ContainerTransformerRules:
         ]
 
     @classmethod
-    def get_rules_start(cls):
+    def get_rules_start(cls) -> list[RuleType]:
         return [
             (
                 [Token.NEWLINE, Token.NEWLINE, Token.heading],
@@ -119,6 +123,16 @@ class ContainerTransformerRules:
             (
                 [Token.NOTE, Token.NEWLINE, Token.NEWLINE],
                 lambda note, n1, n2: note,
+                False,
+            ),
+            (
+                [Token.code_block, Token.NEWLINE, Token.NEWLINE],
+                lambda code_block, n1, n2: code_block,
+                False,
+            ),
+            (
+                [Token.paragraph, Token.NEWLINE],
+                lambda para, _: para,
                 False,
             ),
         ]

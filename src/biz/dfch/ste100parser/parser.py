@@ -15,11 +15,22 @@
 
 """TestMain"""
 
+from enum import auto, Enum
 from pathlib import Path
 
 from lark import Lark, ParseTree
 
 from .grammar.grammar_type import GrammarType
+from .transformer import AsdSte1009Pass1Transformer
+from .transformer import AsdSte1009Pass2Transformer
+
+
+class ParserAction(Enum):
+    """Define parser action."""
+    PARSE = auto()
+    PASS1 = auto()
+    PASS2 = auto()
+    DEFAULT = PARSE
 
 
 class Parser:
@@ -27,13 +38,21 @@ class Parser:
 
     _lark: Lark
     _grammar: GrammarType
+    _pass1_transformer: AsdSte1009Pass1Transformer
+    _pass2_transformer: AsdSte1009Pass2Transformer
 
-    def __init__(self, grammar: GrammarType = GrammarType.DEFAULT):
-        """Default .ctor."""
+    def __init__(
+        self,
+        grammar: GrammarType = GrammarType.DEFAULT
+    ):
+        """Initializes a `Parser` instance with the specified `GrammarType`."""
 
-        assert isinstance(grammar, GrammarType) and grammar.strip()
+        assert isinstance(grammar, GrammarType), type(grammar)
+        assert grammar.strip()
 
         self._grammar = grammar
+        self._pass1_transformer = AsdSte1009Pass1Transformer()
+        self._pass2_transformer = AsdSte1009Pass2Transformer()
 
         path = Path("grammar") / grammar
         self._lark = Lark.open(
@@ -43,7 +62,10 @@ class Parser:
         )  # type: ignore
 
     def is_valid(self, text: str) -> bool:
-        """Returns True, if the text is valid. False, otherwise."""
+        """
+        Returns True, if the text is grammatically valid.
+        False, otherwise.
+        """
 
         try:
             self.invoke(text)
@@ -52,11 +74,42 @@ class Parser:
         except Exception:  # pylint: disable=W0718
             return False
 
-    def invoke(self, text: str) -> ParseTree:
-        """Invokes the parser."""
+    def invoke(
+        self,
+        text: str,
+        *,
+        action: ParserAction = ParserAction.DEFAULT,
+    ) -> ParseTree:
+        """
+        Parses the text based on the specified grammar.
 
-        assert isinstance(text, str) and text.strip()
+        Args:
+            text (str): The text to parse.
+            action (bool): See `ParseAction` for details.
+
+        Returns:
+            ParseTree: The `ParseTree` from `text`.
+        """
+
+        assert isinstance(text, str), type(text)
+        assert text.strip()
+        assert isinstance(action, ParserAction), type(action)
 
         result = self._lark.parse(text)  # type: ignore
 
+        if GrammarType.ASD_STE100_9 != self._grammar:
+            return result
+
+        if ParserAction.PARSE == action:
+            return result
+
+        pass1 = self._pass1_transformer.transform(result)
+        if ParserAction.PASS1 == action:
+            return pass1
+
+        pass2 = self._pass2_transformer.transform(pass1)
+        if ParserAction.PASS2 == action:
+            return pass2
+
+        result = pass2
         return result

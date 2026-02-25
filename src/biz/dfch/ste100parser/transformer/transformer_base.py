@@ -18,20 +18,14 @@
 
 """containers_transformer"""
 
-from dataclasses import dataclass
 
 from lark import Transformer, Tree
+
+from .transformer_configuration import TransformerConfiguration
 
 __all__ = [
     "TransformerBase",
 ]
-
-
-@dataclass
-class TransformerConfiguration():
-    """TransformerConfiguration"""
-
-    log: bool = False
 
 
 class TransformerBase(Transformer):
@@ -41,17 +35,15 @@ class TransformerBase(Transformer):
 
     def __init__(
         self,
-        cfg: TransformerConfiguration = TransformerConfiguration(),
-        log: bool = False,
-        visit_tokens: bool = True
+        cfg: TransformerConfiguration = TransformerConfiguration(
+            log=False,
+        ),
     ) -> None:
 
-        super().__init__(visit_tokens)
-
         assert isinstance(cfg, TransformerConfiguration)
+
         self._cfg = cfg
-        if log:
-            self._cfg.log = log
+        super().__init__(self._cfg.visit_tokens)
 
     def print(self, children, data: str = '') -> None:
         """Prints the token and its children."""

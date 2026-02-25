@@ -17,27 +17,27 @@
 # pylint: disable=W0212
 # type: ignore
 
-"""container_transformer"""
+"""asd_ste100_9_pass1_transformer"""
 
 from lark import Discard, lexer, Tree, v_args
 from lark.tree import Meta
 
-from biz.dfch.ste100parser.transformer.container_transformer_rules import (
-    ContainerTransformerRules
-)
-from biz.dfch.ste100parser.transformer.tree_rewriter import TreeRewriter
-
 from ..char import Char
 from ..token import Token
 
+from .asd_ste100_9_pass1_transformer_rules import (
+    AsdSte1009Pass1TransformerRules
+)
 from .transformer_base import TransformerBase
+from .transformer_configuration import TransformerConfiguration
+from .tree_rewriter import TreeRewriter
 
 __all__ = [
-    "ContainerTransformer",
+    "AsdSte1009Pass1Transformer",
 ]
 
 
-class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
+class AsdSte1009Pass1Transformer(TransformerBase):  # pylint: disable=R0904
     """
     Transformer for pass 1 (with significant white space).
 
@@ -49,6 +49,17 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
     Inside paragraph, there are still only TEXT and WS tokens (and no WORDs).
     """
+
+    def __init__(
+        self,
+        cfg: TransformerConfiguration = TransformerConfiguration(
+            log=True,
+        ),
+    ) -> None:
+
+        assert isinstance(cfg, TransformerConfiguration)
+
+        super().__init__(cfg)
 
     def _get_meta(self, node: lexer.Token) -> Meta:
         assert isinstance(node, lexer.Token)
@@ -167,6 +178,62 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         return result
 
     @v_args(meta=True)
+    def LANGUAGE(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), type(children)
+        assert isinstance(children.value, str)
+        value = children.value.strip()
+        assert "" != value, "Empty LANGUAGE in code_block found."
+
+        token = Token.LANGUAGE.name
+
+        result = Tree(token, [value])
+        return result
+
+    @v_args(meta=True)
+    def CODE_BLOCK(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token), type(children)
+        assert isinstance(children.value, str)
+        value = children.value
+
+        token = Token.CODE.name
+
+        result = Tree(token, [value])
+        return result
+
+    @v_args(meta=True)
+    def code_block(self, meta, children):
+        assert isinstance(children, list)
+        # Each code_block starts and stops with three back ticks.
+        assert 6 < len(children), len(children)
+
+        token = Token.code_block.name
+
+        s1, s2, s3, *mid, l1, l2, l3 = children
+
+        assert Char.CODE == s1
+        assert Char.CODE == s2
+        assert Char.CODE == s3
+        assert Char.CODE == l1
+        assert Char.CODE == l2
+        assert Char.CODE == l3
+
+        self.print(mid, token)
+
+        assert len(mid) in (1, 3), len(mid)
+        code = mid[-1]
+        if 3 == len(mid):
+            language = mid[0]
+        else:
+            language = Tree(Token.LANGUAGE.name, Char.EMPTY)
+
+        items = [
+            language,
+            code,
+        ]
+        result = Tree(token, items, meta=meta)
+        return result
+
+    @v_args(meta=True)
     def dquote(self, meta, children):
         return self._process_token_pair(
             children,
@@ -242,8 +309,23 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
+        length = children.value.count(
+            Char.SPACE) + children.value.count(
+            Char.TAB) * self._cfg.tab_size
         meta = self._get_meta(children)
-        result = Tree(token, [str(len(children))], meta=meta)
+        result = Tree(token, [str(length)], meta=meta)
+        return result
+
+    def PLURAL_S(self, children):  # pylint: disable=C0103
+        assert isinstance(children, lexer.Token)
+        assert 1 <= len(children)
+
+        token = Token.PLURAL_S.name
+
+        self.print(children, token)
+
+        meta = self._get_meta(children)
+        result = Tree(token, [f"{Char.CHAR_LOWER_S}"], meta=meta)
         return result
 
     def MULTIPLY(self, children):  # pylint: disable=C0103
@@ -506,7 +588,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
         ):
             children = children[:-1]
 
-        rules = ContainerTransformerRules().get_rules_paragraph()
+        rules = AsdSte1009Pass1TransformerRules().get_rules_paragraph()
         children = TreeRewriter().invoke(children, rules)
 
         result = Tree(token, children, meta=meta)
@@ -574,7 +656,7 @@ class ContainerTransformer(TransformerBase):  # pylint: disable=R0904
 
         self.print(children, token)
 
-        rules = ContainerTransformerRules().get_rules_start()
+        rules = AsdSte1009Pass1TransformerRules().get_rules_start()
         children = TreeRewriter().invoke(children, rules)
         self.print(children, token)
 

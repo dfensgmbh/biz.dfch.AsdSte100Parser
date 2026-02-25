@@ -86,13 +86,13 @@ class TestBold(TestCaseContainerBase):
     def test_single_fails(self):
         value = "*"
 
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
         self.assertFalse(result)
 
     def test_empty_fails(self):
         value = "**"
 
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
         self.assertFalse(result)
 
     def test_in_dquote(self):

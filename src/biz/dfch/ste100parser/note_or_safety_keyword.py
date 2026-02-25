@@ -13,24 +13,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""STE100 grammar."""
+# pylint: disable=C0103
+# pylint: disable=C0116
+# pylint: disable=W0212
 
-GRAMMAR = """
-start: sentence (SPACE sentence)*
-sentence: word COMMA? (SPACE word)* EOS_MID
-first_word: characters_upper characters_lower*
-word: characters+ | int | fp
-characters_upper: "A".."Z"
-characters_lower: "a".."z"
-characters: ( characters_upper | characters_lower )+
-SPACE: " "
-hyphen: "-"
-EOS: "." | "!" | "?"
-EOS_MID: EOS | ":"
-COMMA: ","
+"""Keyword class."""
 
-digit: "0" .. "9"
-uint: digit+
-int: "-"? uint
-fp: ("0" | int) "." uint
-"""
+from enum import StrEnum
+
+
+class NoteOrSafetyKeyword(StrEnum):
+    """ASD-STE100 keywords."""
+
+    NOTE = "NOTE"
+    WARNING = "WARNING"
+    CAUTION = "CAUTION"

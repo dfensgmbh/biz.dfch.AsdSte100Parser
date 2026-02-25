@@ -19,7 +19,7 @@
 """test_bold_emph"""
 
 from biz.dfch.ste100parser import GrammarType, Parser, Token
-from biz.dfch.ste100parser.transformer import ContainerTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
 
 from ...test_case_container_base import TestCaseContainerBase
 
@@ -44,46 +44,46 @@ class TestBoldEmph(TestCaseContainerBase):
     def test(self):
 
         value = "*_bold-emph text_* at the start"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_multi_line_fails(self):
 
         value = "*_some_code\nmore code_* "
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_single_open_fails(self):
         value = "*_"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_single_close_fails(self):
         value = "_*"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_empty_fails(self):
         value = "*__*"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 
     def test_in_dquote(self):
         value = '"*__*"'
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())
 
     def test_in_squote(self):
         value = "'*__*'"
-        initial = Parser(GrammarType.CONTAINER).invoke(value)
+        initial = Parser(GrammarType.ASD_STE100_9).invoke(value)
 
-        transformed = ContainerTransformer(log=True).transform(initial)
+        transformed = AsdSte1009Pass1Transformer().transform(initial)
         print(transformed.pretty())

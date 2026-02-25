@@ -23,6 +23,7 @@
     | proc
     | note
     | cite
+    | code_block
 
 // ---------- Top-level inline stream ----------
 ?inline_next: NEWLINE
@@ -152,6 +153,7 @@ NOTE_OR_SAFETY_LINE_START: NEWLINE
     | format_containers
     | code
     | quote_containers
+    | paren_sl
 ?note_or_safety_next.1: WS
     | note_or_safety_first
 
@@ -167,6 +169,7 @@ paragraph: paragraph_first_item paragraph_next_item*
 ?paragraph_next_item: SINGLE_NEWLINE
     | paragraph_item
 ?paragraph_item: WS
+    | note
     | paragraph_first_item
 // SINGLE_NEWLINE matches a NEWLINE only if NOT followed by another NEWLINE  
 // This uses a negative lookahead (?!\r?\n)  
@@ -191,10 +194,11 @@ LIST_MARKER_ALPHA_NUM: /[a-zA-Z0-9]+/
 
 ?proc.1: proc_line+
 ?proc_line: PROC_LINE_START proc_marker proc_delimiter proc_indent_suffix proc_item+
-?proc_item.1: WS  
-    | format_containers  
-    | quote_containers  
-    | paren_sl  
+?proc_item.1: WS
+    | format_containers
+    | code
+    | quote_containers
+    | paren_sl
     | common_text
     | list
     | note_or_safety_instruction
@@ -209,24 +213,30 @@ PROC_DELIMITER: /[.)]/
 
 // ---------- Parentheses can be nested. ----------
 // Multi line container. Use outside single line containers.
-paren: PAREN_OPEN paren_item_ml* PAREN_CLOSE
-?paren_item_ml: NEWLINE
-    | paren_item_sl
+paren: PAREN_OPEN paren_item_first paren_item_ml_next* PAREN_CLOSE
+?paren_item_ml_next: NEWLINE
+    | paren_item_sl_next
 // Single line container. Use it within single line containers.
-paren_sl: PAREN_OPEN paren_item_sl* PAREN_CLOSE
-?paren_item_sl: WS
-    | format_containers
+paren_sl: PAREN_OPEN paren_item_first paren_item_sl_next* PAREN_CLOSE
+?paren_item_first: format_containers
+    | code
     | quote_containers
-    | paren
+    | paren_sl
     | common_text
+?paren_item_sl_next: WS
+    | paren_item_first
 
 // ---------- Code (literal until ending backtick) ----------
 code: BACK_TICK CODE BACK_TICK
 
+code_block: BACK_TICK BACK_TICK BACK_TICK (LANGUAGE? NEWLINE)? CODE_BLOCK BACK_TICK BACK_TICK BACK_TICK
+
 // ---------- Terminals ----------
 
 // Highest priority: code and year abbreviations
-CODE.40: /[^`]+/
+CODE.40: /[^`\n]+/
+LANGUAGE: /[^` \n]+/
+CODE_BLOCK.41: /[^`]+/
 YEAR_SHORT.40: /'\d{2}s?(?=[\s.,!?;:]|$)/
 
 // Plural (s) - Matches (s) if preceded by a letter  

@@ -66,7 +66,7 @@ class TestEmph(TestCaseContainerBase):
 
     def test_single_fails(self):
         value = "_"
-        result = Parser(GrammarType.CONTAINER).is_valid(value)
+        result = Parser(GrammarType.ASD_STE100_9).is_valid(value)
 
         self.assertFalse(result)
 

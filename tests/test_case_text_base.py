@@ -19,8 +19,8 @@
 """test_case_text_base"""
 
 from biz.dfch.ste100parser import GrammarType, Parser
-from biz.dfch.ste100parser.transformer import ContainerTransformer
-from biz.dfch.ste100parser.transformer import TextTransformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass1Transformer
+from biz.dfch.ste100parser.transformer import AsdSte1009Pass2Transformer
 from biz.dfch.ste100parser.transformer import TokenConverter
 
 from tests.test_case_base import TestCaseBase
@@ -30,20 +30,21 @@ class TestCaseTextBase(TestCaseBase):
 
     _parser = None
 
-    pass1_transformer: ContainerTransformer
-    transformer: TextTransformer
+    pass1_transformer: AsdSte1009Pass1Transformer
+    pass2_transformer: AsdSte1009Pass2Transformer
+    # pass2_transformer: TextTransformer
     converter: TokenConverter
 
     @classmethod
     def setUpClass(cls) -> None:
         if cls._parser is None:
-            cls._parser = Parser(GrammarType.CONTAINER)
+            cls._parser = Parser(GrammarType.ASD_STE100_9)
 
     def setUp(self):
         """Initialize fresh transformer and converter for every test."""
-        self.pass1_transformer = ContainerTransformer()
-        # self.transformer = TextTransformer(log=True)
-        self.transformer = TextTransformer()
+        self.pass1_transformer = AsdSte1009Pass1Transformer()
+        # self.pass2_transformer = TextTransformer(log=True)
+        self.pass2_transformer = AsdSte1009Pass2Transformer()
         self.converter = TokenConverter()
 
     def invoke(self, value: str):
@@ -51,4 +52,4 @@ class TestCaseTextBase(TestCaseBase):
 
     def transform(self, parse_tree):
         pass1 = self.pass1_transformer.transform(parse_tree)
-        return self.transformer.transform(pass1)  # type: ignore
+        return self.pass2_transformer.transform(pass1)  # type: ignore

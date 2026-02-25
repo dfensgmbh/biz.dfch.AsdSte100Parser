@@ -1,0 +1,135 @@
+# Copyright (C) 2026 Ronald Rink, d-fens GmbH, http://d-fens.ch
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# pylint: disable=C0103
+# pylint: disable=C0116
+# pylint: disable=W0212
+
+"""Inspector."""
+
+from spacy.tokens import Span
+
+from .char import Char
+from .ste100doc import Ste100Doc
+from .string_builder import StringBuilder
+from .token_map import TokenMap
+
+from .serializer.token_base import EmptyToken
+from .serializer.token_base import ListToken
+from .serializer.token_base import TokenBase
+from .serializer.token_base import ValueToken
+from .serializer.token_base import Sentence
+
+from .token_registry import TokenRegistry
+
+
+class Inspector:
+    """Inspect STE100 token trees."""
+
+    _token_registry: TokenRegistry
+    _show_nlp: bool
+    _indent: int
+    _delimiter: str
+
+    def __init__(
+        self, show_nlp: bool = False,
+        indent: int = 1,
+        delimiter: str = ". "
+    ) -> None:
+        assert isinstance(show_nlp, bool), type(show_nlp)
+        assert isinstance(indent, int), type(indent)
+        assert 0 <= indent, indent
+        assert isinstance(delimiter, str), type(delimiter)
+        assert 0 < len(delimiter), len(delimiter)
+
+        self._token_registry = TokenRegistry.Factory.get_instance()
+
+        self._show_nlp = show_nlp
+        self._indent = indent
+        self._indent = indent
+        self._delimiter = delimiter
+
+    def ste100doc(
+        self,
+        doc: Ste100Doc,
+        token_map: TokenMap | None = None
+    ) -> str:
+        assert isinstance(doc, Ste100Doc), type(Ste100Doc)
+
+        if isinstance(token_map, TokenMap):
+            map_ = token_map
+        else:
+            map_ = TokenMap()
+
+        def process(
+            tokens: list[TokenBase],
+            level: int,
+            delimiter: str = Char.SPACE
+        ) -> StringBuilder:
+
+            assert isinstance(tokens, list), type(tokens)
+            assert isinstance(level, int), type(level)
+            assert 0 <= level, level
+            assert isinstance(delimiter, str), type(delimiter)
+            assert 0 < len(delimiter), len(delimiter)
+
+            result = StringBuilder()
+
+            leading_indent: str = (level * self._indent) * delimiter
+            count_ = len(tokens)
+            for i, t in enumerate(tokens):
+                if isinstance(t, (EmptyToken, ValueToken)):
+                    result.append_line(
+                        f"[{level:02}:{count_:02}:{i:02}]{leading_indent}"
+                        f"'{t.text}' [{type(t).__name__}] "
+                        f"[id:{map_[t]:02}]"
+                        f"[p:{map_[t.parent]:02}] "
+                    )
+                    continue
+
+                if isinstance(t, ListToken):
+                    result.append_line(
+                        f"[{level:02}:{count_:02}:{i:02}]{leading_indent}"
+                        f"[{type(t).__name__}] "
+                        f"[id:{map_[t]:02}]"
+                        f"[p:{map_[t.parent]:02}] "
+                        f"[#{len(t.tokens)}]"
+                    )
+
+                    if isinstance(t, Sentence):
+                        record = self._token_registry.get_or_default_ste100(t)
+                        if (
+                            isinstance(record, TokenRegistry.Record) and
+                            isinstance(record.spacy, Span)
+                        ):
+                            result.append(
+                                f"[{level:02}:{count_:02}:{i:02}]"
+                                f"{leading_indent}")
+                            for st in list(record.spacy):
+                                result.append(
+                                    f"'{st.text}' [{st.pos_}] [{st.dep_}] ")
+                            result.append_line()
+
+                    result.extend(process(t.tokens, level + 1, delimiter))
+
+            return result
+
+        result = StringBuilder()
+        result.append_line("[level:total:index]")
+
+        tokens = list(doc)
+        result.extend(process(tokens, 0, self._delimiter))
+
+        return result.to_string()
