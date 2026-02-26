@@ -776,6 +776,10 @@ Is this _not_ permitted (because it is a noun and not a technical noun): "cleani
 
 # ASD-STE100 Dictionary
 
+## Parentheses (TN)
+
+Why is the plural form given? Why not the singular form?
+
 ## safety-clip
 
 # R8.4 STE Example
