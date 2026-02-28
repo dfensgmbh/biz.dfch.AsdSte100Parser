@@ -275,27 +275,27 @@ class TokenRegistry:
 
     #         return result
 
-    def get_or_add_lark(
-        self,
-        token: Tree,
-    ) -> Record:
-        """Get a `Record` from a lark token."""
-        assert isinstance(token, Tree), type(token)
+    # def get_or_add_lark(
+    #     self,
+    #     token: Tree,
+    # ) -> Record:
+    #     """Get a `Record` from a lark token."""
+    #     assert isinstance(token, Tree), type(token)
 
-        key = id(token)
-        with self._sync_root:
-            record_id = self._lark_map.get(key, None)
-            if record_id is None:
-                record = self.Record()
-                record_id = id(record_id)
-                record.lark = token
-                self._lark_map[key] = record_id
-                self._record_map[record_id] = record
-                return record
+    #     key = id(token)
+    #     with self._sync_root:
+    #         record_id = self._lark_map.get(key, None)
+    #         if record_id is None:
+    #             record = self.Record()
+    #             record_id = id(record_id)
+    #             record.lark = token
+    #             self._lark_map[key] = record_id
+    #             self._record_map[record_id] = record
+    #             return record
 
-            record = self._record_map.get(record_id)
-            assert record is not None, token
-            return record
+    #         record = self._record_map.get(record_id)
+    #         assert record is not None, token
+    #         return record
 
     def remove_ste100(
         self,
