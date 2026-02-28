@@ -90,11 +90,6 @@ class SpacyNlp:  # pylint: disable=R0903
         self._nlp = spacy.load(self._model_name)
         self.vocab = self._nlp.vocab
         self.ste100_vocab = Ste100Vocab()
-        self._nlp.add_pipe(
-            "word_matcher",
-            before="ner"
-        )
-
         self.vocab = self._nlp.vocab
 
         SpacyNlp._register_ste100_extensions()
