@@ -53,7 +53,7 @@ class Sentencizer:
     Identify sentences in a list of text tokens.
 
     This is our approach to divide text into sentences. We identify parentheses
-    first and the process block tokens.
+    first and then process block tokens.
     """
 
     _nlp: SpacyNlp

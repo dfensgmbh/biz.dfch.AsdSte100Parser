@@ -16,43 +16,51 @@
 # pylint: disable=R0903
 
 """
-R8.1: You can use all standard English punctuation marks
-but not the semicolon (;).
+Displays a spaCy sentence with displacy.
 """
 
-from ..char import Char
-from ..serializer.token_base import Punct
+from spacy import displacy
+from spacy.tokens import Span
 
 from ..rule_registry import rule
 from ..rule_registry import Rule
 from ..rule_registry import RuleContext
 from ..rule_registry import RulePriority
 from ..rule_registry import TestResult
-from ..rule_registry import TestResultSeverity
 
-from .ste100_rules import Ste100Rules
+from ..token_registry import TokenRegistry
+
+from ..serializer.token_base import TokenBase
+from ..serializer.token_base import Sentence
 
 
-@rule("R8.1", token_types=[Punct], priority=RulePriority.HIGHER)
-class DoNotUseSemicolon(Rule):
+@rule("C0.0", token_types=[Sentence], priority=RulePriority.HIGHEST)
+class DisplacySentence(Rule):
     """
-    You can use all standard English punctuation marks
-    but not the semicolon (;).
+    Displays a spaCy sentence with displacy.
     """
 
-    def examine(self, token: Punct, context: RuleContext) -> list[TestResult]:
+    _registry: TokenRegistry
+
+    def __init__(self) -> None:
+        self._registry = TokenRegistry.Factory.get_instance()
+
+    def examine(
+        self,
+        token: TokenBase,
+        context: RuleContext
+    ) -> list[TestResult]:
         super().examine(token, context)
 
         result: list[TestResult] = []
 
-        if Char.SEMICOLON != token.text:
-            return result
+        record = context.token_registry.get_or_default_ste100(token)
+        assert record is not None
+        assert isinstance(record.spacy, Span), type(record.spacy)
 
-        result.append(TestResult(
-            rule_id=self.rule_id,
-            token=token,
-            severity=TestResultSeverity.ERROR,
-            message=Ste100Rules.R8_1,
-            suggestion=""))
+        for t in record.spacy:
+            print(f"'{t.text}' [{t.pos_}] [{t.dep_}]")
+
+        displacy.render(record.spacy, style="dep", jupyter=True)
 
         return result
