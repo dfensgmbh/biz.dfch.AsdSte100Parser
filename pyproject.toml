@@ -67,6 +67,7 @@ dev = [
     "biz-dfch-ste100parser[test]",
     "black",
     "build",
+    "ipykernel",
     "mypy",
     "parameterized>=0.9.0",
     "twine"
