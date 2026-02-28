@@ -22,8 +22,6 @@ but not the semicolon (;).
 
 from ..char import Char
 from ..serializer.token_base import Punct
-from ..serializer.token_base import Heading
-from ..serializer.token_base import TokenRoot
 
 from ..rule_registry import rule
 from ..rule_registry import Rule
