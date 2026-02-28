@@ -36,6 +36,7 @@ from .span import Span
 from .token_base import TokenBase
 from .token_base import TokenRoot
 from .token_base import Paragraph
+from .token_base import ProcItem
 from .token_base import Sentence
 
 from .token_base import NoteOrSafetyInstruction
@@ -180,8 +181,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         )
 
     def start(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.start")
-        assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.TokenRoot(
             meta=tree.meta,
@@ -194,8 +193,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def heading(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.heading")
-        print(tree.pretty())
         assert isinstance(tree, Tree), type(tree)
 
         level_tree, *remaining = tree.children
@@ -222,7 +219,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return Discard  # type: ignore
 
     def paragraph(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.paragraph")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Paragraph(
@@ -238,7 +234,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def sentence(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.sentence")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Sentence(
@@ -254,7 +249,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def proc_item(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.proc_item")
         assert isinstance(tree, Tree), type(tree)
 
         step_tree, delimiter_tree, *remaining = tree.children
@@ -290,7 +284,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def list_item(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.list_item")
         assert isinstance(tree, Tree), type(tree)
 
         indent_tree, marker_tree, *remaining = tree.children
@@ -323,17 +316,14 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def WARNING(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.WARNING")
         return self._note_or_safety_instruction(
             tree, NoteOrSafetyKeyword.WARNING)
 
     def CAUTION(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.CAUTION")
         return self._note_or_safety_instruction(
             tree, NoteOrSafetyKeyword.CAUTION)
 
     def NOTE(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.NOTE")
         return self._note_or_safety_instruction(
             tree, NoteOrSafetyKeyword.NOTE)
 
@@ -375,7 +365,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return result
 
     def TEXT(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.TEXT")
         assert isinstance(tree, Tree), type(tree)
         assert 1 == len(tree.children), len(tree.children)
         value = tree.children[0]
@@ -397,7 +386,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         if punct in (
             Character.DOT, Character.COMMA,
             Character.EXCLAMATION, Character.QUESTION,
-            Character.COLON
+            Character.COLON, Character.SEMICOLON,
         ):
             # When a punctuation follows parentheses or quotes or formatters,
             # the TEXT token consists of only one character.
@@ -441,7 +430,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def APOSTROPHE(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.APOSTROPHE")
         assert isinstance(tree, Tree), type(tree)
         assert 1 == len(tree.children), len(tree.children)
         value = tree.children[0]
@@ -457,7 +445,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def CHAR(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.CHAR")
         assert isinstance(tree, Tree), type(tree)
         assert 1 == len(tree.children), len(tree.children)
         value = tree.children[0]
@@ -473,7 +460,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def WS(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.WS")
+        # (f"TextInterpreter.WS")
         assert isinstance(tree, Tree), type(tree)
         assert 1 == len(tree.children), len(tree.children)
         value = tree.children[0]
@@ -490,7 +477,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def PLURAL_S(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.PLURAL_S")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Plural(
@@ -502,7 +488,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def MULTIPLY(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.MULTIPLY")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Multiply(
@@ -514,7 +499,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def LINEBREAK(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.LINEBREAK")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.LineBreak(
@@ -535,7 +519,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         )
 
     def dquote(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.dquote")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Dquote(
@@ -551,7 +534,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def squote(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.squote")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Squote(
@@ -567,7 +549,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def cite(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.cite")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Cite(
@@ -583,7 +564,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def bold(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.bold")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Bold(
@@ -599,7 +579,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def emph(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.emph")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Emph(
@@ -615,7 +594,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def bold_emph(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.bold_emph")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.BoldEmph(
@@ -631,7 +609,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def CODE(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.CODE")
         assert isinstance(tree, Tree), type(tree)
         assert 1 == len(tree.children), len(tree.children)
         value = tree.children[0]
@@ -647,7 +624,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def code_block(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.code_block")
         assert isinstance(tree, Tree), type(tree)
         assert 2 == len(tree.children), len(tree.children)
 
@@ -674,7 +650,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
         return [result]
 
     def paren(self, tree) -> list[TokenBase]:
-        # print(f"TextInterpreter.paren")
         assert isinstance(tree, Tree), type(tree)
 
         result = TokenFactory.Parentheses(
@@ -814,6 +789,7 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             Number: process_value_token,
             TokenRoot: process_list_token,
             Paragraph: process_list_token,
+            ProcItem: process_list_token,
             # Heading: process_list_token,
             Format: process_list_token,
             Code: process_value_token,
@@ -831,7 +807,6 @@ class TextInterpreter(Interpreter):  # pylint: disable=R0904
             mapping(token)
 
         print(words)
-        print(spaces)
         assert len(words) == len(spaces)
         assert len(words) == len(source)
         assert len(words) == len(sents)
