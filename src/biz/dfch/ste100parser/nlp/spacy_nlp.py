@@ -29,7 +29,11 @@ import spacy
 from spacy.language import Language
 from spacy.tokens import Doc
 from spacy.tokens import Token
+from spacy.util import registry
 from spacy.vocab import Vocab  # pylint: disable=E0611
+
+from biz.dfch.asdste100vocab.vocab import Vocab as Ste100Vocab
+from .word_matcher import WordMatcher
 
 
 class SpacyExtension(StrEnum):
@@ -39,11 +43,28 @@ class SpacyExtension(StrEnum):
     ste100_token = "ste100_token"
 
 
-@Language.component("ste100_sentencizer")
-def ste100_sentencizer(doc: Doc) -> Doc:
-    assert isinstance(doc, Doc), type(doc)
+@registry.misc("load_vocabulary.v1")
+def load_vocabulary():
+    return Ste100Vocab()
 
-    return doc
+
+@Language.factory("word_matcher")
+def word_matcher_factory(nlp, name, vocab):
+    assert isinstance(nlp, Language), type(nlp)
+    assert isinstance(name, str), type(name)
+    assert name.strip()
+    assert isinstance(vocab, Ste100Vocab), type(vocab)
+
+    pipeline = WordMatcher(vocab)
+
+    return pipeline
+
+
+# @Language.component("word_matcher")
+# def word_matcher(doc: Doc) -> Doc:
+#     assert isinstance(doc, Doc), type(doc)
+
+#     return doc
 
 
 class SpacyNlp:  # pylint: disable=R0903
@@ -67,7 +88,12 @@ class SpacyNlp:  # pylint: disable=R0903
 
         self._model_name = model_name
         self._nlp = spacy.load(self._model_name)
-        self._nlp.add_pipe("ste100_sentencizer", before="ner")
+        self.vocab = self._nlp.vocab
+        self.ste100_vocab = Ste100Vocab()
+        self._nlp.add_pipe(
+            "word_matcher",
+            before="ner"
+        )
 
         self.vocab = self._nlp.vocab
 
