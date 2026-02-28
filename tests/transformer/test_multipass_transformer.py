@@ -40,6 +40,8 @@ from biz.dfch.ste100parser.serializer.token_base import ListToken
 from biz.dfch.ste100parser.rule_registry import RuleRegistry
 from biz.dfch.ste100parser.rule_registry import RuleContext
 
+from biz.dfch.ste100parser.token_registry import TokenRegistry
+
 
 class TestMultiPassTransformer(unittest.TestCase):
 
@@ -136,7 +138,8 @@ Praesent sit amet nunc volutpat lacus eleifend ornare;
         structure = inspector.ste100doc(doc)
         print(structure)
 
-        rule_context = RuleContext(vocab)
+        token_registry = TokenRegistry.Factory.get_instance()
+        rule_context = RuleContext(vocab, token_registry)
         rule_registry = RuleRegistry()
         rule_registry.install_rules("biz.dfch.ste100parser.rule_repository")
 

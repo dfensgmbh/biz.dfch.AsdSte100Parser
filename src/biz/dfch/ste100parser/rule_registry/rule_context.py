@@ -20,9 +20,12 @@ from dataclasses import dataclass
 
 from biz.dfch.asdste100vocab import Vocab
 
+from ..token_registry import TokenRegistry
+
 
 @dataclass
 class RuleContext:
     """Give more information for the `Rule`."""
 
     vocab: Vocab
+    token_registry: TokenRegistry

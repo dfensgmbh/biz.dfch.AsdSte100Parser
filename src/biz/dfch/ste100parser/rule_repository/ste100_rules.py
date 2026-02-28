@@ -13,19 +13,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""TestResult class."""
+"""Rule repository."""
 
-from dataclasses import dataclass
+# flake8: noqa: E501
+# pylint: disable=C0301
 
-from ..serializer.token_base import TokenBase
-from .test_result_severity import TestResultSeverity
+from enum import StrEnum
 
 
-@dataclass
-class TestResult:
-    """This is the result of a rule check."""
-    rule_id: str
-    token: TokenBase
-    severity: TestResultSeverity
-    message: str
-    suggestion: str
+class Ste100Rules(StrEnum):
+    """These are the rules from ASD-STE100 Issue 9."""
+
+    R3_6 = "Use the active voice. In descriptive writing, you can use the passive voice only when the agent is unknown."
+    R5_3 = "Write instructions in the imperative (command) form."
+    R8_1 = "The semicolon (;) is not permitted in STE because it lets you write very long sentences. It is also not easy to use correctly. As an alternative to the semicolon, always write two different sentences."
