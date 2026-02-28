@@ -38,6 +38,7 @@ class Char(StrEnum):
     EXCLAMATION = '!'
     COMMA = ','
     COLON = ':'
+    SEMICOLON = ';'
 
     PAREN_OPEN = '('
     PAREN_CLOSE = ')'
