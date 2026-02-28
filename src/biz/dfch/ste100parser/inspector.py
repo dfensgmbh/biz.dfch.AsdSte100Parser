@@ -19,6 +19,7 @@
 
 """Inspector."""
 
+from spacy.tokens import Span
 
 from .char import Char
 from .ste100doc import Ste100Doc
@@ -29,20 +30,34 @@ from .serializer.token_base import EmptyToken
 from .serializer.token_base import ListToken
 from .serializer.token_base import TokenBase
 from .serializer.token_base import ValueToken
+from .serializer.token_base import Sentence
+
+from .token_registry import TokenRegistry
 
 
 class Inspector:
     """Inspect STE100 token trees."""
 
+    _token_registry: TokenRegistry
+    _show_nlp: bool
     _indent: int
     _delimiter: str
 
-    def __init__(self, indent: int = 1, delimiter: str = ". ") -> None:
+    def __init__(
+        self, show_nlp: bool = False,
+        indent: int = 1,
+        delimiter: str = ". "
+    ) -> None:
+        assert isinstance(show_nlp, bool), type(show_nlp)
         assert isinstance(indent, int), type(indent)
         assert 0 <= indent, indent
         assert isinstance(delimiter, str), type(delimiter)
         assert 0 < len(delimiter), len(delimiter)
 
+        self._token_registry = TokenRegistry.Factory.get_instance()
+
+        self._show_nlp = show_nlp
+        self._indent = indent
         self._indent = indent
         self._delimiter = delimiter
 
@@ -92,8 +107,23 @@ class Inspector:
                         f"[p:{map_[t.parent]:02}] "
                         f"[#{len(t.tokens)}]"
                     )
+
+                    if isinstance(t, Sentence):
+                        record = self._token_registry.get_or_default_ste100(t)
+                        if (
+                            isinstance(record, TokenRegistry.Record) and
+                            isinstance(record.spacy, Span)
+                        ):
+                            result.append(
+                                f"[{level:02}:{count_:02}:{i:02}]"
+                                f"{leading_indent}")
+                            for st in list(record.spacy):
+                                result.append(
+                                    f"'{st.text}' [{st.pos_}] [{st.dep_}] ")
+                            result.append_line()
+
                     result.extend(process(t.tokens, level + 1, delimiter))
-                    continue
+
             return result
 
         result = StringBuilder()

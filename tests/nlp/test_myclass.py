@@ -43,20 +43,7 @@ from biz.dfch.ste100parser.token_map import TokenMap
 from biz.dfch.ste100parser.nlp import SpacyNlp
 
 from biz.dfch.ste100parser.serializer.token_base import TokenBase
-from biz.dfch.ste100parser.serializer.token_base import TokenRoot
-from biz.dfch.ste100parser.serializer.token_base import ListToken
-from biz.dfch.ste100parser.serializer.token_base import Paragraph
 from biz.dfch.ste100parser.serializer.token_base import Sentence
-from biz.dfch.ste100parser.serializer.token_base import Text
-from biz.dfch.ste100parser.serializer.token_base import Parentheses
-from biz.dfch.ste100parser.serializer.token_base import Punct
-from biz.dfch.ste100parser.serializer.token_base import Number
-from biz.dfch.ste100parser.serializer.token_base import Ws
-from biz.dfch.ste100parser.serializer.token_base import Format
-from biz.dfch.ste100parser.serializer.token_base import Quote
-from biz.dfch.ste100parser.serializer.token_base import QuoteType
-from biz.dfch.ste100parser.serializer.token_factory import TokenFactory
-from biz.dfch.ste100parser.serializer.token_factory import from_lark_meta
 from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 from biz.dfch.ste100parser.serializer.text_interpreter import Exclude
 
@@ -68,7 +55,7 @@ def is_possible_eos(abbrev: Token, min_token: int, max_token: int) -> bool:
     assert isinstance(max_token, int) and 0 <= max_token
 
     # When the abbreviation is not within both tokens, it is not end-of-sentence.
-    if False == min_token < abbrev.i < max_token:
+    if not min_token < abbrev.i < max_token:
         return False
 
     # When there is a token dependency after our abbreviation, it is not end-of-sentence.
@@ -89,8 +76,8 @@ def find_eos_token_index(abbrevs: list[Token], min_token: int, max_token: int) -
         print("Nothing found. Trying reverse order.")
         candidates.clear()
         for abbrev in abbrevs:
-            candidates[abbrev.i] = is_possible_eos(
-                abbrev, max_token, min_token)  # pylint: disable=W1114
+            candidates[abbrev.i] = is_possible_eos(  # pylint: disable=W1114
+                abbrev, max_token, min_token)
 
     if not any(c for c in candidates.values() if True is c):
         print("No candidates found.")
@@ -166,48 +153,6 @@ def get_child_of_container(
         token = token.parent
 
     return None
-
-
-class TestInspector(unittest.TestCase):
-
-    def test_inspector_full(self):
-        text = r"""*This* _is_ an *in-flight* *_text_* from the U.K. """ \
-            r"""with (something in) parentheses. """ \
-            r"""And here is another sentence """ \
-            r"""(*which* does not make sense (sic!)). """
-
-        vocab = Vocab(use_ste100=True)
-        vocab.append(Word(
-            name="U.K.",
-            status=WordStatus.APPROVED,
-            type_=WordType.NOUN,
-            source="custom001",
-            category=WordCategory.ROLES_GROUPS,
-        ))
-        vocab.append(Word(
-            name="in-flight",
-            status=WordStatus.APPROVED,
-            type_=WordType.ADJECTIVE,
-            source="custom001",
-            category=WordCategory.VEHICLES_MACHINES,
-        ))
-        parser = Parser(GrammarType.ASD_STE100_9)
-        tree = parser.invoke(text, action=ParserAction.PASS2)
-
-        interpreter = TextInterpreter(vocab)
-        tokens = interpreter.invoke(tree)
-        # We start at Paragraph
-        tokens = tokens[0].tokens  # type: ignore
-        container_token = tokens[0]
-        self.assertIsInstance(tokens, list)
-        self.assertTrue(0 < len(tokens))
-        print("#### 1")
-        print(tokens)
-
-        ste100doc = Ste100Doc(tokens)
-        token_map = TokenMap()
-        inspect = Inspector()
-        print(inspect.ste100doc(ste100doc, token_map))
 
 
 class TestMyClass(unittest.TestCase):

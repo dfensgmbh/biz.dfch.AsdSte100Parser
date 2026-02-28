@@ -34,6 +34,12 @@ from biz.dfch.ste100parser import ParserAction
 from biz.dfch.ste100parser import Ste100Doc
 from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 
+from biz.dfch.ste100parser.serializer.token_base import TokenBase
+from biz.dfch.ste100parser.serializer.token_base import ListToken
+
+from biz.dfch.ste100parser.rule_registry import RuleRegistry
+from biz.dfch.ste100parser.rule_registry import RuleContext
+
 
 class TestMultiPassTransformer(unittest.TestCase):
 
@@ -50,7 +56,7 @@ B) Work step B
 WARNING: This is a *safety* instruction (with parentheses).
 C) When you open the oven, make sure that you do not burn your skin. Do it in this order:
   1 Put on protective gear. A heat resistant glove gives best protection.
-  2 Set the switch of the oven to 'OFF'.
+  2 Set the switch of the oven to 'OFF';
   3 Carefully, open the door.
 CAUTION: This is a `safety` instruction without parentheses.
 D) Open the smooth-rounded self-inflating door.
@@ -77,7 +83,7 @@ Aliquam ullamcorper malesuada ultricies.
 Nullam lacinia, ligula vel ultricies rutrum, lorem libero luctus neque, ut feugiat est justo vel sapien. 
 Etiam suscipit mi vel sollicitudin vestibulum. 
 Mauris feugiat volutpat quam sed venenatis. 
-Praesent sit amet nunc volutpat lacus eleifend ornare. 
+Praesent sit amet nunc volutpat lacus eleifend ornare; 
 """
 
     def test_pass1(self):
@@ -110,3 +116,40 @@ Praesent sit amet nunc volutpat lacus eleifend ornare.
         inspector = Inspector()
         structure = inspector.ste100doc(doc)
         print(structure)
+
+    def test_rules(self):
+        text = self.text
+        parser = Parser(GrammarType.ASD_STE100_9)
+        tree = parser.invoke(text, action=ParserAction.PASS2)
+        print(tree.pretty())
+
+        vocab = Vocab()
+        vocab.append(word=Word(
+            name="eenie-weenie",
+            status=WordStatus.APPROVED,
+            type_=WordType.TECHNICAL_NOUN,
+        ))
+        interpreter = TextInterpreter(vocab=vocab)
+        tokens = interpreter.invoke(tree)
+        doc = Ste100Doc(tokens)
+        inspector = Inspector()
+        structure = inspector.ste100doc(doc)
+        print(structure)
+
+        rule_context = RuleContext(vocab)
+        rule_registry = RuleRegistry()
+        rule_registry.install_rules("biz.dfch.ste100parser.rule_repository")
+
+        def _process_tokens(tokens: list[TokenBase]):
+            for token in tokens:
+                if isinstance(token, ListToken):
+                    _process_tokens(token.tokens)
+                print(f"[{type(token).__name__}] Processing token '{token.text}' ...")
+                rules = rule_registry.get_rules(token)
+                for rule in rules:
+                    print(f"Processing rule '{rule.rule_id}' [{rule.priority}] [{type(token).__name__}] ...")
+                    test_results = rule.examine(token, rule_context)
+                    for test_result in test_results:
+                        print(f"[{test_result.severity}] {test_result.rule_id}: '{test_result.message}'")
+
+        _process_tokens(list(doc))

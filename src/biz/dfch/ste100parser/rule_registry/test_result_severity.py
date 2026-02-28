@@ -13,52 +13,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""char enum."""
-
-# pylint: disable=C0116
-# type: ignore
+"""TestResultSeverity class."""
 
 from enum import StrEnum
 
-__all__ = [
-    "Char",
-]
 
-
-class Char(StrEnum):
-    """Character definitions."""
-
-    EMPTY = ''
-
-    DQUOTE = '"'
-    SQUOTE = "'"
-
-    DOT = '.'
-    QUESTION = '?'
-    EXCLAMATION = '!'
-    COMMA = ','
-    COLON = ':'
-    SEMICOLON = ';'
-
-    PAREN_OPEN = '('
-    PAREN_CLOSE = ')'
-
-    STAR = '*'
-    HYPHEN = '-'
-    UNDER = '_'
-    CODE = '`'
-    BOLD_EMPH_OPEN = '*_'
-    BOLD_EMPH_CLOSE = '_*'
-
-    WS = r"[ \t]+"
-    MULTIPLY = '*'
-    SPACE = ' '
-    TAB = '\t'
-    NEWLINE = r"\r?\n"
-    LF = "\n"
-    TEXT = r"""[^"'*_`\s]+"""
-    APOSTROPHE = r"""(?<=[A-Za-z0-9])'(?:s)?(?=[\s.,!?;:]|$)"""
-    CHAR_LOWER_S = 's'
-    YEAR_SHORT = r"""'\d{2}s?(?=[\s.,!?;:]|$)"""
-
-    HASH = '#'
+class TestResultSeverity(StrEnum):
+    """The severity result of a `Rule` examination."""
+    OK = "OK"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
