@@ -175,7 +175,17 @@ class LineBreak(EmptyToken):
 
 
 @dataclass
-class Multiply(EmptyToken):
+class Text(ValueToken):
+    """This is a text token."""
+
+
+@dataclass
+class SpecialText(Text):
+    """This is a base class for special text tokens."""
+
+
+@dataclass
+class Multiply(SpecialText):
     """This is a multiply token."""
 
     @property
@@ -184,7 +194,7 @@ class Multiply(EmptyToken):
 
 
 @dataclass
-class Plural(EmptyToken):
+class Plural(SpecialText):
     """This is a plural 's' token."""
 
     @property
@@ -198,33 +208,32 @@ class Plural(EmptyToken):
 
 
 @dataclass
-class Text(ValueToken):
-    """This is a text token."""
-
-
-@dataclass
-class Number(ValueToken):
+class Number(Text):
     """This is a number token."""
 
 
 @dataclass
-class Char(ValueToken):
+class Char(SpecialText):
     """This is a character token."""
 
 
 @dataclass
-class Word(ValueToken):
+class Apostrophe(SpecialText):
+    """This is an apostrophe token."""
+
+    @property
+    def text(self) -> str:
+        result = f"{Character.SQUOTE}{self.value}"
+        return result
+
+@dataclass
+class Word(Text):
     """This is a word token."""
 
 
 @dataclass
 class Punct(ValueToken):
     """This is a punctuation token."""
-
-
-@dataclass
-class SpecialText(ValueToken):
-    """This is a base class for special text tokens."""
 
 
 @dataclass
@@ -242,13 +251,3 @@ class CodeBlock(ValueToken):
 @dataclass
 class Ws(ValueToken):
     """This is a normalized whitespace token."""
-
-
-@dataclass
-class Apostrophe(SpecialText):
-    """This is an apostrophe token."""
-
-    @property
-    def text(self) -> str:
-        result = f"{Character.SQUOTE}{self.value}"
-        return result
