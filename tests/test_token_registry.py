@@ -124,7 +124,7 @@ This is the 2nd sentence and this sentence has another sentence in parentheses (
                 sentences.append(token)
             return True
 
-        ste100doc.examine(func)
+        ste100doc.visit(func)
         for sentence in sentences:
             print(sentence.text)
             token_registry = TokenRegistry.Factory.get_instance()
