@@ -32,7 +32,7 @@ from .serializer.text_interpreter import TextInterpreter
 from .serializer.token_base import TokenBase
 from .serializer.token_base import ListToken
 
-WalkerFunc: TypeAlias = Callable[[TokenBase, int], bool]
+VisitTokenFunc: TypeAlias = Callable[[TokenBase, int], bool]
 
 
 class Ste100Doc:
@@ -73,7 +73,7 @@ class Ste100Doc:
         self,
         tokens: list[TokenBase],
         *,
-        func: WalkerFunc,
+        func: VisitTokenFunc,
         level: int = 0,
     ) -> None:
         for token in tokens:
@@ -95,7 +95,7 @@ class Ste100Doc:
                     level=level+1
                 )
 
-    def examine(self, func: WalkerFunc) -> None:
+    def visit(self, func: VisitTokenFunc) -> None:
         assert isinstance(func, Callable), type(func)
 
         self._walk(self._items, func=func)
