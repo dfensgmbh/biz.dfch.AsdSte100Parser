@@ -39,6 +39,7 @@ from biz.dfch.ste100parser.serializer.token_base import ListToken
 
 from biz.dfch.ste100parser.rule_registry import RuleRegistry
 from biz.dfch.ste100parser.rule_registry import RuleContext
+from biz.dfch.ste100parser.rule_registry import TextUtils
 
 from biz.dfch.ste100parser.token_registry import TokenRegistry
 
@@ -139,7 +140,7 @@ Praesent sit amet nunc volutpat lacus eleifend ornare;
         print(structure)
 
         token_registry = TokenRegistry.Factory.get_instance()
-        rule_context = RuleContext(vocab, token_registry)
+        rule_context = RuleContext(vocab, token_registry, TextUtils())
         rule_registry = RuleRegistry()
         rule_registry.install_rules("biz.dfch.ste100parser.rule_repository")
 

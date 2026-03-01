@@ -22,6 +22,8 @@ from biz.dfch.asdste100vocab import Vocab
 
 from ..token_registry import TokenRegistry
 
+from .text_utils import TextUtils
+
 
 @dataclass
 class RuleContext:
@@ -29,3 +31,4 @@ class RuleContext:
 
     vocab: Vocab
     token_registry: TokenRegistry
+    text_utils: TextUtils
