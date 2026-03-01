@@ -22,7 +22,7 @@ R1.1: Use words that are:
     * Technical verbs.
 """
 
-from spacy.tokens import Span, Token
+from spacy.tokens import Span
 
 from ..rule_registry import rule
 from ..rule_registry import Rule
@@ -31,77 +31,10 @@ from ..rule_registry import TestResult
 from ..rule_registry import TestResultSeverity
 
 from ..serializer.token_base import Sentence
-from ..serializer.token_base import TokenBase
 from ..serializer.token_base import Paragraph
 from ..serializer.token_base import ProcItem
 
 from .ste100_rules import Ste100Rules
-
-
-class SpacyUtils:
-    """SpaCy text processing methods."""
-
-    @staticmethod
-    def is_imperative_form(sent: Span) -> bool:
-        """Examines if a sentence is in imperative form."""
-
-        root = sent.root
-        if root.pos_ != "VERB":
-            return False
-
-        if root.morph.get("VerbForm", []) != ["Inf"]:
-            return False
-
-        if any(t.dep_ == "nsubj" for t in sent):
-            return False
-
-        return True
-
-    @staticmethod
-    def find_container(token: TokenBase) -> TokenBase | None:
-        """
-        Find the parent of the token that is either `Paragraph`, `ProcItem`
-        or `None`.
-        """
-        current = token.parent
-
-        while current is not None:
-            if isinstance(current, (Paragraph, ProcItem)):
-                return current
-            current = current.parent
-
-        return None
-
-    @staticmethod
-    def find_sentence(token: TokenBase) -> Sentence | None:
-        """
-        Find the next sentence of the token.
-        """
-        current = token.parent
-
-        while current is not None:
-            if isinstance(current, Sentence):
-                return current
-            current = current.parent
-
-        return None
-
-    @staticmethod
-    def get_passive_tokens(sent: Span) -> list[Token]:
-        """
-        Examines if the sentence is in passive voice. Then the list contains
-        the tokens that are in passive voice.
-        """
-        root = sent.root
-        tokens = [
-            t for t in root.children
-            if t.dep_ in ("nsubjpass", "auxpass")
-        ]
-        if not tokens:
-            return []
-        tokens.append(root)
-
-        return sorted(tokens, key=lambda t: t.i)
 
 
 @rule("R5.3", token_types=[Sentence])
@@ -121,11 +54,11 @@ class UseImperativeForm(Rule):
         assert record is not None
         assert isinstance(record.spacy, Span), type(record.spacy)
 
-        container = SpacyUtils.find_container(token)
+        container = context.text_utils.find_ste100_container(token)
         if not isinstance(container, ProcItem):
             return result
 
-        is_imperative = SpacyUtils.is_imperative_form(record.spacy)
+        is_imperative = context.text_utils.is_imperative_form(record.spacy)
         if not is_imperative:
             return result
 
@@ -160,13 +93,17 @@ class UseActiveVoice(Rule):
         assert record is not None
         assert isinstance(record.spacy, Span), type(record.spacy)
 
-        words = [t.text for t in SpacyUtils.get_passive_tokens(record.spacy)]
+        words = [
+            t.text for t
+            in context.text_utils.get_passive_tokens(
+                record.spacy)
+        ]
         if not words:
             return []
 
         prefix = "Unknown"
         severity = TestResultSeverity.WARNING
-        container = SpacyUtils.find_container(token)
+        container = context.text_utils.find_ste100_container(token)
         if isinstance(container, Paragraph):
             prefix = "Descriptive"
             severity = TestResultSeverity.WARNING
