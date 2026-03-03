@@ -17,36 +17,16 @@
 # pylint: disable=C0115
 # pylint: disable=C0116
 
-"""
-rule_repository module.
-"""
-
-from biz.dfch.ste100parser import ParserAction
-from biz.dfch.ste100parser import Ste100Doc
+from biz.dfch.ste100parser import ParserAction, Ste100Doc
 
 from .test_rule_base import TestRuleBase
 
 
-class TestDoNotUseSemicolon(TestRuleBase):
+class TestImperativeForm(TestRuleBase):
 
-    def test_sentence_with_semicolon(self):
-        text = """The first sentences stops with a semicolon; the last sentence stops with a dot."""
-        expected = 1
-
-        tree = self.parser.invoke(text, action=ParserAction.PASS2)
-
-        tokens = self.interpreter.invoke(tree)
-        doc = Ste100Doc(tokens)
-        structure = self.inspector.ste100doc(doc)
-        print(structure)
-
-        doc.visit(func=self._process_token)
-
-        result = self.test_results
-        self.assertEqual(expected, len([r for r in result if r.rule_id == "R8.1"]), result)
-
-    def test_sentence_without_semicolon(self):
-        text = """This sentence does not have a semicolon and stops with a dot."""
+    def test_imperative_in_descriptive(self):
+        text = """Close the door.
+"""
         expected = 0
 
         tree = self.parser.invoke(text, action=ParserAction.PASS2)
@@ -58,4 +38,20 @@ class TestDoNotUseSemicolon(TestRuleBase):
         doc.visit(func=self._process_token)
 
         result = self.test_results
-        self.assertEqual(expected, len([r for r in result if r.rule_id == "R8.1"]), result)
+        self.assertEqual(expected, len([r for r in result if r.rule_id == "R5.3"]), result)
+
+    def test_imperative_in_procedure(self):
+        text = """
+A) Close the door."""
+        expected = 1
+
+        tree = self.parser.invoke(text, action=ParserAction.PASS2)
+        tokens = self.interpreter.invoke(tree)
+        doc = Ste100Doc(tokens)
+        structure = self.inspector.ste100doc(doc)
+        print(structure)
+
+        doc.visit(func=self._process_token)
+
+        result = self.test_results
+        self.assertEqual(expected, len([r for r in result if r.rule_id == "R5.3"]), result)
