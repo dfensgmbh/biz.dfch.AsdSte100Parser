@@ -31,8 +31,10 @@ from ..rule_registry import RuleResult
 from ..serializer.token_base import Text
 from ..serializer.token_base import TokenBase
 
+from .rule_id import RuleId
 
-@rule("R1.1", token_types=[Text], priority=RulePriority.HIGHER)
+
+@rule(RuleId.R1_1, token_types=[Text], priority=RulePriority.HIGHER)
 class UseWordsInTheVocabulary(Rule):
     """
     Use words that are:
