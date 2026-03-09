@@ -22,7 +22,7 @@ import unittest
 from biz.dfch.asdste100vocab import Vocab, Word, WordCategory, WordSource, WordStatus, WordType
 
 from biz.dfch.ste100parser import GrammarType, Inspector, Parser
-from biz.dfch.ste100parser.rule_registry import RuleContext, RuleRegistry, TestResult, TextUtils
+from biz.dfch.ste100parser.rule_registry import RuleContext, RuleRegistry, RuleResult, TextUtils
 from biz.dfch.ste100parser.serializer.text_interpreter import TextInterpreter
 from biz.dfch.ste100parser.serializer.token_base import TokenBase
 from biz.dfch.ste100parser.token_registry import TokenRegistry
@@ -32,7 +32,7 @@ class TestRuleBase(unittest.TestCase):
 
     RULE_PACKAGE_PATH = "biz.dfch.ste100parser.rule_repository"
 
-    test_results: list[TestResult]
+    test_results: list[RuleResult]
 
     parser: Parser
     vocab: Vocab

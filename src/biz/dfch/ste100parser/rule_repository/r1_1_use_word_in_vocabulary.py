@@ -26,7 +26,7 @@ from ..rule_registry import rule
 from ..rule_registry import Rule
 from ..rule_registry import RuleContext
 from ..rule_registry import RulePriority
-from ..rule_registry import TestResult
+from ..rule_registry import RuleResult
 
 from ..serializer.token_base import Text
 from ..serializer.token_base import TokenBase
@@ -45,9 +45,9 @@ class UseWordsInTheVocabulary(Rule):
         self,
         token: TokenBase,
         context: RuleContext
-    ) -> list[TestResult]:
+    ) -> list[RuleResult]:
         super().examine(token, context)
 
-        result: list[TestResult] = []
+        result: list[RuleResult] = []
 
         return result

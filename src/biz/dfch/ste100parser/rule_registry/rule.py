@@ -24,7 +24,7 @@ from typing import TypeVar
 
 from .rule_context import RuleContext
 from .rule_priority import RulePriority
-from .test_result import TestResult
+from .rule_result import RuleResult
 
 from ..serializer.token_base import TokenBase
 
@@ -60,7 +60,7 @@ class Rule(ABC, Generic[T]):
         self,
         token: T,
         context: RuleContext
-    ) -> list[TestResult]:
+    ) -> list[RuleResult]:
         """Examine the specified node and make sure it agrees to the rule."""
 
         assert isinstance(

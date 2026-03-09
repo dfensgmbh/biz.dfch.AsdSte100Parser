@@ -27,8 +27,8 @@ from spacy.tokens import Span
 from ..rule_registry import rule
 from ..rule_registry import Rule
 from ..rule_registry import RuleContext
-from ..rule_registry import TestResult
-from ..rule_registry import TestResultSeverity
+from ..rule_registry import RuleResult
+from ..rule_registry import RuleResultSeverity
 
 from ..serializer.token_base import Sentence
 from ..serializer.token_base import Paragraph
@@ -45,10 +45,10 @@ class UseImperativeForm(Rule):
         self,
         token: Sentence,
         context: RuleContext
-    ) -> list[TestResult]:
+    ) -> list[RuleResult]:
         super().examine(token, context)
 
-        result: list[TestResult] = []
+        result: list[RuleResult] = []
 
         record = context.token_registry.get_or_default_ste100(token)
         assert record is not None
@@ -62,10 +62,10 @@ class UseImperativeForm(Rule):
         if not is_imperative:
             return result
 
-        result.append(TestResult(
+        result.append(RuleResult(
             rule_id=self.rule_id,
             token=token,
-            severity=TestResultSeverity.ERROR,
+            severity=RuleResultSeverity.ERROR,
             message=Ste100Rules.R5_3,
             suggestion="",
         ))
@@ -84,10 +84,10 @@ class UseActiveVoice(Rule):
         self,
         token: Sentence,
         context: RuleContext
-    ) -> list[TestResult]:
+    ) -> list[RuleResult]:
         super().examine(token, context)
 
-        result: list[TestResult] = []
+        result: list[RuleResult] = []
 
         record = context.token_registry.get_or_default_ste100(token)
         assert record is not None
@@ -102,17 +102,17 @@ class UseActiveVoice(Rule):
             return []
 
         prefix = "Unknown"
-        severity = TestResultSeverity.WARNING
+        severity = RuleResultSeverity.WARNING
         container = context.text_utils.find_ste100_container(token)
         if isinstance(container, Paragraph):
             prefix = "Descriptive"
-            severity = TestResultSeverity.WARNING
+            severity = RuleResultSeverity.WARNING
         elif isinstance(container, ProcItem):
             prefix = "Procedural"
-            severity = TestResultSeverity.ERROR
+            severity = RuleResultSeverity.ERROR
 
         message = f"{prefix}: [{words}] {Ste100Rules.R3_6}"
-        result.append(TestResult(
+        result.append(RuleResult(
             rule_id=self.rule_id,
             token=token,
             severity=severity,

@@ -26,7 +26,7 @@ from ..rule_registry import rule
 from ..rule_registry import Rule
 from ..rule_registry import RuleContext
 from ..rule_registry import RulePriority
-from ..rule_registry import TestResult
+from ..rule_registry import RuleResult
 
 from ..token_registry import TokenRegistry
 
@@ -49,10 +49,10 @@ class DisplacySentence(Rule):
         self,
         token: TokenBase,
         context: RuleContext
-    ) -> list[TestResult]:
+    ) -> list[RuleResult]:
         super().examine(token, context)
 
-        result: list[TestResult] = []
+        result: list[RuleResult] = []
 
         record = context.token_registry.get_or_default_ste100(token)
         assert record is not None

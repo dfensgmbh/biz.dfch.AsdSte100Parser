@@ -27,8 +27,8 @@ from ..rule_registry import rule
 from ..rule_registry import Rule
 from ..rule_registry import RuleContext
 from ..rule_registry import RulePriority
-from ..rule_registry import TestResult
-from ..rule_registry import TestResultSeverity
+from ..rule_registry import RuleResult
+from ..rule_registry import RuleResultSeverity
 
 from .ste100_rules import Ste100Rules
 
@@ -40,18 +40,18 @@ class DoNotUseSemicolon(Rule):
     but not the semicolon (;).
     """
 
-    def examine(self, token: Punct, context: RuleContext) -> list[TestResult]:
+    def examine(self, token: Punct, context: RuleContext) -> list[RuleResult]:
         super().examine(token, context)
 
-        result: list[TestResult] = []
+        result: list[RuleResult] = []
 
         if Char.SEMICOLON != token.text:
             return result
 
-        result.append(TestResult(
+        result.append(RuleResult(
             rule_id=self.rule_id,
             token=token,
-            severity=TestResultSeverity.ERROR,
+            severity=RuleResultSeverity.ERROR,
             message=Ste100Rules.R8_1,
             suggestion=""))
 

@@ -18,14 +18,14 @@
 from dataclasses import dataclass
 
 from ..serializer.token_base import TokenBase
-from .test_result_severity import TestResultSeverity
+from .rule_result_severity import RuleResultSeverity
 
 
 @dataclass
-class TestResult:
+class RuleResult:
     """This is the result of a rule check."""
     rule_id: str
     token: TokenBase
-    severity: TestResultSeverity
+    severity: RuleResultSeverity
     message: str
     suggestion: str

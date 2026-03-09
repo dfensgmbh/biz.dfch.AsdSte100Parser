@@ -20,8 +20,8 @@ from .rule import Rule
 from .rule_context import RuleContext
 from .rule_priority import RulePriority
 from .rule_registry import RuleRegistry
-from .test_result import TestResult
-from .test_result_severity import TestResultSeverity
+from .rule_result import RuleResult
+from .rule_result_severity import RuleResultSeverity
 from .text_utils import TextUtils
 
 __all__ = [
@@ -30,7 +30,7 @@ __all__ = [
     "RuleContext",
     "RulePriority",
     "RuleRegistry",
-    "TestResult",
-    "TestResultSeverity",
+    "RuleResult",
+    "RuleResultSeverity",
     "TextUtils",
 ]

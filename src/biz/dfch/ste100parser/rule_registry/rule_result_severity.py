@@ -18,7 +18,7 @@
 from enum import StrEnum
 
 
-class TestResultSeverity(StrEnum):
+class RuleResultSeverity(StrEnum):
     """The severity result of a `Rule` examination."""
     OK = "OK"
     INFO = "INFO"
