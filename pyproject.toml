@@ -67,10 +67,14 @@ dev = [
     "biz-dfch-ste100parser[test]",
     "black",
     "build",
+    "cairosvg",
     "ipykernel",
     "mypy",
     "parameterized>=0.9.0",
-    "twine"
+    "pip>=26.0.1",
+    "setuptools>=82.0.1",
+    "twine",
+    "wheel>=0.46.3"
 ]
 
 [project.urls]  
