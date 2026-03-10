@@ -32,7 +32,7 @@ class TestRuleBase(unittest.TestCase):
 
     RULE_PACKAGE_PATH = "biz.dfch.ste100parser.rule_repository"
 
-    test_results: list[RuleResult]
+    rule_results: list[RuleResult]
 
     parser: Parser
     vocab: Vocab
@@ -43,7 +43,7 @@ class TestRuleBase(unittest.TestCase):
     rule_registry: RuleRegistry
 
     def setUp(self) -> None:
-        self.test_results = []
+        self.rule_results = []
         self.parser = Parser(GrammarType.ASD_STE100_9)
 
         self.vocab = Vocab()
@@ -71,9 +71,9 @@ class TestRuleBase(unittest.TestCase):
         for rule in rules:
             print(
                 f"Processing rule '{rule.rule_id}' [{rule.priority}] [{type(token).__name__}] ...")
-            test_results = rule.examine(token, self.rule_context)
-            for test_result in test_results:
+            rule_results = rule.examine(token, self.rule_context)
+            for test_result in rule_results:
                 print(
                     f"[{test_result.severity}] {test_result.rule_id}: '{test_result.message}'")
-            self.test_results.extend(test_results)
+            self.rule_results.extend(rule_results)
         return True

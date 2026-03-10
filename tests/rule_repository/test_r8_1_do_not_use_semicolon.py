@@ -23,6 +23,7 @@ rule_repository module.
 
 from biz.dfch.ste100parser import ParserAction
 from biz.dfch.ste100parser import Ste100Doc
+from biz.dfch.ste100parser.rule_repository.rule_id import RuleId
 
 from .test_rule_base import TestRuleBase
 
@@ -42,8 +43,9 @@ class TestDoNotUseSemicolon(TestRuleBase):
 
         doc.visit(func=self._process_token)
 
-        result = self.test_results
-        self.assertEqual(expected, len([r for r in result if r.rule_id == "R8.1"]), result)
+        result = self.rule_results
+        self.assertEqual(expected, len(
+            [r for r in result if r.rule_id == RuleId.R8_1]), result)
 
     def test_sentence_without_semicolon(self):
         text = """This sentence does not have a semicolon and stops with a dot."""
@@ -57,5 +59,6 @@ class TestDoNotUseSemicolon(TestRuleBase):
 
         doc.visit(func=self._process_token)
 
-        result = self.test_results
-        self.assertEqual(expected, len([r for r in result if r.rule_id == "R8.1"]), result)
+        result = self.rule_results
+        self.assertEqual(expected, len(
+            [r for r in result if r.rule_id == RuleId.R8_1]), result)

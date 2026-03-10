@@ -18,6 +18,7 @@
 # pylint: disable=C0116
 
 from biz.dfch.ste100parser import ParserAction, Ste100Doc
+from biz.dfch.ste100parser.rule_repository.rule_id import RuleId
 
 from .test_rule_base import TestRuleBase
 
@@ -37,8 +38,9 @@ class TestImperativeForm(TestRuleBase):
 
         doc.visit(func=self._process_token)
 
-        result = self.test_results
-        self.assertEqual(expected, len([r for r in result if r.rule_id == "R5.3"]), result)
+        result = self.rule_results
+        self.assertEqual(expected, len(
+            [r for r in result if r.rule_id == RuleId.R5_3]), result)
 
     def test_imperative_in_procedure(self):
         text = """
@@ -53,5 +55,6 @@ A) Close the door."""
 
         doc.visit(func=self._process_token)
 
-        result = self.test_results
-        self.assertEqual(expected, len([r for r in result if r.rule_id == "R5.3"]), result)
+        result = self.rule_results
+        self.assertEqual(expected, len(
+            [r for r in result if r.rule_id == RuleId.R5_3]), result)
