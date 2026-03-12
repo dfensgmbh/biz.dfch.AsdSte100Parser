@@ -21,7 +21,7 @@ from .rule_context import RuleContext
 from .rule_priority import RulePriority
 from .rule_registry import RuleRegistry
 from .rule_result import RuleResult
-from .rule_result_severity import RuleResultSeverity
+from .rule_severity import RuleSeverity
 from .text_utils import TextUtils
 
 __all__ = [
@@ -31,6 +31,6 @@ __all__ = [
     "RulePriority",
     "RuleRegistry",
     "RuleResult",
-    "RuleResultSeverity",
+    "RuleSeverity",
     "TextUtils",
 ]

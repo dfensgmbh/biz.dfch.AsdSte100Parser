@@ -20,18 +20,18 @@ R8.1: You can use all standard English punctuation marks
 but not the semicolon (;).
 """
 
-from ...char import Char
-from ...rule_registry import rule
-from ...rule_registry import RuleBase
-from ...rule_registry import RuleContext
-from ...rule_registry import RulePriority
-from ...rule_registry import RuleResult
-from ...rule_registry import RuleResultSeverity
-from ...serializer.token_base import Punct
+from ....char import Char
+from ....rule_registry import rule
+from ....rule_registry import RuleBase
+from ....rule_registry import RuleContext
+from ....rule_registry import RulePriority
+from ....rule_registry import RuleResult
+from ....rule_registry import RuleSeverity
+from ....serializer.token_base import Punct
 
-from .ste100_rules import Ste100Rules
+from ..ste100_rules import Ste100Rules
 
-from .rule_id import RuleId
+from ..rule_id import RuleId
 
 
 @rule(RuleId.R8_1, token_types=[Punct], priority=RulePriority.HIGHER)
@@ -52,7 +52,7 @@ class DoNotUseSemicolon(RuleBase):
         result.append(RuleResult(
             rule_id=self.rule_id,
             token=token,
-            severity=RuleResultSeverity.ERROR,
+            severity=RuleSeverity.ERROR,
             message=Ste100Rules.R8_1,
             suggestion=""))
 

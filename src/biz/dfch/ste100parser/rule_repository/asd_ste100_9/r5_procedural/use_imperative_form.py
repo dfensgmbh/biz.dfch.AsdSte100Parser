@@ -22,15 +22,15 @@ R5.3: Write instructions in the imperative (command) form.
 
 from spacy.tokens import Span
 
-from ...rule_registry import rule
-from ...rule_registry import RuleBase
-from ...rule_registry import RuleContext
-from ...rule_registry import RuleResult
-from ...rule_registry import RuleResultSeverity
-from ...serializer.token_base import ProcItem, Sentence
+from ....rule_registry import rule
+from ....rule_registry import RuleBase
+from ....rule_registry import RuleContext
+from ....rule_registry import RuleResult
+from ....rule_registry import RuleSeverity
+from ....serializer.token_base import ProcItem, Sentence
 
-from .rule_id import RuleId
-from .ste100_rules import Ste100Rules
+from ..rule_id import RuleId
+from ..ste100_rules import Ste100Rules
 
 
 @rule(RuleId.R5_3, token_types=[Sentence])
@@ -61,7 +61,7 @@ class UseImperativeForm(RuleBase):
         result.append(RuleResult(
             rule_id=self.rule_id,
             token=token,
-            severity=RuleResultSeverity.ERROR,
+            severity=RuleSeverity.ERROR,
             message=Ste100Rules.R5_3,
             suggestion="",
         ))

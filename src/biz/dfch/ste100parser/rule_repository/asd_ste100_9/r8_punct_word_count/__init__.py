@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""INCOSE Requirements rule repository."""
+"""STE100 rule repository."""
 
-from .accuracy.avoid_vague_terms import AccuracyAvoidVagueTerms
+from .do_not_use_semicolon import DoNotUseSemicolon
 
 __all__ = [
-    "AccuracyAvoidVagueTerms",
+    "DoNotUseSemicolon",
 ]

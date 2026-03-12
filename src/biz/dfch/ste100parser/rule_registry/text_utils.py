@@ -94,3 +94,7 @@ class TextUtils:
             result.append(verb)
 
         return sorted(result, key=lambda t: t.i)
+
+    @staticmethod
+    def get_numeric_tokens(sent: Span) -> list[Token]:
+        pass

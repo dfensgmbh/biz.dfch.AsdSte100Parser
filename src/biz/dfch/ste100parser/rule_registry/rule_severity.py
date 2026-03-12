@@ -13,10 +13,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""INCOSE Requirements rule repository."""
+"""TestResultSeverity class."""
 
-from .accuracy.avoid_vague_terms import AccuracyAvoidVagueTerms
+from enum import StrEnum
 
-__all__ = [
-    "AccuracyAvoidVagueTerms",
-]
+
+class RuleSeverity(StrEnum):
+    """The severity result of a `Rule` examination."""
+    OK = "OK"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"

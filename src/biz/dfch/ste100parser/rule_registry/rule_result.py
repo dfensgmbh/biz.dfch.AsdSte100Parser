@@ -18,7 +18,7 @@
 from dataclasses import dataclass
 
 from ..serializer.token_base import TokenBase
-from .rule_result_severity import RuleResultSeverity
+from .rule_severity import RuleSeverity
 
 
 @dataclass
@@ -26,6 +26,6 @@ class RuleResult:
     """This is the result of a rule check."""
     rule_id: str
     token: TokenBase
-    severity: RuleResultSeverity
+    severity: RuleSeverity
     message: str
     suggestion: str = ""

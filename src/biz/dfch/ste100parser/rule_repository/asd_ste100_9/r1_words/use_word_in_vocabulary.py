@@ -22,16 +22,16 @@ R1.1: Use words that are:
     * Technical verbs.
 """
 
-from ...rule_registry import rule
-from ...rule_registry import RuleBase
-from ...rule_registry import RuleContext
-from ...rule_registry import RulePriority
-from ...rule_registry import RuleResult
+from ....rule_registry import rule
+from ....rule_registry import RuleBase
+from ....rule_registry import RuleContext
+from ....rule_registry import RulePriority
+from ....rule_registry import RuleResult
 
-from ...serializer.token_base import Text
-from ...serializer.token_base import TokenBase
+from ....serializer.token_base import Text
+from ....serializer.token_base import TokenBase
 
-from .rule_id import RuleId
+from ..rule_id import RuleId
 
 
 @rule(RuleId.R1_1, token_types=[Text], priority=RulePriority.HIGHER)

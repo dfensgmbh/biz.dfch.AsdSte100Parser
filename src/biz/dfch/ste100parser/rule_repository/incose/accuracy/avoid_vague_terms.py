@@ -33,11 +33,11 @@ from biz.dfch.asdste100vocab import (
 )
 
 from biz.dfch.ste100parser.rule_registry import (
+    rule,
     RuleBase,
     RuleContext,
     RuleResult,
-    RuleResultSeverity,
-    rule,
+    RuleSeverity,
 )
 from biz.dfch.ste100parser.serializer.token_base import Sentence
 
@@ -106,7 +106,7 @@ class AccuracyAvoidVagueTerms(RuleBase):
             result.append(RuleResult(
                 rule_id="R7 - /ACCURACY/AVOIDVAGUETERMS",
                 token=token,
-                severity=RuleResultSeverity.OK,
+                severity=RuleSeverity.OK,
                 message="Avoid the use of vague terms.",
                 suggestion="",
             ))

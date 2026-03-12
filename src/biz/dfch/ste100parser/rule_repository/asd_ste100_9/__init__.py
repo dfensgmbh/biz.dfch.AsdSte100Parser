@@ -15,10 +15,10 @@
 
 """STE100 rule repository."""
 
-from .r1_1_use_word_in_vocabulary import UseWordsInTheVocabulary
-from .r3_6_use_active_voice import UseActiveVoice
-from .r5_3_use_imperative_form import UseImperativeForm
-from .r8_1_do_not_use_semicolon import DoNotUseSemicolon
+from .r1_words.use_word_in_vocabulary import UseWordsInTheVocabulary
+from .r3_verbs.use_active_voice import UseActiveVoice
+from .r5_procedural.use_imperative_form import UseImperativeForm
+from .r8_punct_word_count.do_not_use_semicolon import DoNotUseSemicolon
 from .rule_id import RuleId
 from .ste100_rules import Ste100Rules
 
