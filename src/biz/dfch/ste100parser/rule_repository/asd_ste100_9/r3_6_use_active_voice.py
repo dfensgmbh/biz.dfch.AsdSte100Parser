@@ -16,26 +16,32 @@
 # pylint: disable=R0903
 
 """
-R5.3: Write instructions in the imperative (command) form.
+R3.6: Use the active voice. In descriptive writing, you can use the passive
+voice only when the agent is unknown.
 """
-
 
 from spacy.tokens import Span
 
-from ..rule_repository.rule_id import RuleId
-from ..rule_repository.ste100_rules import Ste100Rules
-from ..serializer.token_base import ProcItem, Sentence
+from ...rule_registry import rule
+from ...rule_registry import RuleBase
+from ...rule_registry import RuleContext
+from ...rule_registry import RuleResult
+from ...rule_registry import RuleResultSeverity
 
-from ..rule_registry import rule
-from ..rule_registry import Rule
-from ..rule_registry import RuleContext
-from ..rule_registry import RuleResult
-from ..rule_registry import RuleResultSeverity
+from ...serializer.token_base import Sentence
+from ...serializer.token_base import Paragraph
+from ...serializer.token_base import ProcItem
+
+from .ste100_rules import Ste100Rules
+from .rule_id import RuleId
 
 
-@rule(RuleId.R5_3, token_types=[Sentence])
-class UseImperativeForm(Rule):
-    """Write instructions in the imperative (command) form."""
+@rule(RuleId.R3_6, token_types=[Sentence])
+class UseActiveVoice(RuleBase):
+    """
+    Use the active voice. In descriptive writing, you can use the passive
+    voice only when the agent is unknown.
+    """
 
     def examine(
         self,
@@ -50,20 +56,30 @@ class UseImperativeForm(Rule):
         assert record is not None
         assert isinstance(record.spacy, Span), type(record.spacy)
 
+        words = [
+            t.text for t
+            in context.text_utils.get_passive_tokens(
+                record.spacy)
+        ]
+        if not words:
+            return []
+
+        prefix = "Unknown"
+        severity = RuleResultSeverity.WARNING
         container = context.text_utils.find_ste100_container(token)
-        if not isinstance(container, ProcItem):
-            return result
+        if isinstance(container, Paragraph):
+            prefix = "Descriptive"
+            severity = RuleResultSeverity.WARNING
+        elif isinstance(container, ProcItem):
+            prefix = "Procedural"
+            severity = RuleResultSeverity.ERROR
 
-        is_imperative = context.text_utils.is_imperative_form(record.spacy)
-        if not is_imperative:
-            return result
-
+        message = f"{prefix}: [{words}] {Ste100Rules.R3_6}"
         result.append(RuleResult(
             rule_id=self.rule_id,
             token=token,
-            severity=RuleResultSeverity.ERROR,
-            message=Ste100Rules.R5_3,
+            severity=severity,
+            message=message,
             suggestion="",
         ))
-
         return result

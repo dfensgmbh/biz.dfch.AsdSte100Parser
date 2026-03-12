@@ -13,19 +13,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""TestResult class."""
+"""INCOSE Requirements rule repository."""
 
-from dataclasses import dataclass
-
-from ..serializer.token_base import TokenBase
-from .rule_result_severity import RuleResultSeverity
+from .r7_avoid_vague_terms import AccuracyAvoidVagueTerms
 
 
-@dataclass
-class RuleResult:
-    """This is the result of a rule check."""
-    rule_id: str
-    token: TokenBase
-    severity: RuleResultSeverity
-    message: str
-    suggestion: str = ""
+__all__ = [
+    "AccuracyAvoidVagueTerms",
+]

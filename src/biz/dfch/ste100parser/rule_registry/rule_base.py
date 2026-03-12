@@ -48,7 +48,7 @@ def rule(
 T = TypeVar("T", bound=TokenBase)
 
 
-class Rule(ABC, Generic[T]):
+class RuleBase(ABC, Generic[T]):
     """This is the base class for all rules."""
     rule_id: str
     token_types: list[type]

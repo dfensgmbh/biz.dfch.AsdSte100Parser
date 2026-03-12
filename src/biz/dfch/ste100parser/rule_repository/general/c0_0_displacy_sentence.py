@@ -22,20 +22,20 @@ Displays a spaCy sentence with displacy.
 from spacy import displacy
 from spacy.tokens import Span
 
-from ..rule_registry import rule
-from ..rule_registry import Rule
-from ..rule_registry import RuleContext
-from ..rule_registry import RulePriority
-from ..rule_registry import RuleResult
+from ...rule_registry import rule
+from ...rule_registry import RuleBase
+from ...rule_registry import RuleContext
+from ...rule_registry import RulePriority
+from ...rule_registry import RuleResult
 
-from ..token_registry import TokenRegistry
+from ...serializer.token_base import TokenBase
+from ...serializer.token_base import Sentence
 
-from ..serializer.token_base import TokenBase
-from ..serializer.token_base import Sentence
+from ...token_registry import TokenRegistry
 
 
 @rule("C0.0", token_types=[Sentence], priority=RulePriority.HIGHEST)
-class DisplacySentence(Rule):
+class DisplacySentence(RuleBase):
     """
     Displays a spaCy sentence with displacy.
     """
@@ -60,6 +60,15 @@ class DisplacySentence(Rule):
 
         for t in record.spacy:
             print(f"'{t.text}' [{t.pos_}] [{t.dep_}]")
+
+        try:
+            # pylint: disable=C0415
+            from IPython import get_ipython  # type: ignore
+            shell = get_ipython()
+            if shell is None:
+                return result
+        except ImportError:
+            return result
 
         displacy.render(record.spacy, style="dep", jupyter=True)
 

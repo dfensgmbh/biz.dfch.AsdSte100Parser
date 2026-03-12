@@ -20,15 +20,14 @@ R8.1: You can use all standard English punctuation marks
 but not the semicolon (;).
 """
 
-from ..char import Char
-from ..serializer.token_base import Punct
-
-from ..rule_registry import rule
-from ..rule_registry import Rule
-from ..rule_registry import RuleContext
-from ..rule_registry import RulePriority
-from ..rule_registry import RuleResult
-from ..rule_registry import RuleResultSeverity
+from ...char import Char
+from ...rule_registry import rule
+from ...rule_registry import RuleBase
+from ...rule_registry import RuleContext
+from ...rule_registry import RulePriority
+from ...rule_registry import RuleResult
+from ...rule_registry import RuleResultSeverity
+from ...serializer.token_base import Punct
 
 from .ste100_rules import Ste100Rules
 
@@ -36,7 +35,7 @@ from .rule_id import RuleId
 
 
 @rule(RuleId.R8_1, token_types=[Punct], priority=RulePriority.HIGHER)
-class DoNotUseSemicolon(Rule):
+class DoNotUseSemicolon(RuleBase):
     """
     You can use all standard English punctuation marks
     but not the semicolon (;).

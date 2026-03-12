@@ -13,19 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""TestResult class."""
+"""General rules repository."""
 
-from dataclasses import dataclass
+from .c0_0_displacy_sentence import DisplacySentence
 
-from ..serializer.token_base import TokenBase
-from .rule_result_severity import RuleResultSeverity
-
-
-@dataclass
-class RuleResult:
-    """This is the result of a rule check."""
-    rule_id: str
-    token: TokenBase
-    severity: RuleResultSeverity
-    message: str
-    suggestion: str = ""
+__all__ = [
+    "DisplacySentence",
+]

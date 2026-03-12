@@ -13,19 +13,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""TestResult class."""
+"""STE100 rule repository."""
 
-from dataclasses import dataclass
+from .r1_1_use_word_in_vocabulary import UseWordsInTheVocabulary
+from .r3_6_use_active_voice import UseActiveVoice
+from .r5_3_use_imperative_form import UseImperativeForm
+from .r8_1_do_not_use_semicolon import DoNotUseSemicolon
+from .rule_id import RuleId
+from .ste100_rules import Ste100Rules
 
-from ..serializer.token_base import TokenBase
-from .rule_result_severity import RuleResultSeverity
+__all__ = [
+    "UseWordsInTheVocabulary",
+    "UseActiveVoice",
+    "UseImperativeForm",
+    "DoNotUseSemicolon",
 
-
-@dataclass
-class RuleResult:
-    """This is the result of a rule check."""
-    rule_id: str
-    token: TokenBase
-    severity: RuleResultSeverity
-    message: str
-    suggestion: str = ""
+    "RuleId",
+    "Ste100Rules",
+]

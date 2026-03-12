@@ -23,7 +23,7 @@ rule_repository module.
 
 from biz.dfch.ste100parser import ParserAction
 from biz.dfch.ste100parser import Ste100Doc
-from biz.dfch.ste100parser.rule_repository.rule_id import RuleId
+from biz.dfch.ste100parser.rule_repository import RuleId
 
 from .test_rule_base import TestRuleBase
 

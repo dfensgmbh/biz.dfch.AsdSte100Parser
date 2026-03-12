@@ -22,13 +22,13 @@ import pkgutil
 
 from ..serializer.token_base import TokenBase
 
-from .rule import Rule
+from .rule_base import RuleBase
 
 
 class RuleRegistry:
     """Install rules from a package."""
 
-    _rules: dict[type, list[Rule]]
+    _rules: dict[type, list[RuleBase]]
 
     def __init__(self) -> None:
 
@@ -41,13 +41,13 @@ class RuleRegistry:
         assert path.strip()
 
         package = importlib.import_module(path)
-        for _, name, _ in pkgutil.iter_modules(package.__path__):
+        for _, name, _ in pkgutil.walk_packages(package.__path__):
             full_name = f"{path}.{name}"
             print(f"Import module '{full_name}'.")
             module = importlib.import_module(full_name)
 
             for _, t in inspect.getmembers(module, inspect.isclass):
-                if not issubclass(t, Rule) or inspect.isabstract(t):
+                if not issubclass(t, RuleBase) or inspect.isabstract(t):
                     continue
                 if not hasattr(t, 'token_types'):
                     continue
@@ -62,7 +62,7 @@ class RuleRegistry:
                     )
                     self._rules[type_].append(instance)
 
-    def get_rules(self, token: TokenBase) -> list[Rule]:
+    def get_rules(self, token: TokenBase) -> list[RuleBase]:
         """Get rules for specified `token`."""
 
         result = []

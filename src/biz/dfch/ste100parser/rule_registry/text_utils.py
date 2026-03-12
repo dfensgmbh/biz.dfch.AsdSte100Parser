@@ -78,14 +78,19 @@ class TextUtils:
         """
         Examines if the sentence is in passive voice. Then the list contains
         the tokens that are in passive voice.
+        If there is no agent, then a passive voice is permitted.
         """
-        root = sent.root
-        tokens = [
-            t for t in root.children
-            if t.dep_ in ("nsubjpass", "auxpass")
-        ]
-        if not tokens:
-            return []
-        tokens.append(root)
+        result: list[Token] = []
 
-        return sorted(tokens, key=lambda t: t.i)
+        verbs = [t for t in sent if t.pos_ == "VERB"]
+        for verb in verbs:
+            tokens: list[Token] = [
+                t for t in verb.children
+                if t.dep_ in ("nsubjpass", "auxpass")
+            ]
+            if not tokens:
+                continue
+            result.extend(tokens)
+            result.append(verb)
+
+        return sorted(result, key=lambda t: t.i)

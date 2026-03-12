@@ -15,8 +15,8 @@
 
 """rules module."""
 
-from .rule import rule
-from .rule import Rule
+from .rule_base import rule
+from .rule_base import RuleBase
 from .rule_context import RuleContext
 from .rule_priority import RulePriority
 from .rule_registry import RuleRegistry
@@ -26,7 +26,7 @@ from .text_utils import TextUtils
 
 __all__ = [
     "rule",
-    "Rule",
+    "RuleBase",
     "RuleContext",
     "RulePriority",
     "RuleRegistry",
