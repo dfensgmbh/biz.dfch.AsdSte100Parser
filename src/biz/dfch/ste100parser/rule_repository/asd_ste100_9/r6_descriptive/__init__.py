@@ -15,5 +15,8 @@
 
 """STE100 rule repository."""
 
+from .use_max_six_sentences import UseMaxSixSentences
+
 __all__ = [
+    "UseMaxSixSentences",
 ]

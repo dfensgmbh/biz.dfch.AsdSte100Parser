@@ -38,6 +38,14 @@ class Ste100Rules(StrEnum):
     R5_3 = "Write instructions in the imperative (command) form."
 
     # Descriptive writing
+    R6_6 = "[{count}] Make sure that no paragraph has more than six sentences."
+    R6_6_SUGGESTION = (
+        "Paragraphs divide a text into logical units and help keep the reader's attention. "
+        "If paragraphs are too long, they cannot have this function. "
+        "Do not put different topics in the same paragraph. "
+        "If a paragraph has more than six sentences, divide it into two smaller paragraphs. "
+        "This structure will make your text easier to read."
+    )
 
     # Safety instructions
 
