@@ -169,7 +169,6 @@ paragraph: paragraph_first_item paragraph_next_item*
 ?paragraph_next_item: SINGLE_NEWLINE
     | paragraph_item
 ?paragraph_item: WS
-    | note
     | paragraph_first_item
 // SINGLE_NEWLINE matches a NEWLINE only if NOT followed by another NEWLINE  
 // This uses a negative lookahead (?!\r?\n)  
