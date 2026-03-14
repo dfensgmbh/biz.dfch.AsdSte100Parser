@@ -62,7 +62,7 @@ class TextUtils:
     @staticmethod
     def find_sentence(token: TokenBase) -> Sentence | None:
         """
-        Find the next sentence of the token.
+        Find the enclosing sentence of the token.
         """
         current = token.parent
 

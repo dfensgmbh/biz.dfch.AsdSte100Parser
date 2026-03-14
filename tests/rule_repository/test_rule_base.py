@@ -70,10 +70,14 @@ class TestRuleBase(unittest.TestCase):
         rules = self.rule_registry.get_rules(token)
         for rule in rules:
             print(
-                f"Processing rule '{rule.rule_id}' [{rule.priority}] [{type(token).__name__}] ...")
+                f"Processing rule '{rule.rule_id}' "
+                f"[{rule.priority}] [{type(token).__name__}] ..."
+            )
             rule_results = rule.examine(token, self.rule_context)
             for test_result in rule_results:
                 print(
-                    f"[{test_result.severity}] {test_result.rule_id}: '{test_result.message}'")
+                    f"[{test_result.severity}] "
+                    f"{test_result.rule_id}: '{test_result.message}'"
+                )
             self.rule_results.extend(rule_results)
         return True
