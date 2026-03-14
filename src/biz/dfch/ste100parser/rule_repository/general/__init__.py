@@ -15,7 +15,7 @@
 
 """General rules repository."""
 
-from .c0_0_displacy_sentence import DisplacySentence
+from .displacy_sentence import DisplacySentence
 
 __all__ = [
     "DisplacySentence",

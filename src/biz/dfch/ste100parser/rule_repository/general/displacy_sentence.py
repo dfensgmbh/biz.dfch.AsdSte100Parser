@@ -34,7 +34,7 @@ from ...serializer.token_base import Sentence
 from ...token_registry import TokenRegistry
 
 
-@rule("C0.0", token_types=[Sentence], priority=RulePriority.HIGHEST)
+@rule("G0.0", token_types=[Sentence], priority=RulePriority.HIGHEST)
 class DisplacySentence(RuleBase):
     """
     Displays a spaCy sentence with displacy.
