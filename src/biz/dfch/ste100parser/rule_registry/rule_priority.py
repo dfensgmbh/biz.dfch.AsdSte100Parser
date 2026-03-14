@@ -20,11 +20,13 @@ from enum import IntEnum
 
 class RulePriority(IntEnum):
     """The execution priority of a `Rule`."""
-    HIGHEST = 1023
-    HIGHER = 768
-    MEDIUM = 512
-    MEDIUM_HIGH = MEDIUM + 128
-    MEDIUM_LOW = MEDIUM - 128
-    LOWER = 256
-    LOWEST = 0
-    DEFAULT = MEDIUM_LOW
+
+    LOWEST = -0x7F
+    LOWER = -0x55
+    MEDIUM_LOW = -0x2B
+    MEDIUM = 0x00
+    MEDIUM_HIGH = 0x2B
+    HIGHER = 0x55
+    HIGHEST = 0x7F
+
+    DEFAULT = MEDIUM
