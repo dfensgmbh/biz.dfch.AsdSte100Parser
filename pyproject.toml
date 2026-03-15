@@ -90,3 +90,7 @@ namespaces = true
 
 [tool.setuptools.package-data]
 "biz.dfch.ste100parser" = ["grammar/*.lark"]
+
+[[tool.mypy.overrides]]
+module = ["parameterized.*"]
+ignore_missing_imports = true

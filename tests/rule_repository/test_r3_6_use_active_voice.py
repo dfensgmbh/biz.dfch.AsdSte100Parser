@@ -17,7 +17,7 @@
 # pylint: disable=C0115
 # pylint: disable=C0116
 
-from parameterized import parameterized  # type: ignore
+from parameterized import parameterized
 
 from biz.dfch.ste100parser import ParserAction, Ste100Doc
 from biz.dfch.ste100parser.rule_repository import RuleId
