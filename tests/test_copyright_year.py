@@ -20,8 +20,9 @@
 
 """Module update copyright."""
 
-from pathlib import Path
+from datetime import datetime
 import os
+from pathlib import Path
 import re
 import subprocess
 import unittest
@@ -31,9 +32,12 @@ import unittest
     os.getenv('GITHUB_ACTIONS') == 'true',
     "This 'test' does change source files. Do only start it locally.")
 class TestCopyright(unittest.TestCase):
-    """Change copyright year to include specified year."""
+    """
+    Change copyright year information of a Python source file to include
+    specified year, if the source file changed in the specified year.
+    """
 
-    CURRENT_YEAR = "2026"  # or str(datetime.now().year)
+    CURRENT_YEAR = str(datetime.now().year)
 
     _pattern = re.compile(
         r"^(# Copyright \(c\) )(.+?)( d-fens GmbH, http://d-fens\.ch)$"
