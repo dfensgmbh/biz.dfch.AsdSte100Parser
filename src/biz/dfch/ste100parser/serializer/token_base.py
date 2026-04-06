@@ -54,6 +54,11 @@ class TokenBase(ABC):
 
     @property
     @abstractmethod
+    def token_info(self) -> list[TokenInfo]:
+        pass
+
+    @property
+    @abstractmethod
     def text(self) -> str:
         pass
 
@@ -70,6 +75,13 @@ class ValueToken(TokenBase):
     value: str
 
     @property
+    def token_info(self) -> list[TokenInfo]:
+        return [TokenInfo(
+            text=self.text,
+            token=self,
+        )]
+
+    @property
     def text(self) -> str:
         return self.value
 
@@ -79,6 +91,10 @@ class ListToken(TokenBase):
     """This is a token with a list of tokens."""
 
     tokens: list[TokenBase]
+
+    @property
+    def token_info(self) -> list[TokenInfo]:
+        raise NotImplementedError(f"token_info: [{type(self).__name__}]")
 
     @property
     def text(self) -> str:
@@ -121,8 +137,108 @@ class Paragraph(ListToken):
 
 
 @dataclass
+class TokenInfo:
+    """This class contains text with its related
+    token, if there is one."""
+    text: str
+    token: TokenBase | None
+
+
+@dataclass
 class Sentence(ListToken):
     """This is a sentence in an ASD-STE100 text."""
+
+    @property
+    def token_info(self) -> list[TokenInfo]:
+        result: list[TokenInfo] = []
+
+        count: int = -1
+        for token in self.tokens:
+            assert isinstance(token, TokenBase)
+            count += 1
+            if isinstance(token, Ws):
+                result.append(TokenInfo(
+                    text=Character.SPACE,
+                    token=token,
+                ))
+                continue
+
+            if isinstance(token, (Text, Punct)):
+                result.append(TokenInfo(
+                    text=token.text,
+                    token=token,
+                ))
+                continue
+
+            if isinstance(token, Parentheses):
+                result.append(TokenInfo(
+                    text=Character.PAREN_OPEN,
+                    token=None,
+                ))
+                result.append(TokenInfo(
+                    text=Character.PAREN_CLOSE,
+                    token=None,
+                ))
+                continue
+
+            if isinstance(token, Quote):
+                if QuoteType.DOUBLE == token.type_:
+                    result.append(TokenInfo(
+                        text=Character.DQUOTE,
+                        token=None,
+                    ))
+                elif QuoteType.SINGLE == token.type_:
+                    result.append(TokenInfo(
+                        text=Character.SQUOTE,
+                        token=None,
+                    ))
+
+                for t in token.tokens:
+                    result.extend(t.token_info)
+
+                if QuoteType.DOUBLE == token.type_:
+                    result.append(TokenInfo(
+                        text=Character.SQUOTE,
+                        token=None,
+                    ))
+                elif QuoteType.SINGLE == token.type_:
+                    result.append(TokenInfo(
+                        text=Character.DQUOTE,
+                        token=None,
+                    ))
+                continue
+
+        return result
+
+    @property
+    def text(self) -> str:
+        sb = StringBuilder()
+        for token in self.tokens:
+            assert isinstance(token, TokenBase)
+            if isinstance(token, Ws):
+                sb.append(Character.SPACE)
+                continue
+            if isinstance(token, (Text, Punct)):
+                sb.append(token.text)
+                continue
+            if isinstance(token, Parentheses):
+                sb.append(Character.PAREN_OPEN)
+                sb.append(Character.PAREN_CLOSE)
+                continue
+            if isinstance(token, Quote):
+                if QuoteType.DOUBLE == token.type_:
+                    sb.append(Character.DQUOTE)
+                elif QuoteType.SINGLE == token.type_:
+                    sb.append(Character.SQUOTE)
+                for t in token.tokens:
+                    sb.append(t.text)
+                if QuoteType.DOUBLE == token.type_:
+                    sb.append(Character.DQUOTE)
+                elif QuoteType.SINGLE == token.type_:
+                    sb.append(Character.SQUOTE)
+                continue
+
+        return sb.to_string()
 
 
 class QuoteType(StrEnum):
@@ -137,6 +253,23 @@ class Quote(ListToken):
     """This is a quote token."""
 
     type_: QuoteType
+
+    @property
+    def token_info(self) -> list[TokenInfo]:
+        result: list[TokenInfo] = []
+        for t in self.tokens:
+            if isinstance(t, Parentheses):
+                result.append(TokenInfo(
+                    text=Character.PAREN_OPEN,
+                    token=None,
+                ))
+                result.append(TokenInfo(
+                    text=Character.PAREN_CLOSE,
+                    token=None,
+                ))
+                continue
+            result.extend(t.token_info)
+        return result
 
 
 class FormatType(StrEnum):
@@ -225,6 +358,7 @@ class Apostrophe(SpecialText):
     def text(self) -> str:
         result = f"{Character.SQUOTE}{self.value}"
         return result
+
 
 @dataclass
 class Word(Text):
