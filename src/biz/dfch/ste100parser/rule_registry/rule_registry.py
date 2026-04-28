@@ -29,16 +29,25 @@ class RuleRegistry:
     """Install rules from a package."""
 
     _rules: dict[type, list[RuleBase]]
+    _rule_ids: set[str]
 
     def __init__(self) -> None:
 
         self._rules = defaultdict(list)
+        self._rule_ids = set()
 
     def install_rules(self, path: str):
-        """Install `Rule` classes from specified `path`."""
+        """
+        Install `RuleBase` classes from specified `path`.
+
+        Make sure, that `path` contains an `__init__.py` file with all rule
+        classes that you want to install.
+        """
 
         assert isinstance(path, str), type(path)
         assert path.strip()
+
+        print(f"Importing modules from path '{path}' ...")
 
         package = importlib.import_module(path)
         for _, name, _ in pkgutil.walk_packages(package.__path__):
@@ -54,6 +63,17 @@ class RuleRegistry:
                 instance = t()
                 if instance.is_disabled:
                     continue
+
+                # Examine if a rule with the same rule_id already exists.
+                if instance.rule_id in self._rule_ids:
+                    fqcn = f"{module.__name__}.{type(instance).__qualname__}"
+                    print(
+                        f"Duplicate rule '{instance.rule_id}' found: "
+                        f"'{fqcn}'."
+                    )
+                    continue
+                self._rule_ids.add(instance.rule_id)
+
                 for type_ in instance.token_types:
                     print(
                         f"[{type_.__name__}] "

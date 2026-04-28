@@ -33,6 +33,29 @@ class Ste100Rules(StrEnum):
     R3_6 = "Use the active voice. In descriptive writing, you can use the passive voice only when the agent is unknown."
 
     # Sentences
+    R4_3 = "Use a vertical list for complex texts."
+    R4_3_SUGGESTION = (
+        "When you make a vertical list: "
+        "Put a colon (:) at the end of the first sentence, before the first item in the vertical list. "
+        "Identify each item in the vertical list with a number, letter, punctuation mark, or symbol. "
+        "Start each item in the vertical list with an uppercase letter. "
+        "Where applicable, use an article before the noun that is the subject of each item in the vertical list. "
+        "Put a period at the end of an item in the vertical list if it is a full sentence. "
+        "Do not put a period at the end of an item in the vertical list if it is not a full sentence. "
+        "Do not put a comma or a semicolon at the end of an item in the vertical list. "
+        "Put a period at the end of the last item in the vertical list."
+    )
+
+    R4_3_SUGGESTION_01_START_COLON = "When you make a vertical list, put a colon (:) at the end of the first sentence, before the first item in the vertical list."
+    R4_3_SUGGESTION_02_IDENTIFY = "When you make a vertical list, identify each item in the vertical list with a number, letter, punctuation mark, or symbol. "
+    R4_3_SUGGESTION_03_UPPERCASE = "When you make a vertical list, start each item in the vertical list with an uppercase letter. "
+    R4_3_SUGGESTION_04_ARTICLE = "When you make a vertical list, where applicable, use an article before the noun that is the subject of each item in the vertical list. "
+    R4_3_SUGGESTION_05_PERIOD = "When you make a vertical list, put a period at the end of an item in the vertical list if it is a full sentence. "
+    R4_3_SUGGESTION_06_NO_PERIOD = "When you make a vertical list, do not put a period at the end of an item in the vertical list if it is not a full sentence. "
+    R4_3_SUGGESTION_07_NO_COMMA_OR_SEMICOLON = "When you make a vertical list, do not put a comma or a semicolon at the end of an item in the vertical list. "
+    R4_3_SUGGESTION_08_END_PERIOD = "When you make a vertical list, put a period at the end of the last item in the vertical list."
+    R4_3_SUGGESTION_09_SAME_MARKER = "When you make a vertical list, use the same marker."
+    R4_3_SUGGESTION_10_SAME_INDENT = "When you make a vertical list, use the same indentation and do not make nested lists."
 
     # Procedural writing
     R5_3 = "Write instructions in the imperative (command) form."

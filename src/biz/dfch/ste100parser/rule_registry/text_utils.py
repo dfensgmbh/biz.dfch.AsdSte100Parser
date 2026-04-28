@@ -30,7 +30,7 @@ class TextUtils:
 
     @staticmethod
     def is_imperative_form(sent: Span) -> bool:
-        """Examines if a sentence is in imperative form."""
+        """Examine if a sentence is in imperative form."""
 
         root = sent.root
         if root.pos_ != "VERB":
@@ -94,3 +94,74 @@ class TextUtils:
             result.append(verb)
 
         return sorted(result, key=lambda t: t.i)
+
+    @staticmethod
+    def is_complete_sentence(sent: Span) -> bool:
+        """
+        Examine if the sentence `sent` is a grammatically correct and full
+        sentence.
+
+        It does not examine if the punctuation of the sentence is correct.
+        """
+
+        assert isinstance(sent, Span), type(sent)
+
+        # First, examine if the sentence is in imperative form.
+        # Then, we identify the sentence as complete.
+        if TextUtils.is_imperative_form(sent):
+            return True
+
+        # Then, we examine if there is a verb.
+
+        root = sent.root
+        if root.pos_.lower() in ("verb", "aux"):
+            return any(
+                e for e
+                in sent
+                if e.head == root
+                and e.dep_.lower() in ("nsubj", "nsubjpass")
+            )
+
+        return False
+
+    @staticmethod
+    def has_noun_article(sent: Span) -> bool:
+        """
+        Examine if the noun of the sentence `sent` has an article.
+        """
+
+        assert isinstance(sent, Span), type(sent)
+
+        # First, find noun.
+
+        root = sent.root
+        print("Sentence root: ", (root, root.pos_, root.dep_))
+
+        if root.pos_.lower() in ("noun"):
+            noun = root
+        elif root.pos_.lower() in ("aux", "verb"):
+            nouns = [
+                e for e
+                in sent
+                if e.head == root
+                and e.pos_.lower() in ("noun")
+                and e.dep_.lower() in ("nsubj", "nsubjpass")
+            ]
+            if 1 != len(nouns):
+                print("No single sentence noun found: ", nouns)
+                return False
+            noun = nouns[0]
+        else:
+            print("No sentence correct root found.")
+            return False
+
+        # Then, find if there is an article for that noun.
+        print("Sentence noun: ", (noun, noun.pos_, noun.dep_))
+        result = any(
+            e for e
+            in sent
+            if noun == e.head
+            and e.pos_.lower() in ("det")
+        )
+
+        return result

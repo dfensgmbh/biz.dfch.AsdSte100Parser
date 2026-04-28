@@ -34,7 +34,7 @@ from ..ste100_rules import Ste100Rules
 from ..rule_id import RuleId
 
 
-@rule(RuleId.R8_1, token_types=[Punct], priority=RulePriority.HIGHER)
+@rule(RuleId.R8_1, token_types=[Punct], priority=RulePriority.LOWER)
 class DoNotUseSemicolon(RuleBase):
     """
     You can use all standard English punctuation marks
