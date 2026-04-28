@@ -313,6 +313,7 @@ class LineBreak(EmptyToken):
             token=self,
         )]
 
+
 @dataclass
 class Text(ValueToken):
     """This is a text token."""
