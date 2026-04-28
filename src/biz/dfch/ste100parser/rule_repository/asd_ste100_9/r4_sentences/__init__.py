@@ -15,5 +15,8 @@
 
 """STE100 rule repository."""
 
+from .use_vertical_list_for_complex_tasks import UseVerticalListsForComplexTasks
+
 __all__ = [
+    "UseVerticalListsForComplexTasks",
 ]
