@@ -306,6 +306,12 @@ class LineBreak(EmptyToken):
     def text(self) -> str:
         return Character.SPACE
 
+    @property
+    def token_info(self) -> list[TokenInfo]:
+        return [TokenInfo(
+            text=Character.LF,
+            token=self,
+        )]
 
 @dataclass
 class Text(ValueToken):
